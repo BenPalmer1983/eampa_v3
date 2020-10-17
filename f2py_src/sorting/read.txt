@@ -1,0 +1,14 @@
+F2PY Sorting Module
+################################################
+
+Sort subroutines.
+
+It can be compiled and used by Python using f2py.
+
+The subroutines should be easy enough to reuse in a Fortran only program.
+
+Sort use bubble < 100 length array, and merge for 100 and bigger.
+
+I probably saw the merge subsoutine somewhere else, but I can't remember where.
+
+
