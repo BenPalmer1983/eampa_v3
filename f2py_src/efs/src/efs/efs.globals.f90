@@ -16,6 +16,8 @@ INTEGER(kind=StandardInteger) ::                        key(1:max_configs, 1:32)
 
 !# CONFIGS + NL
 INTEGER(kind=StandardInteger) ::                        cc = 0
+INTEGER(kind=StandardInteger) ::                        total_atoms = 0
+INTEGER(kind=StandardInteger) ::                        l_nl_size = 0
 REAL(kind=DoubleReal), ALLOCATABLE ::                   rcut(:) 
 REAL(kind=DoubleReal), ALLOCATABLE ::                   alat(:)  
 REAL(kind=DoubleReal), ALLOCATABLE ::                   volume(:) 

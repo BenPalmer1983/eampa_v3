@@ -263,6 +263,8 @@ IF(bp_id .EQ. 0)THEN
     bp_data_i(cc, 3) = cc_end               ! bp end
     bp_data_i(cc, 4) = m                    ! atom count
     !print *, key(cc, 1), key(cc, 2), key(cc, 3), key(cc, 4), key(cc, 5), key(cc, 6)
+    
+    total_atoms = total_atoms + m
   END DO
 
   bp_cn(bp_id, rn, 2) = cc_counter - 1
@@ -371,12 +373,12 @@ IF(bp_id .EQ. 0)THEN
       bp_data_i(cc, 4) = m                    ! atom count
       !print *, key(cc, 1), key(cc, 2), key(cc, 3), key(cc, 4), key(cc, 5), key(cc, 6)
       
+      
+      total_atoms = total_atoms + m      
     END DO
-    bp_cn(bp_id, rn, 2) = cc_counter - 1
-    
+    bp_cn(bp_id, rn, 2) = cc_counter - 1    
     
   END DO  
-  
   
 END IF
 

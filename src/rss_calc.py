@@ -83,6 +83,8 @@ class rss_calc:
     
   # ASSUMES EFS AND BP ALREADY SET UP
   def run_calc(): 
+    # START TIME
+    s = time.time()  
   
     # EFS CONFIG COUNT
     try:
@@ -138,9 +140,6 @@ class rss_calc:
     g.rss['current'] = rss
     g.rss['log'].append(rss)
     
-
-    
-    
     # KEEP LOG OF BEST RSS
     if(g.rss['since_improvement'] == None):
       g.rss['since_improvement'] = 0
@@ -152,7 +151,20 @@ class rss_calc:
       g.efs_results_best = copy.deepcopy(g.efs_results)
       g.bp_results_best = copy.deepcopy(g.bp_results)
       
-    #
+    # END TIME
+    e = time.time()  
+    
+    dt = e - s
+    
+    
+    #efs_cc bp_cc
+    g.benchmark['total_atoms'] = g.benchmark['total_atoms'] + (bp.total_atoms + efs.total_atoms)
+    g.benchmark['total_interactions'] = g.benchmark['total_interactions'] + (bp.l_nl_size + efs.l_nl_size)
+    g.benchmark['configs'] =  g.benchmark['configs'] + efs_cc + bp_cc
+    g.benchmark['total_time'] = g.benchmark['total_time'] + dt
+    g.benchmark['atomspersec'] =  g.benchmark['total_atoms'] / g.benchmark['total_time'] 
+    g.benchmark['interationspersec'] =  g.benchmark['total_interactions'] / g.benchmark['total_time'] 
+    g.benchmark['configspersec'] =  g.benchmark['configs'] / g.benchmark['total_time'] 
     
     # RETURN
     return rss

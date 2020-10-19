@@ -41,6 +41,9 @@ DO cn = 1, cc
     END DO
   END DO  
   key(cn, 6) = nc - 1
+  IF(key(cn, 6) .GT. l_nl_size)THEN
+    l_nl_size = key(cn, 6)
+  END IF
 END DO
 
 CALL end_t(nl_timer)

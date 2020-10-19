@@ -3,8 +3,8 @@
 # Change to $PBS_O_WORKDIR
 cd "$PBS_O_WORKDIR"
 # Set the number of threads to 1
-export OMP_NUM_THREADS=4
-export PROC_COUNT=4
+export OMP_NUM_THREADS=5
+export PROC_COUNT=1
 export PWSCF_SCRATCH=/opt/scratch
 export PWSCF_PP=/opt/pp
 export PWSCF_CACHE=/opt/pwscf_cache

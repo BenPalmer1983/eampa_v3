@@ -16,13 +16,19 @@ class pf_data:
     top = {'filled': False, 'counter': 0, 'size': top_size, 'rss': numpy.zeros((top_size,),), 'p': numpy.zeros((top_size, width,),),}
     top['rss'][:] = -1.0
 
-    rss = { 'start': None,
-            'current': None,
-            'best': None,
-            'counter': 0,
-            'counter_successful': 0,
-            'since_improvement': 0,
-    }
+
+    
+    try:
+      bp_atom_count = bp.total_atoms
+    except:  
+      bp_atom_count = 0
+      
+    try:
+      efs_atom_count = efs.total_atoms
+    except:  
+      efs_atom_count = 0      
+      
+    
     d = {
         'stage': 'Not Set', 
         'params': {'count': width, 
@@ -38,8 +44,14 @@ class pf_data:
                    'current': numpy.zeros((width,),),
                    'pop_merged': numpy.zeros((2 * pop_size + 3 * fresh_size, width,),),
                    'pop_merged_rss': numpy.zeros((2 * pop_size + 3 * fresh_size,),),
-                  },
-        'rss': rss,
+        },
+        'rss': {'start': None,
+                'current': None,
+                'best': None,
+                'counter': 0,
+                'counter_successful': 0,
+                'since_improvement': 0,
+        },
         'cycle': {'counter': 0, 'total_cycles': g.fit['cycles'], 'spline_counter': 0,},
         'generation': {'counter': 0, 'total_generations': g.fit['gens'], 'spline_counter': 0,},
         'top': top,

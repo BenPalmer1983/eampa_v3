@@ -101,7 +101,9 @@ class pf:
      
     
   def get_rss():  
-    rss = rss_calc.run_calc()    
+    rss = rss_calc.run_calc()  
+    
+    
     g.pfdata['rss']['current'] = rss
     g.pfdata['rss']['counter'] += 1
     
@@ -197,12 +199,13 @@ class pf:
     
     
   def save():  
-    g.pfdata['stage'] = 'Finished'
-    display.finish()
    
     # Load best
-    print(g.pfdata['params']['best'][:])
     pf_potential.update(g.pfdata['params']['best'][:])
+    
+    # Display
+    g.pfdata['stage'] = 'Finished'
+    display.finish()
     
     # Output
     potential_output.full()

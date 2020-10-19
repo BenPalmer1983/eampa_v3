@@ -35,6 +35,7 @@ INTEGER(kind=StandardInteger) ::                        ec_points = 0         ! 
 INTEGER(kind=StandardInteger) ::                        cc = 0
 INTEGER(kind=StandardInteger) ::                        key(1:max_configs, 1:32)
 INTEGER(kind=StandardInteger) ::                        cc_log(1:max_configs, 1:32)
+INTEGER(kind=StandardInteger) ::                        total_atoms = 0
 
 
 REAL(kind=DoubleReal), ALLOCATABLE ::                   rcut(:) 

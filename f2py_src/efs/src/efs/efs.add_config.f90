@@ -52,6 +52,7 @@ IF(SIZE(labels_in,1) .EQ. SIZE(coords_in,1))THEN
   END IF
   key(cc, 1) = ka
   key(cc, 2) = kb
+  total_atoms = total_atoms + SIZE(labels_in, 1) 
   
   ! STORE
   energies(cc) = energy_in                ! Total Energy

@@ -73,6 +73,8 @@ class g:
   bp_results = {'ok': False,}
   bp_results_best = {'ok': False,}
   
+  benchmark = {'configs': 0, 'total_atoms': 0, 'total_interactions': 0, 'total_time': 0.0, 'configspersec': 0.0, 'atomspersec': 0.0, 'interationspersec': 0.0,}
+  
 
   #RSS
   rss = {'current': None, 'best': None, 'counter': None, 'since_improvement': None, 'log': [], 'efs': {'ok': False, 'cc': 0,}, 'bp': {'ok': False, 'cc': 0,}}
