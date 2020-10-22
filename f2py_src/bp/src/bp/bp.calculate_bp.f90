@@ -212,8 +212,6 @@ calc_debye(bp_id) = ((h / k) * &
                     * calc_vm(bp_id))
 
 
-
-
 IF(known_set(bp_id, 1))THEN
   rss(bp_id, 1) = (known_alat(bp_id) - calc_alat(bp_id))**2
 END IF

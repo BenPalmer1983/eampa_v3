@@ -1,0 +1,124 @@
+POTNAME pd_pot
+
+/* comment block */
+""" comment block """
+
+
+!###########################
+!# PALLADIUM
+!###########################
+
+
+! Pair PD PD
+START
+FILE              pd_pair.pot
+FIT               pd_pair.fit
+LABEL             PD   PD
+F_ON true
+F_TYPE            PAIR            ! PAIR DENS EMBE
+F_GROUP
+R_CUT              6.5
+ZOOR     true  ! zero out of range
+END
+
+
+! Pd Density
+START
+FILE              pd_dens.pot
+FIT               pd_dens.fit
+LABEL             PD
+F_ON true
+F_TYPE            DENS            ! PAIR DENS EMBE
+F_GROUP           1
+R_CUT             6.5
+END
+
+
+! AL Embedding
+START
+FILE              pd_embe.pot
+FIT               pd_embe.fit
+LABEL             PD
+F_ON true
+F_TYPE            EMBE            ! PAIR DENS EMBE
+F_GROUP           1
+R_CUT              6.5
+ZOOR     true  ! zero out of range
+END
+
+
+
+
+
+!###########################
+!# PALLADIUM
+!###########################
+
+
+
+
+
+
+!###########################
+!# IRON
+!###########################
+
+! Pair FE FE
+START
+FILE              fe_pair.pot
+FIT               fe_pair.fit
+LABEL             FE   FE
+F_ON true
+F_TYPE            PAIR            ! PAIR DENS EMBE
+F_GROUP
+R_CUT              6.5
+ZOOR     true  ! zero out of range
+END
+
+
+! FE Density
+START
+FILE              fe_dens.pot
+FIT               fe_dens.fit
+LABEL             FE
+F_ON true
+F_TYPE            DENS            ! PAIR DENS EMBE
+F_GROUP           1
+R_CUT             6.5
+END
+
+
+! FE Embedding
+START
+FILE              fe_embe.pot
+FIT               fe_embe.fit
+LABEL             FE
+F_ON true
+F_TYPE            EMBE            ! PAIR DENS EMBE
+F_GROUP           1
+R_CUT              6.5
+ZOOR     true  ! zero out of range
+END
+
+
+
+
+
+
+
+
+ZBLSTART
+PD PD on 46 46 0.8 2.0 exp3
+FE FE on 26 26 1.5 2.5 exp3
+ZBLEND
+
+
+
+// Another comment line
+
+
+#ZBL_R             0.5             ! Radius for ZBL
+#ZBL_S             2.5             ! Spline radius for ZBL
+#ZBL_T             1               ! 1.  exp(P(ax3+bx2+cx1+d))
+#TAB_FILE          alpair.pot
+#FIT MORSE

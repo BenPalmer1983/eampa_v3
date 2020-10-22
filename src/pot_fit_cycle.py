@@ -20,11 +20,16 @@ class pf_cycle:
     r = numpy.random.rand(p_count)
     
     # New parameters
-    p_new = c + (r - 0.5) * m_range
+    e = 0
+    if(g.pfdata['generation']['counter']>0):
+      e = g.pfdata['generation']['counter'] - 1
+    
+    p_new = c + (r - 0.5) * m_range * (g.fit['gen_var_factor'])**(e)
     
     # Return
     return p_new
-
+    
+    
   
   def run():  
   

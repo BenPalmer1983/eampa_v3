@@ -45,7 +45,6 @@ class potential_functions:
   # f(x) = A * (exp(-2.0D0 * B * (r - C)) - 2.0D0 * exp(-B*(r - C)))
   @staticmethod
   def morse(r, p, pf):
-    print(pf)
     return fnc.morse_v(r, p, pf)
     #return 
 

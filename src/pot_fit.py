@@ -100,7 +100,7 @@ class pf:
      
      
     
-  def get_rss():  
+  def get_rss(top=True):  
     rss = rss_calc.run_calc()  
     
     
@@ -122,13 +122,10 @@ class pf:
         g.pfdata['rss']['best'] = rss
         g.pfdata['bp_best'] = copy.deepcopy(g.bp_results)        
         g.pfdata['rss']['since_improvement'] = 0
-
         
-      # Fill in top ten  
-      pf.top(g.pfdata['params']['current'], rss)
-
-      #pf.print_top_ten()  
-      #g.pfdata['bp'][h] = copy.deepcopy(g.bp_results)
+      # Fill in top 
+      if(top):
+        pf.top(g.pfdata['params']['current'], rss)
 
     # DISPLAY
     display.output()    

@@ -1,0 +1,6 @@
+#A
+#TYPE triple_embedding
+#P 1.0 1.0 0.38256091762
+#PF 0.0
+#L 0.0
+#U 1.0

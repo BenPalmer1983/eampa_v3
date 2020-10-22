@@ -1,0 +1,20 @@
+/* A sample input file */
+#L_UNITS ang
+#E_UNITS eV
+#S_UNITS GPA
+#F_UNITS EV/ANG
+#ALAT 	3.43 // alat comment
+#X 1.0 0.0 0.0
+#Y 0.0 1.0 0.0
+#Z 0.0 0.0 1.0
+#C 4 4 4
+#sx 0.00 0.0 0.0
+#sy 0.0 0.00 0.0
+#sz 0.0 0.0 0.00
+#RCUT 6.5
+#EPA -4.27
+#M FE  26.98
+FE 0.0     0.0     0.0
+FE 0.0     0.5     0.5    
+FE 0.5     0.0     0.5   
+FE 0.5     0.5     0.0    

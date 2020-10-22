@@ -86,6 +86,7 @@ class read_input:
     'fresh_we': 1.5,
     'enhance_every': 10,
     'enhance_top': 5,
+    'gen_var_factor': 1.0,
     }
 
     # TRY READING

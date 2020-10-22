@@ -1,8 +1,9 @@
-!# See Olsson, Wallenius 2005
+!# Olsson/Walenius
+!# Ackland Mendelev 2004
 
 SUBROUTINE ackland_embedding(r, p, p_fixed, y)
 !############################################################
-! f(x) = A * sqrt(r) + B * r + C * r**2
+! f(x) = A * sqrt(r) + B * r**2 + C * r**4
 IMPLICIT NONE
 !############################################################
 REAL(kind=DoubleReal), INTENT(IN) :: r
@@ -17,7 +18,7 @@ END SUBROUTINE ackland_embedding
 
 SUBROUTINE ackland_embedding_v(r, p, p_fixed, y)
 !############################################################
-! f(x) = A * sqrt(r) + B * r + C * r**2
+! f(x) = A * sqrt(r) + B * r**2 + C * r**4
 IMPLICIT NONE
 !############################################################
 REAL(kind=DoubleReal), INTENT(IN) :: r(:)
