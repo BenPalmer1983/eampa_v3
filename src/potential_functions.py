@@ -5,7 +5,6 @@
 
 import numpy
 import os
-from f2py_lib.f_fnc import fnc
 
 
 ################################################

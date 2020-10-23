@@ -30,6 +30,10 @@ class display:
     
     
   def output_1():
+  
+    # Best BP
+    bp_best = g.pfdata['bp_best']
+    
     if(display.display_header_set == False or display.last_stage == None or display.last_stage != g.pfdata['stage']):
       display.last_stage = g.pfdata['stage']
       display.display_header_set = True 
@@ -50,6 +54,7 @@ class display:
     print("# Configs/second:   " + display.pad_r(g.benchmark['configspersec'], 16), end=" ")
     print("# Atoms/second:     " + display.pad_r(g.benchmark['atomspersec'], 16), end=" ")
     print()
+    print("# Timer:            " + display.pad_l(time.time() - g.times['start'], 16))
     print("# RSS: ", display.pad_r(g.pfdata['rss']['current'], 20), end="          ")
     print("Best: ", display.pad_r(g.pfdata['rss']['best'], 20), end=" ")
     print()
@@ -191,6 +196,7 @@ class display:
     # HEADER
     # PRINT HEADER
     display.print_line()
+    print("# Timer:            " + display.pad_l(time.time() - g.times['start'], 16))
     print("# Cycles:           " + str(g.pfdata['cycle']['total_cycles']))
     print("# Generations:      " + str(g.pfdata['generation']['total_generations']))
     print("# Pop Size:         " + str(g.fit['pop_size']))

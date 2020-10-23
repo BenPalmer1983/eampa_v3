@@ -8,7 +8,6 @@ import os
 from labels import labels
 from pwscf_output import pwscf_output
 from potential_functions import potential_functions
-from f2py_lib.f_interp import interp
 
 class configs:
 

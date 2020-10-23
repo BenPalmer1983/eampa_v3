@@ -4,8 +4,6 @@
 ######################################################
 
 import numpy
-from f2py_lib.f_efs import efs
-from f2py_lib.f_bp import bp
 import matplotlib.pyplot as plt
 import time
 

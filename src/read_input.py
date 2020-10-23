@@ -75,7 +75,10 @@ class read_input:
     'exct_every': 5,
     'exct_var': 0.1,
     'exct_top_bias': 0.5,
-    'rescale_density': True,
+    'rescale_density': 0,
+    'rescale_min': 0.3,
+    'rescale_max': 0.9,
+    'rescale_default': 0.6,
     'wide_start': 0.5,
     'wide_end': 10.0,
     'mutate_chance': 0.01,
@@ -87,6 +90,10 @@ class read_input:
     'enhance_every': 10,
     'enhance_top': 5,
     'gen_var_factor': 1.0,
+    'pool_size': 1000,
+    'sane_seeds_a': 50,
+    'sane_seeds_b': 200,
+    'sane_fraction': 0.5,
     }
 
     # TRY READING

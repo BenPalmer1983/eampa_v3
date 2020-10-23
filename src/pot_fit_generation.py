@@ -163,9 +163,25 @@ class pf_generation:
     return params   
     
     
+  def make_fresh():    
+    w = g.fit['fresh_ws']
+    w_inc = (g.fit['fresh_we'] - g.fit['fresh_ws']) / (g.fit['fresh_size'] // 2 - 1)
+    for p in range(g.fit['fresh_size']):
+      loop = True
+      while(loop):
+        try:
+          g.pfdata['params']['fresh'][p, :] = pf_parameters.get_p()
+          pf_potential.update(g.pfdata['params']['fresh'][p, :])
+          rss = pf.get_rss()
+          if(g.pfdata['rss']['current'] is not None):
+            loop = False
+            g.pfdata['params']['fresh_rss'][p] = rss
+        except:
+          pass 
+      
+      
     
-  def make_fresh():
-    
+  def make_fresh_old():    
     w = g.fit['fresh_ws']
     w_inc = (g.fit['fresh_we'] - g.fit['fresh_ws']) / (g.fit['fresh_size'] // 2 - 1)
     for p in range(g.fit['fresh_size']):

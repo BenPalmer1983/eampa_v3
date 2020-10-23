@@ -10,4 +10,3 @@ src/potential/potential.f90 \
 src/efs/efs.f90 \
 -m f_efs
 
-cp *.so ../../f2py_lib/

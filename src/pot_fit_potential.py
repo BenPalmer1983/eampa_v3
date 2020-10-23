@@ -3,7 +3,7 @@
 
 class pf_potential:
 
-  def update(p):    
+  def update(p, no_rescale=False):    
     # Store
     g.pfdata['params']['current'][:] = p[:]
   
@@ -28,10 +28,24 @@ class pf_potential:
         potential.make_analytic_points_inner(fn)
         a = b    
       
-    # Rescale density functions 0.0 to 1.0  
-    if(g.fit['rescale_density']):
+    # Rescale density functions 
+    if(g.fit['rescale_density'] == 2 and no_rescale == False):
       rescale_density.run()    
     
     # Update efs and bp modules
     potential.efs_add_potentials()     # Load potentials
     potential.bp_add_potentials()      # Load potentials
+
+
+
+  def take_density(p, p_dens): 
+    a = 0
+    for fn in range(len(g.pot_functions['functions'])): 
+      b = a + g.pot_functions['functions'][fn]['fit_size'] 
+      if(g.pot_functions['functions'][fn]['fit_type'] == 1):     # NODE SPLINE 
+        pass
+      elif(g.pot_functions['functions'][fn]['fit_type'] == 2):   # ANALYTIC          
+        if(g.pot_functions['functions'][fn]['f_type_id'] == 2):
+          p[a:b] = copy.deepcopy(p_dens[a:b])
+      a = b
+    return p

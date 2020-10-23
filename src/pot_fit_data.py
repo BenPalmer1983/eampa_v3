@@ -17,6 +17,8 @@ class pf_data:
     top['rss'][:] = -1.0
 
 
+
+
     
     try:
       bp_atom_count = bp.total_atoms
@@ -31,6 +33,10 @@ class pf_data:
     
     d = {
         'stage': 'Not Set', 
+        'pool': {'params': None,
+                 'pn': 0,
+                 'pmax': 10000,
+        },
         'params': {'count': width, 
                    'start': numpy.zeros((width,),),
                    'var': numpy.zeros((2,width,),),

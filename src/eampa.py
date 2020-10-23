@@ -25,6 +25,20 @@ from pot_fit import pf
 from trial import trial
 from relax_calc import relax_calc
 
+
+
+from eampa_lib.f_es import es
+from eampa_lib.f_efs import efs
+from eampa_lib.f_bp import bp
+from eampa_lib.f_sorting import sort
+from eampa_lib.f_interp import interp
+from eampa_lib.f_spline import spline
+from eampa_lib.f_fnc import fnc
+from eampa_lib.f_bp import polyfit
+from eampa_lib.f_relax import relax
+
+
+
 class eampa:
  
   def run():

@@ -12,5 +12,4 @@ src/potential/potential.f90 \
 src/es/es.f90 \
 -m f_es
 
-cp *.so ../../f2py_lib/
 

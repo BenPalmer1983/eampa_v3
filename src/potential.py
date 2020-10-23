@@ -10,10 +10,6 @@ import os
 from potential_functions import potential_functions
 from potential_output import potential_output
 from rescale_density import rescale_density
-from f2py_lib.f_interp import interp
-from f2py_lib.f_efs import efs
-from f2py_lib.f_bp import bp
-from f2py_lib.f_spline import spline
 
 
 class potential:

@@ -3,7 +3,6 @@
 #  Max density should be estimated
 #  The embedding energy will run from 0.0 to 1.0
 
-from f2py_lib.f_interp import interp
 import numpy
 
 # Estimate density function needs to be expanded to include BCC and a variety of lattice parameters
@@ -11,15 +10,14 @@ import numpy
 class rescale_density:
   
   def run():
-    
-    
     for fn in range(len(g.pot_functions['functions'])): 
       if(g.pot_functions['functions'][fn]['f_type_id'] == 2):
         min_rho = min(g.pot_functions['functions'][fn]['points'][:,1])
         g.pot_functions['functions'][fn]['points'][:,1] = g.pot_functions['functions'][fn]['points'][:,1] - min_rho 
-        rho = rescale_density.estimate_density(fn)        
-        g.pot_functions['functions'][fn]['points'][:,1:3] = (0.5 / rho) * g.pot_functions['functions'][fn]['points'][:,1:3]
-        rho = rescale_density.estimate_density(fn)
+        rho = rescale_density.estimate_density(fn) 
+        if(rho < g.fit['rescale_min'] or rho > g.fit['rescale_max']):
+          g.pot_functions['functions'][fn]['points'][:,1:3] = (g.fit['rescale_default'] / rho) * g.pot_functions['functions'][fn]['points'][:,1:3]
+          rho = rescale_density.estimate_density(fn)
 
 
   def estimate_density(fn):

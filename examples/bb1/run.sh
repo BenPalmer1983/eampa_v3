@@ -1,4 +1,5 @@
 #!/bin/bash
+export PYTHONPATH=$PYTHONPATH:"/cloud/Code/python/eampa/f2py_lib"
 
 # Change to $PBS_O_WORKDIR
 cd "$PBS_O_WORKDIR"

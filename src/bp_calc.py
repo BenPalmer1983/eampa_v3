@@ -4,9 +4,6 @@
 ######################################################
 
 import numpy
-from f2py_lib.f_efs import efs
-from f2py_lib.f_bp import bp
-from f2py_lib.f_bp import polyfit
 
 """
 1. init()

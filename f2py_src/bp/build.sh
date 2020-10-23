@@ -12,5 +12,3 @@ src/potential/potential.f90 \
 src/bp/bp.f90 \
 -m f_bp
 
-cp *.so ../../f2py_lib/
-

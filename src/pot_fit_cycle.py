@@ -2,6 +2,93 @@
 class pf_cycle:
 
 
+
+    
+  
+  def run():  
+  
+    # Increment Cycle Counter
+    g.pfdata['cycle']['counter'] += 1
+    
+    # Load from globals
+    pop_size = g.fit['pop_size']
+    fresh_size = g.fit['fresh_size']
+    w_start =g.fit['wide_start']
+    w_end =g.fit['wide_end']
+    
+    #############################
+    # Initialise first half
+    # Search within ranges
+    #############################
+    
+    g.pfdata['stage'] = 'Initialising Population'
+    
+    parameters = copy.deepcopy(g.pfdata['params']['start'][:])
+    n = 0
+    for p in range(pop_size):
+      loop = True
+      while(loop): 
+        n = n + 1
+        if(n == 1):
+          g.pfdata['params']['pop'][p, :] = g.pfdata['params']['start'][:]
+        else:
+          g.pfdata['params']['pop'][p, :] = pf_parameters.get_p()
+        
+        # Try - if it fails or rss == None, try next
+        try:
+          # Update
+          pf_potential.update(g.pfdata['params']['pop'][p, :])
+          rss = pf.get_rss()
+          if(g.pfdata['rss']['current'] is not None):
+            loop = False
+            g.pfdata['params']['pop_rss'][p] = rss
+        except:
+          pass
+      
+ 
+            
+    ###################################
+    # LOOP THROUGH GENERATIONS
+    ###################################
+  
+    for gen in range(g.fit['gens']):
+      g.pfdata['generation']['counter'] += 1
+      g.pfdata['stage'] = 'Loop Through Generations - Gen ' + str(g.pfdata['generation']['counter']) 
+      
+      # Run through a generation
+      pf_generation.run()
+      
+      
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   def random_p(c=0.0, m=1.0):
     # 
     p_count = g.pfdata['params']['count']
@@ -30,8 +117,7 @@ class pf_cycle:
     return p_new
     
     
-  
-  def run():  
+  def run_old():  
   
     # Increment Cycle Counter
     g.pfdata['cycle']['counter'] += 1

@@ -4,7 +4,6 @@
 ######################################################
 
 import numpy
-from f2py_lib.f_relax import relax
 
 
 

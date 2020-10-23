@@ -11,5 +11,3 @@ src/spline/spline.f90 \
 src/relax/relax.f90 \
 -m f_relax
 
-cp *.so ../../f2py_lib/
-

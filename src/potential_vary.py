@@ -7,10 +7,6 @@ import numpy
 import os
 from potential_functions import potential_functions
 from potential import potential
-from f2py_lib.f_interp import interp
-from f2py_lib.f_efs import efs
-from f2py_lib.f_bp import bp
-
 """
     'f_on': 1,  
     'a_text': '',

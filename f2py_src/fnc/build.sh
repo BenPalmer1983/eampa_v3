@@ -7,5 +7,4 @@ src/sls/sls.f90 \
 src/fnc/fnc.f90 \
 -m f_fnc
 
-cp *.so ../../f2py_lib/
 

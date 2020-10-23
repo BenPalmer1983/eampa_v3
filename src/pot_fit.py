@@ -4,9 +4,6 @@
 ######################################################
 
 import numpy
-from f2py_lib.f_efs import efs
-from f2py_lib.f_bp import bp
-from f2py_lib.f_sorting import sort
 from potential import potential
 from display import display
 from gd import gd
@@ -17,6 +14,7 @@ from pot_fit_potential import pf_potential
 from pot_fit_generation import pf_generation
 from pot_fit_extinction import pf_extinction
 from pot_fit_enhance import pf_enhance
+from pot_fit_parameters import pf_parameters
 import matplotlib.pyplot as plt
 import time
 import random
@@ -36,7 +34,9 @@ class pf:
     # Print start screen
     pf.startup()
     
-    
+    # Make Pool
+    pf_parameters.make_pool()
+   
     # Run
     pf.run_fit()
     
@@ -66,7 +66,7 @@ class pf:
     bp_calc.get_known()
     
     # Rescale density function
-    if(g.fit['rescale_density']):
+    if(g.fit['rescale_density'] == 2):
       rescale_density.run()      
     
     

@@ -10,7 +10,7 @@ for d in */ ; do
   cd $d
   if test -f "build.sh"; then
     ./build.sh
-    cp *.so ../../f2py_lib/
+    cp *.so ../../f2py_lib/eampa/
   fi
   cd $top
 done

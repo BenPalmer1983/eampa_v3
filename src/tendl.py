@@ -3,7 +3,6 @@ import json
 import zlib
 import os
 import matplotlib.pyplot as plt
-from f2py.f_interp import interp
 
 class tendl:
 
