@@ -42,7 +42,9 @@ class potential:
     potential.load_tabulated()
     potential.make_tabulated_points()
     potential.load_analytic()
-    potential.make_analytic_points()
+    potential.make_analytic_points()    
+    potential.load_spline()
+    potential.make_spline_points()
     potential.load_fit_data()
     potential.pf_output()
     potential.make_copies()
@@ -70,17 +72,20 @@ class potential:
     'file': None,
     'function_type': 0,       # 1 tab, 2 analytic
     'f_points': None,         # READ IN TO PYTHON
-    'a_type': '',
     'f': None,
     'a_params': None,
     'a_params_fixed': None,
     'a_l': 0.0,
     'a_u': 10.0,
+    'a_type': '',
+    's_type': '',
+    's_nodes': None,
     'zoor': 1,
-    'points': numpy.zeros((g.tab_size,g.tab_width,),),         # THESE ARE USED BY FORTRAN
-    'points_original': numpy.zeros((g.tab_size,g.tab_width,),),         # THESE ARE USED BY FORTRAN
+    'points': numpy.zeros((g.tab_size,g.tab_width,),),           # THESE ARE USED BY FORTRAN
+    'points_original': numpy.zeros((g.tab_size,g.tab_width,),), 
     'fit_file': None,
     'fit_type': None,         # 1 spline, 2 analytic
+    'fit_spline_type': None,  # 1 poly3, 2 poly5
     'fit_parameters': None,
     'fit_size': None,
     'fit_mult': None,
@@ -195,7 +200,11 @@ class potential:
             }
         g.pot_functions['zbl'].append(z)
        
-
+       
+       
+  ###################
+  # TABULATED
+  ###################
         
   @staticmethod
   def load_tabulated():      
@@ -217,10 +226,83 @@ class potential:
   @staticmethod
   def vary_tabulated_points(fn, yvar=None):  
     if(type(yvar) != numpy.ndarray):
-      yvar = numpy.zeros((10,),)
+      yvar = numpy.zeros((10,),)      
     g.pot_functions['functions'][fn]['points'] = spline.vary(g.pot_functions['functions'][fn]['points'][:,0], 
                                                              g.pot_functions['functions'][fn]['points'][:,1], yvar)
+                                                             
+  ###################
+  # SPLINE
+  ###################        
+  
+  @staticmethod
+  def load_spline():
+    for i in range(len(g.pot_functions['functions'])): 
+      pf_file = g.pot_functions['pot_dir'] + '/' + g.pot_functions['functions'][i]['file']   
+      if(pf_file is None):
+        print("Error fn " + str(i) + " no file set")
+      elif(not os.path.isfile(pf_file)):
+        print("Error fn " + str(i) + " file does not exist (" + pf_file + ")")
+      elif(pf_file is not None and os.path.isfile(pf_file) and potential.pf_file_type(pf_file) == 'S'):
+        g.pot_functions['functions'][i]['function_type'] = 3
 
+        fd = std.config_file_to_list(pf_file)  
+        #print(fd)
+        spline_x = [] 
+        spline_y = []
+        for l in fd:
+          if(l[0].upper() == '#TYPE'):
+            g.pot_functions['functions'][i]['s_type'] = l[1].lower()
+          elif(l[0].upper().strip() == '#X'):
+            for ln in range(1, len(l)):
+              p = l[ln].strip()
+              if(p != ""):
+                try:
+                  p = float(p)
+                  spline_x.append(p)
+                except:
+                  pass
+          elif(l[0].upper().strip() == '#Y'):
+            for ln in range(1, len(l)):
+              p = l[ln].strip()
+              if(p != ""):
+                try:
+                  p = float(p)
+                  spline_y.append(p)
+                except:
+                  pass
+         # Always give a 1 length for param_f even if they aren't used
+        g.pot_functions['functions'][i]['s_nodes'] = numpy.zeros((len(spline_x),2,),)
+
+        for p in range(len(spline_x)):
+          g.pot_functions['functions'][i]['s_nodes'][p,0] = float(spline_x[p])
+          g.pot_functions['functions'][i]['s_nodes'][p,1] = float(spline_y[p])
+  
+  
+  
+  
+  
+  @staticmethod
+  def make_spline_points():  
+    for i in range(len(g.pot_functions['functions'])):    
+      if(g.pot_functions['functions'][i]['function_type'] == 3):
+        potential.make_spline_points_inner(i)
+        
+  def make_spline_points_inner(fn):  
+    st = 1   # poly3
+    if(g.pot_functions['functions'][fn]['s_type'] == 'poly5'):
+      st = 2
+    
+    splined = spline.spline_nodes(st, g.pot_functions['functions'][fn]['s_nodes'][:,:], 100)
+    g.pot_functions['functions'][fn]['points'] = interp.fill(splined[:,0], splined[:,1], g.tab_size, g.tab_width)
+
+    # Now treat as tabulated
+    g.pot_functions['functions'][fn]['function_type'] = 1
+        
+       
+       
+  ###################
+  # ANALYTIC
+  ###################        
   
   @staticmethod
   def load_analytic():  
@@ -305,6 +387,7 @@ class potential:
         params = None
         fit_file = g.pot_functions['pot_dir'] + '/' + g.pot_functions['functions'][fn]['fit_file']
         if(os.path.isfile(fit_file)):
+          # Read File
           fh = open(fit_file, 'r')
           for line in fh:
             line = std.one_space(line.strip().upper())
@@ -317,44 +400,54 @@ class potential:
             if(line[0:3] == "#PL"):
               params_lower = f[1:]                     
             if(line[0:3] == "#PU"):
-              params_upper = f[1:]     
-            if(line[0:2] == "#M"):
-              g.pot_functions['functions'][fn]['fit_mult'] = numpy.zeros((2,),)
-              """
-              try:
-                g.pot_functions['functions'][fn]['fit_mult'][0] = float(f[1])
-                g.pot_functions['functions'][fn]['fit_mult'][1] = float(f[2])
-              except:  
-                g.pot_functions['functions'][fn]['fit_mult'][0] = 0.1
-                g.pot_functions['functions'][fn]['fit_mult'][1] = 10.0
-              """
-                
+              params_upper = f[1:]                      
+            if(line[0:2] == "#N"):
+              spline_nodes = f[1:]                      
+            if(line[0:3] == "#ST"):
+              spline_type = 1
+              if(f[1].upper().strip() == "POLY5"):
+                spline_type = 2
+              
           fh.close()
-        if(g.pot_functions['functions'][fn]['fit_type'] != None and type(params_lower) == list):
+      
+          if(g.pot_functions['functions'][fn]['fit_type'] != None and type(params_lower) == list):
+          
+            # g.pot_functions['functions'][fn]['fit_type']       1 = Spline  2 = Analytic
+            # g.pot_functions['functions'][fn]['function_type']  1 = Tab     2 = Analytic
         
-        
-          # Analytic fitting
-          if(g.pot_functions['functions'][fn]['fit_type'] == 2 and
-             g.pot_functions['functions'][fn]['function_type'] == 2):
-            g.pot_functions['functions'][fn]['fit_size'] = len(g.pot_functions['functions'][fn]['a_params'])
-            g.pot_functions['functions'][fn]['fit_parameters'] = numpy.zeros((2,len(g.pot_functions['functions'][fn]['a_params']),),)     
+            # TAB DATA BUT WRONG FITTING
+            if(g.pot_functions['functions'][fn]['fit_type'] == 2 and
+               g.pot_functions['functions'][fn]['function_type'] == 1):
+              g.pot_functions['functions'][fn]['fit_type'] = 1
+              g.pot_functions['functions'][fn]['fit_size'] = 15
+              g.pot_functions['functions'][fn]['fit_parameters'] = numpy.zeros((3,15,),)  
+              for i in range(g.pot_functions['functions'][fn]['fit_size']):
+                g.pot_functions['functions'][fn]['fit_parameters'][0,i] = float(-1.0)
+                g.pot_functions['functions'][fn]['fit_parameters'][1,i] = float(1.0)
+                
+            # Analytic fitting
+            elif(g.pot_functions['functions'][fn]['fit_type'] == 2 and
+               g.pot_functions['functions'][fn]['function_type'] == 2):
+              g.pot_functions['functions'][fn]['fit_size'] = len(g.pot_functions['functions'][fn]['a_params'])
+              g.pot_functions['functions'][fn]['fit_parameters'] = numpy.zeros((3,len(g.pot_functions['functions'][fn]['a_params']),),)     
             
-            for i in range(g.pot_functions['functions'][fn]['fit_size']):
-              g.pot_functions['functions'][fn]['fit_parameters'][0,i] = float(params_lower[i])
-              g.pot_functions['functions'][fn]['fit_parameters'][1,i] = float(params_upper[i])
+              for i in range(g.pot_functions['functions'][fn]['fit_size']):
+                g.pot_functions['functions'][fn]['fit_parameters'][0,i] = float(params_lower[i])
+                g.pot_functions['functions'][fn]['fit_parameters'][1,i] = float(params_upper[i])
               
-              
-          # Spline fitting
-          else:
-            s = len(params_lower)
-            g.pot_functions['functions'][fn]['fit_type'] = 1
-            g.pot_functions['functions'][fn]['fit_size'] = s            
-            g.pot_functions['functions'][fn]['fit_parameters'] = numpy.zeros((2,s,),) 
-            
-            for i in range(len(params_lower)):
-              g.pot_functions['functions'][fn]['fit_parameters'][0,i] = float(params_lower[i])
-              g.pot_functions['functions'][fn]['fit_parameters'][1,i] = float(params_upper[i])
+            # Spline fitting
+            elif(g.pot_functions['functions'][fn]['fit_type'] == 1):
+              g.pot_functions['functions'][fn]['fit_size'] = len(params_lower)
+              g.pot_functions['functions'][fn]['fit_parameters'] = numpy.zeros((3,len(params_lower),),)
+              g.pot_functions['functions'][fn]['fit_spline_type'] = spline_type  
+              for i in range(g.pot_functions['functions'][fn]['fit_size']):
+                g.pot_functions['functions'][fn]['fit_parameters'][0,i] = float(params_lower[i])
+                g.pot_functions['functions'][fn]['fit_parameters'][1,i] = float(params_upper[i])
+                g.pot_functions['functions'][fn]['fit_parameters'][2,i] = float(spline_nodes[i])
 
+    
+            
+            
   @staticmethod
   def make_copies(): 
     for fn in range(len(g.pot_functions['functions'])): 
@@ -377,8 +470,10 @@ class potential:
     fh = open(file, 'r')
     for row in fh:
       fh.close()
-      if(row.strip().upper() == '#A'):
+      if(row.strip().upper()[0:2] == '#A'):
         return 'A'
+      elif(row.strip().upper()[0:2] == '#S'):
+        return 'S'
       return 'T'
       
     
@@ -473,71 +568,82 @@ class potential:
       
       
   def plot_python_potentials(dir = None):  
-    if(dir == None):
-      dir = g.dirs['pots']
+  
+    try:
+      if(dir == None):
+        dir = g.dirs['pots']
+      std.make_dir(dir)
+      print(dir)
       
-    for i in range(len(g.pot_functions['functions'])): 
-      pot_name = 'py_pot'
-      pot_count = i + 1
+      for i in range(len(g.pot_functions['functions'])): 
+        pot_name = 'py_pot'
+        pot_count = i + 1
       
-      pot_type = g.pot_functions['functions'][i]['f_type_id']
-      label_a = g.pot_functions['functions'][i]['a']
+        pot_type = g.pot_functions['functions'][i]['f_type_id']
+        label_a = g.pot_functions['functions'][i]['a']
       
-      if(pot_type == 1):
-        label_b = g.pot_functions['functions'][i]['b']
-      else:
-        label_b = g.pot_functions['functions'][i]['f_group']
+        if(pot_type == 1):
+          label_b = g.pot_functions['functions'][i]['b']
+        else:
+          label_b = g.pot_functions['functions'][i]['f_group']
         
       
-      potential.plot_potential(dir, pot_name, pot_count, pot_type, label_a, label_b, 
-                               g.pot_functions['functions'][i]['points'][:,0], 
-                               g.pot_functions['functions'][i]['points'][:,1], 
-                               g.pot_functions['functions'][i]['points'][:,2], 
-                               g.pot_functions['functions'][i]['points'][:,3])
-      
-      
+        potential.plot_potential(dir, pot_name, pot_count, pot_type, label_a, label_b, 
+                                 g.pot_functions['functions'][i]['points'][:,0], 
+                                 g.pot_functions['functions'][i]['points'][:,1], 
+                                 g.pot_functions['functions'][i]['points'][:,2], 
+                                 g.pot_functions['functions'][i]['points'][:,3])
+      return True
+    except:
+      return False  
       
     
     
   def plot_fortran_potentials(dir = None):  
     
-    if(dir == None):
-      dir = g.dirs['pots']
+    try:
     
-    if(efs.pc > 0):
-      for i in range(efs.pc):
+      if(dir == None):
+        dir = g.dirs['pots']
+      std.make_dir(dir)
+      print(dir)
     
-        a = efs.pkey[i,0] - 1
-        b = efs.pkey[i,1]
+      if(efs.pc > 0):
+        for i in range(efs.pc):
+    
+          a = efs.pkey[i,0] - 1
+          b = efs.pkey[i,1]
       
-        pot_name = 'fort_pot'
-        pot_count = i + 1
+          pot_name = 'fort_pot'
+          pot_count = i + 1
        
-        pot_type = efs.pkey[i,2]
-        label_a = efs.pkey[i,3]
-        label_b = efs.pkey[i,4]
+          pot_type = efs.pkey[i,2]
+          label_a = efs.pkey[i,3]
+          label_b = efs.pkey[i,4]
       
-        potential.plot_potential(dir, pot_name, pot_count, pot_type, label_a, label_b, 
-                                 efs.pot[a:b,0], efs.pot[a:b,1], 
-                                 efs.pot[a:b,2], efs.pot[a:b,3])
+          potential.plot_potential(dir, pot_name, pot_count, pot_type, label_a, label_b, 
+                                   efs.pot[a:b,0], efs.pot[a:b,1], 
+                                   efs.pot[a:b,2], efs.pot[a:b,3])
     
-    elif(bp.pc > 0):
-      for i in range(bp.pc):
+      elif(bp.pc > 0):
+        for i in range(bp.pc):
     
-        a = bp.pkey[i,0] - 1
-        b = bp.pkey[i,1]
+          a = bp.pkey[i,0] - 1
+          b = bp.pkey[i,1]
       
-        pot_name = 'fort_pot'
-        pot_count = i + 1
+          pot_name = 'fort_pot'
+          pot_count = i + 1
        
-        pot_type = bp.pkey[i,2]
-        label_a = bp.pkey[i,3]
-        label_b = bp.pkey[i,4]
+          pot_type = bp.pkey[i,2]
+          label_a = bp.pkey[i,3]
+          label_b = bp.pkey[i,4]
       
-        potential.plot_potential(dir, pot_name, pot_count, pot_type, label_a, label_b, 
-                                 bp.pot[a:b,0], bp.pot[a:b,1], 
-                                 bp.pot[a:b,2], bp.pot[a:b,3])
-                                 
+          potential.plot_potential(dir, pot_name, pot_count, pot_type, label_a, label_b, 
+                                   bp.pot[a:b,0], bp.pot[a:b,1], 
+                                   bp.pot[a:b,2], bp.pot[a:b,3])
+      return True
+    except:
+      return False                                  
                                  
       
   def plot_potential(dir, pot_name, pot_count, pot_type, label_a, label_b, x, y, yp, ypp):  
@@ -691,7 +797,8 @@ class potential:
     es.clear_potentials()
     
     # ADD POTENTIALS
-    for pf in g.pot_functions['functions']:
+    for pn in range(len(g.pot_functions['functions'])):
+      pf = g.pot_functions['functions'][pn]
       if(pf['f_on']):
         if(pf['f_type_id'] == 1):
           es.add_potential(
@@ -732,23 +839,26 @@ class potential:
     bp.clear_potentials()
     
     # ADD POTENTIALS
-    for pf in g.pot_functions['functions']:
+    for pn in range(len(g.pot_functions['functions'])):
+      pf = g.pot_functions['functions'][pn]
       if(pf['f_on']):
         if(pf['f_type_id'] == 1):
-          bp.add_potential(
+          fortran_id = bp.add_potential(
                             pf['f_type_id'],
                             pf['a'], 
                             pf['b'],  
                             pf['r_cut'], 
-                            pf['points'] 
+                            pf['points'],
+                            pn
                            )
         elif(pf['f_type_id'] > 1):
-          bp.add_potential(
+          fortran_id = bp.add_potential(
                             pf['f_type_id'],
                             pf['a'], 
                             pf['f_group'],  
                             pf['r_cut'], 
-                            pf['points'] 
+                            pf['points'],
+                            pn 
                            )    
       
     # ADD ZBL   

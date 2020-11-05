@@ -23,13 +23,15 @@ END SUBROUTINE clear_potentials
 
 
 
-SUBROUTINE add_potential(ftype, option_a, option_b, rcut_in, tab)
+SUBROUTINE add_potential(ftype, option_a, option_b, rcut_in, tab, pykey, pc_out)
 !###########################################################
-INTEGER(kind=StandardInteger) :: ftype
-INTEGER(kind=StandardInteger) :: option_a
-INTEGER(kind=StandardInteger) :: option_b
-REAL(kind=DoubleReal) :: rcut_in
-REAL(kind=DoubleReal) :: tab(:,:)
+INTEGER(kind=StandardInteger), INTENT(IN) :: ftype
+INTEGER(kind=StandardInteger), INTENT(IN) :: option_a
+INTEGER(kind=StandardInteger), INTENT(IN) :: option_b
+REAL(kind=DoubleReal), INTENT(IN) :: rcut_in
+REAL(kind=DoubleReal), INTENT(IN) :: tab(:,:)
+INTEGER(kind=StandardInteger), INTENT(IN) :: pykey
+INTEGER(kind=StandardInteger), INTENT(OUT) :: pc_out
 !###########################################################
 !###########################################################
 !print *, ftype, option_a, option_b
@@ -39,6 +41,8 @@ IF(pc .EQ. 0)THEN
 END IF
 
 pc = pc + 1
+pc_out = pc
+pkey_python(pc) = pykey
 
 IF(pc .EQ. 1)THEN
   pkey_temp(pc, 1) = 1
@@ -49,7 +53,7 @@ pkey_temp(pc, 2) = pkey_temp(pc, 1) + SIZE(tab, 1) - 1
 pkey_temp(pc, 3) = ftype        ! 1 PAIR 2 DENS 3 EMBE
 pkey_temp(pc, 4) = option_a     ! Type a
 pkey_temp(pc, 5) = option_b     ! Type b or f group
-
+!print *, pkey_temp(pc, 3), pkey_temp(pc, 4), pkey_temp(pc, 5)
 ! STORE RCUT
 pot_rcut(pc) = rcut_in
 
@@ -58,6 +62,8 @@ pot_temp(pkey_temp(pc, 1):pkey_temp(pc, 2), 1:4) = tab(:,1:4)
 
 
 END SUBROUTINE add_potential
+
+
 
 
 
@@ -88,6 +94,8 @@ zbl_r(zbl_counter, 4) = rb
 
 
 END SUBROUTINE add_zbl
+
+
 
 
 
@@ -126,6 +134,7 @@ k = 0
 pot_t(1:1001,1:4) = 0.0D0
 coeffs(1:10) = 0.0D0
 
+
 ! REARRANGE FGROUP (IF NEEDED)
 group_max = 0
 DO pn =1,pc  
@@ -144,7 +153,6 @@ DO pn =1,pc
   END IF
   !print *, pkey_temp(pn, 1), pkey_temp(pn, 2), pkey_temp(pn, 3), pkey_temp(pn, 4), pkey_temp(pn, 5)
 END DO
-!print *, group_max
 
 
 ! READ POTENTIALS INTO A TEMPORARY ARRAY pkey_temp
@@ -215,6 +223,8 @@ DO pn =1, pc
     fgroups_embe(pkey(pn, 4), k) = pkey(pn, 5)  
   END IF
 END DO
+
+
 
 
 
@@ -356,6 +366,19 @@ IF(zbl_counter .GT. 0)THEN
     END IF
   END DO
 END IF
+
+
+
+!zbl_counter = zbl_counter + 1
+
+!zbl_l(zbl_counter) = on
+!zbl_i(zbl_counter, 1) = id1
+!zbl_i(zbl_counter, 2) = id2
+!zbl_i(zbl_counter, 3) = spline_type
+!zbl_r(zbl_counter, 1) = z1
+!zbl_r(zbl_counter, 2) = z2
+!zbl_r(zbl_counter, 3) = ra
+!zbl_r(zbl_counter, 4) = rb
 
 
 
@@ -548,6 +571,10 @@ END IF
 END SUBROUTINE pot_search_interpolate_b 
 
 
+
+
+
+
 SUBROUTINE interp4(xi, x, y, yi)
 ! Identity for square matrix
 IMPLICIT NONE
@@ -576,7 +603,41 @@ END IF
 END SUBROUTINE interp4
 
 
-
+SUBROUTINE interp4dydx(xi, x, y, ypi)
+! Interpolate and return derivative at xi
+IMPLICIT NONE
+! IN/OUT
+REAL(kind=DoubleReal), INTENT(IN) :: xi
+REAL(kind=DoubleReal), INTENT(IN) :: x(1:4)
+REAL(kind=DoubleReal), INTENT(IN) :: y(1:4)
+REAL(kind=DoubleReal), INTENT(OUT) :: ypi
+! PRIVATE
+INTEGER(kind=StandardInteger) :: i, j, k, n
+REAL(kind=DoubleReal) :: fx, gx, psum
+!############################################################
+n = 4
+IF (SIZE(x,1) .EQ. SIZE(y,1) .AND. n .EQ. SIZE(x,1)) THEN
+  ypi = 0.0D0
+  Do i=1,SIZE(x,1)
+    fx = 1.0D0
+    gx = 0.0D0
+    Do j=1,SIZE(x,1)
+      If(i .NE. j) Then
+        fx = fx / (x(i) - x(j))
+        psum = 1.0D0
+        Do k=1,SIZE(x,1)
+          If((i .NE. k) .AND. (j .NE. k))Then
+            psum = psum * (xi - x(k))
+          End If
+        End Do
+        gx = gx + psum
+      End If
+    End Do
+    ypi = ypi + fx * gx * y(i)
+  End Do
+END IF
+!############################################################
+END SUBROUTINE interp4dydx
 
 
 
@@ -598,6 +659,10 @@ DO i = 1, n
 END DO
 
 END SUBROUTINE linspace
+
+
+
+
 
 
 
@@ -658,6 +723,8 @@ termGc = (-3.2D0/xs)**2*0.1818D0*exp((-3.2D0/xs)*xVal)+&                 !g''(x)
 (-0.2016D0/xs)**2*0.02817*exp((-0.2016D0/xs)*xVal)
 ddy = termFa*termGc+2*termFb*termGb+termFc*termGa    
 END SUBROUTINE zblfull
+
+
 
 
 

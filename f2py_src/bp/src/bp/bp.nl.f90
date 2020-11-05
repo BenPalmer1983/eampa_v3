@@ -42,5 +42,4 @@ key(cn, 6) = nc - 1
 IF(key(cn, 6) .GT. l_nl_size)THEN
   l_nl_size = key(cn, 6)
 END IF
-
 END SUBROUTINE make_nl

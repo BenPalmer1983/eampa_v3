@@ -8,6 +8,7 @@
 INTEGER(kind=StandardInteger), PARAMETER ::             max_bps = 50
 INTEGER(kind=StandardInteger), PARAMETER ::             max_configs = 2000
 INTEGER(kind=StandardInteger), PARAMETER ::             max_zbl = 100
+INTEGER(kind=StandardInteger), PARAMETER ::             max_potfunctions = 1000
 
 
 INTEGER(kind=StandardInteger) ::                        v_config_size = 500000
@@ -23,9 +24,9 @@ INTEGER(kind=StandardInteger) ::                        l_nl_size = 0
 
 !# EDITABLE IN PYTHON
 INTEGER(kind=StandardInteger) ::                        eos_size = 10
-REAL(kind=DoubleReal) ::                                eos_strain = 0.05D0   ! Total strain
+REAL(kind=DoubleReal) ::                                eos_strain = 0.005D0   ! Total strain
 INTEGER(kind=StandardInteger) ::                        eos_points = 0        ! 2*eos_size + 1
-REAL(kind=DoubleReal) ::                                ec_strain = 0.05D0    ! Total strain
+REAL(kind=DoubleReal) ::                                ec_strain = 0.005D0    ! Total strain
 INTEGER(kind=StandardInteger) ::                        ec_size = 10          ! 2*eos_size + 1
 INTEGER(kind=StandardInteger) ::                        ec_points = 0         ! ec_size
 
@@ -74,13 +75,14 @@ INTEGER(kind=StandardInteger) ::                        mapkeys = 0
 INTEGER(kind=StandardInteger) ::                        map_pn = 0
 INTEGER(kind=StandardInteger) ::                        r_size = 1001
 INTEGER(kind=StandardInteger) ::                        r_width = 4
-INTEGER(kind=StandardInteger) ::                        pkey_temp(1:max_configs, 1:6)
-INTEGER(kind=StandardInteger) ::                        pkey(1:max_configs, 1:6)
+INTEGER(kind=StandardInteger) ::                        pkey_temp(1:max_potfunctions, 1:6)
+INTEGER(kind=StandardInteger) ::                        pkey(1:max_potfunctions, 1:6)
+INTEGER(kind=StandardInteger) ::                        pkey_python(1:max_potfunctions) = -1
 
-REAL(kind=DoubleReal) ::                                pot_rcut(1:max_configs) 
+REAL(kind=DoubleReal) ::                                pot_rcut(1:max_potfunctions) 
 REAL(kind=DoubleReal) ::                                pot_temp(1:50000, 1:4) 
 REAL(kind=DoubleReal) ::                                pot(1:50000, 1:4) 
-REAL(kind=DoubleReal) ::                                pot_min_max(1:max_configs, 1:2) = -1.0D0
+REAL(kind=DoubleReal) ::                                pot_min_max(1:max_potfunctions, 1:2) = -1.0D0
 
 INTEGER(kind=StandardInteger) ::                        potmap(1:3, 1:50, 1:50) = 0         ! TYPE,  A,  B/Group
 INTEGER(kind=StandardInteger) ::                        fgroups_dens(1:50, 1:51) = 0        ! LIST OF FGROUPS FOR EACH TYPE  COUNTER IN 51
@@ -93,7 +95,7 @@ REAL(kind=DoubleReal) ::                                zbl_r(1:max_zbl, 1:8)   
 LOGICAL ::                                              zbl_l(1:max_zbl) = .TRUE.       ! on/off
 
 !# CALCULATED
-REAL(kind=DoubleReal) ::                                config_energy(1:max_configs, 1:6) = 0.0D0 ! PAIR, EMBED, TOTAL 
+REAL(kind=DoubleReal) ::                                config_energy(1:max_potfunctions, 1:6) = 0.0D0 ! PAIR, EMBED, TOTAL 
 
 
 !# BP DATA

@@ -26,6 +26,7 @@ class pf_parameters:
   
     # Any Density
     if(g.fit['rescale_density'] == 0):
+      print("Creating Pool")
       w = w_start
       w_inc = (w_end - w_start) / (pmax - 1)
       pn = 0
@@ -34,6 +35,7 @@ class pf_parameters:
         g.pfdata['pool']['params'][pn, :] = copy.deepcopy(p)
         pn = pn + 1
         w = w + w_inc
+        #print(pn)
     elif(g.fit['rescale_density'] == 1 or g.fit['rescale_density'] == 2):
       sa = g.fit['sane_seeds_a']
       sb = g.fit['sane_seeds_b']
@@ -81,6 +83,7 @@ class pf_parameters:
         w = w + w_inc
         
     # Shuffle    
+    print("Shuffle Pool")
     numpy.random.shuffle(g.pfdata['pool']['params'])
 
             

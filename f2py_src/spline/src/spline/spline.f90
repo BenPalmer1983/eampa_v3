@@ -25,6 +25,7 @@ INCLUDE "spline.spline_it.f90"
 INCLUDE "spline.spline_array.f90"
 INCLUDE "spline.get_nodes.f90"
 INCLUDE "spline.vary.f90"
+INCLUDE "spline.spline_nodes.f90"
 
 
 END MODULE spline

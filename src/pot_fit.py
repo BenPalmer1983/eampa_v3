@@ -30,10 +30,13 @@ class pf:
     
     # Make data structure
     g.pfdata = pf_data.make()
-        
+    
     # Print start screen
     pf.startup()
     
+    # Output
+    potential.plot_python_potentials(g.dirs['wd'] + '/plots/pots/start_potential')
+
     # Make Pool
     pf_parameters.make_pool()
    
@@ -51,8 +54,9 @@ class pf:
   def set_up():  
     # If a spline fit, convert into a spline with the set number of nodes
     for fn in range(len(g.pot_functions['functions'])):       
-      if(g.pot_functions['functions'][fn]['fit_type'] == 1): 
+      if(g.pot_functions['functions'][fn]['fit_type'] == 1):     
         potential.vary_tabulated_points(fn)
+
   
     # Setup EFS
     efs.init()                         # Initialise (allocate arrays)

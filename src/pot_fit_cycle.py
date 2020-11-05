@@ -25,23 +25,24 @@ class pf_cycle:
     
     parameters = copy.deepcopy(g.pfdata['params']['start'][:])
     n = 0
-    for p in range(pop_size):
+    for pn in range(pop_size):
       loop = True
       while(loop): 
         n = n + 1
         if(n == 1):
-          g.pfdata['params']['pop'][p, :] = g.pfdata['params']['start'][:]
+          g.pfdata['params']['pop'][pn, :] = g.pfdata['params']['start'][:]
         else:
-          g.pfdata['params']['pop'][p, :] = pf_parameters.get_p()
+          g.pfdata['params']['pop'][pn, :] = pf_parameters.get_p()
         
         # Try - if it fails or rss == None, try next
+        pf_potential.update(g.pfdata['params']['pop'][pn, :])
+        rss = pf.get_rss()
         try:
           # Update
-          pf_potential.update(g.pfdata['params']['pop'][p, :])
           rss = pf.get_rss()
           if(g.pfdata['rss']['current'] is not None):
             loop = False
-            g.pfdata['params']['pop_rss'][p] = rss
+            g.pfdata['params']['pop_rss'][pn] = rss
         except:
           pass
       

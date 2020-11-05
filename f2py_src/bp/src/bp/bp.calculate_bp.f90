@@ -69,7 +69,7 @@ s = b - a + 1
 ! STORE ENERGIES, FIT, STORE CALC VALUES
 calc_energies(bp_id, 1, 1:s) = config_energy(a:b, 6)
 calc_sizes(bp_id, 1) = s
-!print *, calc_energies(bp_id, 1, 1:s)
+
 CALL fit_bm(calc_volumes(bp_id, 1, 1:s), calc_energies(bp_id, 1, 1:s), p(1:4))
 DO n = 1, s
   calc_energies_fit(bp_id, 1, n) = BirchMurn(calc_volumes(bp_id, 1, n), p(1:4))  

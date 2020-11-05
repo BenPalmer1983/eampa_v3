@@ -79,7 +79,22 @@ class bp_calc:
     
     # Initialise
     bp.init(g.memory['bp']['c'], g.memory['bp']['g'], g.memory['bp']['nl'])
+ 
+
+    bp.eos_size = g.bp_input['eos_size']
+    bp.eos_strain = g.bp_input['eos_strain']
+    bp.ec_size = g.bp_input['ec_size']
+    bp.ec_strain = g.bp_input['ec_strain']
     
+    
+    """g.bp_input = {
+    'dir': '',
+    'bp_file': None,
+    'eos_size': 10,
+    'eos_strain': 10,
+    'ec_size': 10,
+    'ec_strain': 10,
+    }"""
     
     
     

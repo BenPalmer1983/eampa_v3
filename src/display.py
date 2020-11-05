@@ -164,10 +164,14 @@ class display:
     
     for fn in range(len(g.pot_functions['functions'])):          
       if(g.pot_functions['functions'][fn]['fit_type'] == 1):     # SPLINE
-        print("Fn: " + str(fn) + "   Type: spline")
+        print("Fn:" + str(fn) + "[S] ", end='')
         for i in range(g.pot_functions['functions'][fn]['fit_size']):
-          print("  [" + str(i) + "]", display.pad_r(g.pot_functions['functions'][fn]['fit_parameters'][0,i],8), end='')
-          print()
+          print("  [" + str(i) + "]", display.pad_r(g.pot_functions['functions'][fn]['s_nodes'][i,0],8), end='')
+        print()
+        print("         ", end="")
+        for i in range(g.pot_functions['functions'][fn]['fit_size']):
+          print("  [" + str(i) + "]", display.pad_r(g.pot_functions['functions'][fn]['s_nodes'][i,1],8), end='')
+        print()
       elif(g.pot_functions['functions'][fn]['fit_type'] == 2):   # ANALYTIC
         print("Fn:" + str(fn) + "[A] ", end='')
         for i in range(g.pot_functions['functions'][fn]['fit_size']):
@@ -175,8 +179,7 @@ class display:
         print()
     display.print_line()
     
-    
-    
+
     
   def finish():
     try:
@@ -247,10 +250,14 @@ class display:
     
     for fn in range(len(g.pot_functions['functions'])):          
       if(g.pot_functions['functions'][fn]['fit_type'] == 1):     # SPLINE
-        print("Fn: " + str(fn) + "   Type: spline")
+        print("Fn:" + str(fn) + "[S] ", end='')
         for i in range(g.pot_functions['functions'][fn]['fit_size']):
-          print("  [" + str(i) + "]", display.pad_r(g.pot_functions['functions'][fn]['fit_parameters'][0,i],8), end='')
-          print()
+          print("  [" + str(i) + "]", display.pad_r(g.pot_functions['functions'][fn]['s_nodes'][i,0],8), end='')
+        print()
+        print("         ", end="")
+        for i in range(g.pot_functions['functions'][fn]['fit_size']):
+          print("  [" + str(i) + "]", display.pad_r(g.pot_functions['functions'][fn]['s_nodes'][i,1],8), end='')
+        print()
       elif(g.pot_functions['functions'][fn]['fit_type'] == 2):   # ANALYTIC
         print("Fn:" + str(fn) + "[A] ", end='')
         for i in range(g.pot_functions['functions'][fn]['fit_size']):
@@ -305,10 +312,14 @@ class display:
     
     for fn in range(len(g.pot_functions['functions'])):          
       if(g.pot_functions['functions'][fn]['fit_type'] == 1):     # SPLINE
-        print("Fn: " + str(fn) + "   Type: spline")
+        print("Fn:" + str(fn) + "[S] ", end='')
         for i in range(g.pot_functions['functions'][fn]['fit_size']):
-          print("  [" + str(i) + "]", display.pad_r(g.pot_functions['functions'][fn]['fit_parameters'][0,i],8), end='')
-          print()
+          print("  [" + str(i) + "]", display.pad_r(g.pot_functions['functions'][fn]['s_nodes'][i,0],8), end='')
+        print()
+        print("         ", end="")
+        for i in range(g.pot_functions['functions'][fn]['fit_size']):
+          print("  [" + str(i) + "]", display.pad_r(g.pot_functions['functions'][fn]['s_nodes'][i,1],8), end='')
+        print()
       elif(g.pot_functions['functions'][fn]['fit_type'] == 2):   # ANALYTIC
         print("Fn:" + str(fn) + "[A] ", end='')
         for i in range(g.pot_functions['functions'][fn]['fit_size']):

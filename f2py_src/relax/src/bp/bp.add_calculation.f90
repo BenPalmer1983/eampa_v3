@@ -111,7 +111,7 @@ uv_in(:,:) = 0.0D0
 uv_in(1,1) = 1.0D0
 uv_in(2,2) = 1.0D0
 uv_in(3,3) = 1.0D0
-
+print *, "AAAAAAAA"
 
 CALL add_inner(rcut_in, alat_in, uv_in, label, crystal_type, expansion, atoms_per_crystal, &
                primitive_labels, primitive_coords, bp_id)
@@ -230,7 +230,7 @@ IF(bp_id .EQ. 0)THEN
     ! Calc volume
     vol_cell(:,:) = alat_in * uv_config(:,:)
     vol = TripleProduct(vol_cell(1,:), vol_cell(2,:), vol_cell(3,:))
-
+    print *, alat_in
     CALL add_config(rcut_in, alat_in, uv_config, expanded_labels(1:m), expanded_coords(1:m,1:3))  ! Increments cc by 1
     cn_counter = cn_counter + 1
     bp_configs(bp_id, cn_counter) = cc 

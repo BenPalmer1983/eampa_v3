@@ -40,6 +40,8 @@ class rss_calc:
     # Plots
     #potential.plot_fortran_potentials()
     #potential.plot_python_potentials()
+    potential.plot_python_potentials(g.dirs['wd'] + '/plots/potential_python')
+    potential.plot_fortran_potentials(g.dirs['wd'] + '/plots/potential_fortran')
     
     b_props.bp_output()
     b_props.bp_eos_plot()

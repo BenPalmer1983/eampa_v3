@@ -14,6 +14,7 @@ class read_input:
     read_input.rss_weights()
     read_input.fit()
     read_input.fit_results()
+    read_input.bp()
 
 
 
@@ -133,3 +134,30 @@ class read_input:
       except:
         pass
       
+
+  def bp():
+      
+    # DEFAULT
+    g.bp_input = {
+    'dir': '',
+    'bp_file': None,
+    'eos_size': 10,
+    'eos_strain': 0.005,
+    'ec_size': 10,
+    'ec_strain': 0.005,
+    }
+
+    # TRY READING
+    for k in g.bp_input.keys():
+      try:
+        g.bp_input[k] = g.inp['bp'][k]
+      except:
+        pass
+
+
+
+
+
+
+
+
