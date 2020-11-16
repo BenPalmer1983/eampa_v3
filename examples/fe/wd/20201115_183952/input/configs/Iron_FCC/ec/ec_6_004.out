@@ -1,0 +1,859 @@
+--------------------------------------------------------------------------
+WARNING: There was an error initializing an OpenFabrics device.
+
+  Local host:   bear-pg0211u36a
+  Local device: mlx5_0
+--------------------------------------------------------------------------
+
+     Program PWSCF v.6.3 starts on 17Oct2020 at 14:40:31 
+
+     This program is part of the open-source Quantum ESPRESSO suite
+     for quantum simulation of materials; please cite
+         "P. Giannozzi et al., J. Phys.:Condens. Matter 21 395502 (2009);
+         "P. Giannozzi et al., J. Phys.:Condens. Matter 29 465901 (2017);
+          URL http://www.quantum-espresso.org", 
+     in publications or presentations arising from this work. More details at
+     http://www.quantum-espresso.org/quote
+
+     Parallel version (MPI & OpenMP), running on      40 processor cores
+     Number of MPI processes:                40
+     Threads/MPI process:                     1
+
+     MPI processes distributed on     1 nodes
+     R & G space division:  proc/nbgrp/npool/nimage =      40
+     Reading input from wd/ec/ec_6_004.in
+Warning: card &IONS ignored
+Warning: card ION_DYNAMICS = 'BFGS', ignored
+Warning: card / ignored
+Warning: card &CELL ignored
+Warning: card CELL_DYNAMICS = 'BFGS', ignored
+Warning: card CELL_FACTOR = 2.0, ignored
+Warning: card PRESS = 0.0, ignored
+Warning: card / ignored
+
+     Current dimensions of program PWSCF are:
+     Max number of different atomic species (ntypx) = 10
+     Max number of k-points (npk) =  40000
+     Max angular momentum in pseudopotentials (lmaxx) =  3
+               file Fe.pbe-spn-kjpaw_psl.1.0.0.UPF: wavefunction(s)  3P 3D renormalized
+               file Fe.pbe-spn-kjpaw_psl.1.0.0.UPF: wavefunction(s)  3P 3D renormalized
+               file Fe.pbe-spn-kjpaw_psl.1.0.0.UPF: wavefunction(s)  3P 3D renormalized
+               file Fe.pbe-spn-kjpaw_psl.1.0.0.UPF: wavefunction(s)  3P 3D renormalized
+
+     Subspace diagonalization in iterative solution of the eigenvalue problem:
+     a serial algorithm will be used
+
+     Found symmetry operation: I + (  0.0000  0.0000 -0.5000)
+     This is a supercell, fractional translations are disabled
+ 
+     Parallelization info
+     --------------------
+     sticks:   dense  smooth     PW     G-vecs:    dense   smooth      PW
+     Min         150      99     27                 8594     4613     663
+     Max         151     100     28                 8599     4618     668
+     Sum        6035    3987   1105               343859   184595   26625
+ 
+
+
+     bravais-lattice index     =            0
+     lattice parameter (alat)  =      12.9382  a.u.
+     unit-cell volume          =    2283.7593 (a.u.)^3
+     number of atoms/cell      =           32
+     number of atomic types    =            4
+     number of electrons       =       512.00
+     number of Kohn-Sham states=          307
+     kinetic-energy cutoff     =      71.0000  Ry
+     charge density cutoff     =     430.0000  Ry
+     convergence threshold     =      1.0E-06
+     mixing beta               =       0.1000
+     number of iterations used =           10  plain     mixing
+     Exchange-correlation      = SLA PW PBX PBC ( 1  4  3  4 0 0)
+
+     celldm(1)=  12.938187  celldm(2)=   0.000000  celldm(3)=   0.000000
+     celldm(4)=   0.000000  celldm(5)=   0.000000  celldm(6)=   0.000000
+
+     crystal axes: (cart. coord. in units of alat)
+               a(1) = (   1.000008   0.005272   0.000000 )  
+               a(2) = (   0.005000   1.054482   0.000000 )  
+               a(3) = (   0.000000   0.000000   0.999995 )  
+
+     reciprocal axes: (cart. coord. in units 2 pi/alat)
+               b(1) = (  1.000017 -0.004742  0.000000 )  
+               b(2) = ( -0.005000  0.948356  0.000000 )  
+               b(3) = (  0.000000  0.000000  1.000005 )  
+
+
+     PseudoPot. # 1 for Fe read from file:
+     /rds/homes/b/bxp912/pp/Fe.pbe-spn-kjpaw_psl.1.0.0.UPF
+     MD5 check sum: 42f43b795421b414b0dc916aa790dbcb
+     Pseudo is Projector augmented-wave + core cor, Zval = 16.0
+     Generated using "atomic" code by A. Dal Corso v.6.3
+     Shape of augmentation charge: PSQ
+     Using radial grid of 1191 points,  6 beta functions with: 
+                l(1) =   0
+                l(2) =   0
+                l(3) =   1
+                l(4) =   1
+                l(5) =   2
+                l(6) =   2
+     Q(r) pseudized with 0 coefficients 
+
+
+     PseudoPot. # 2 for Fe read from file:
+     /rds/homes/b/bxp912/pp/Fe.pbe-spn-kjpaw_psl.1.0.0.UPF
+     MD5 check sum: 42f43b795421b414b0dc916aa790dbcb
+     Pseudo is Projector augmented-wave + core cor, Zval = 16.0
+     Generated using "atomic" code by A. Dal Corso v.6.3
+     Shape of augmentation charge: PSQ
+     Using radial grid of 1191 points,  6 beta functions with: 
+                l(1) =   0
+                l(2) =   0
+                l(3) =   1
+                l(4) =   1
+                l(5) =   2
+                l(6) =   2
+     Q(r) pseudized with 0 coefficients 
+
+
+     PseudoPot. # 3 for Fe read from file:
+     /rds/homes/b/bxp912/pp/Fe.pbe-spn-kjpaw_psl.1.0.0.UPF
+     MD5 check sum: 42f43b795421b414b0dc916aa790dbcb
+     Pseudo is Projector augmented-wave + core cor, Zval = 16.0
+     Generated using "atomic" code by A. Dal Corso v.6.3
+     Shape of augmentation charge: PSQ
+     Using radial grid of 1191 points,  6 beta functions with: 
+                l(1) =   0
+                l(2) =   0
+                l(3) =   1
+                l(4) =   1
+                l(5) =   2
+                l(6) =   2
+     Q(r) pseudized with 0 coefficients 
+
+
+     PseudoPot. # 4 for Fe read from file:
+     /rds/homes/b/bxp912/pp/Fe.pbe-spn-kjpaw_psl.1.0.0.UPF
+     MD5 check sum: 42f43b795421b414b0dc916aa790dbcb
+     Pseudo is Projector augmented-wave + core cor, Zval = 16.0
+     Generated using "atomic" code by A. Dal Corso v.6.3
+     Shape of augmentation charge: PSQ
+     Using radial grid of 1191 points,  6 beta functions with: 
+                l(1) =   0
+                l(2) =   0
+                l(3) =   1
+                l(4) =   1
+                l(5) =   2
+                l(6) =   2
+     Q(r) pseudized with 0 coefficients 
+
+
+     atomic species   valence    mass     pseudopotential
+        Fe1           16.00    55.84500     Fe( 1.00)
+        Fe2           16.00    55.84500     Fe( 1.00)
+        Fe3           16.00    55.84500     Fe( 1.00)
+        Fe4           16.00    55.84500     Fe( 1.00)
+
+     Starting magnetic structure 
+     atomic species   magnetization
+        Fe1          0.100
+        Fe2         -0.100
+        Fe3          0.100
+        Fe4         -0.100
+
+      4 Sym. Ops., with inversion, found
+
+
+
+   Cartesian axes
+
+     site n.     atom                  positions (alat units)
+         1           Fe1 tau(   1) = (   0.0000000   0.0000000   0.0000000  )
+         2           Fe2 tau(   2) = (   0.2512490   0.2649414   0.0000000  )
+         3           Fe3 tau(   3) = (   0.2500002   0.0013181   0.2499968  )
+         4           Fe4 tau(   4) = (   0.0012500   0.2636219   0.2500028  )
+         5           Fe1 tau(   5) = (   0.0000000   0.0000000   0.4999977  )
+         6           Fe2 tau(   6) = (   0.2512518   0.2649442   0.4999977  )
+         7           Fe3 tau(   7) = (   0.2500002   0.0013181   0.7499975  )
+         8           Fe4 tau(   8) = (   0.0012500   0.2636219   0.7499915  )
+         9           Fe1 tau(   9) = (   0.0025000   0.5272413   0.0000000  )
+        10           Fe2 tau(  10) = (   0.2537489   0.7921776   0.0000000  )
+        11           Fe3 tau(  11) = (   0.2525025   0.5285594   0.2500008  )
+        12           Fe4 tau(  12) = (   0.0037500   0.7908609   0.2500028  )
+        13           Fe1 tau(  13) = (   0.0025000   0.5272413   0.4999977  )
+        14           Fe2 tau(  14) = (   0.2537517   0.7921748   0.4999977  )
+        15           Fe3 tau(  15) = (   0.2525025   0.5285594   0.7499945  )
+        16           Fe4 tau(  16) = (   0.0037500   0.7908609   0.7499915  )
+        17           Fe1 tau(  17) = (   0.5000040   0.0026362   0.0000000  )
+        18           Fe2 tau(  18) = (   0.7512589   0.2675776   0.0000000  )
+        19           Fe3 tau(  19) = (   0.7500077   0.0039543   0.2499968  )
+        20           Fe4 tau(  20) = (   0.5012540   0.2662571   0.2500008  )
+        21           Fe1 tau(  21) = (   0.5000040   0.0026362   0.4999977  )
+        22           Fe2 tau(  22) = (   0.7512561   0.2675804   0.4999977  )
+        23           Fe3 tau(  23) = (   0.7500077   0.0039543   0.7499975  )
+        24           Fe4 tau(  24) = (   0.5012540   0.2662571   0.7499935  )
+        25           Fe1 tau(  25) = (   0.5025040   0.5298775   0.0000000  )
+        26           Fe2 tau(  26) = (   0.7537589   0.7948138   0.0000000  )
+        27           Fe3 tau(  27) = (   0.7525055   0.5311956   0.2500008  )
+        28           Fe4 tau(  28) = (   0.5037540   0.7934981   0.2500008  )
+        29           Fe1 tau(  29) = (   0.5025040   0.5298775   0.4999977  )
+        30           Fe2 tau(  30) = (   0.7537561   0.7948110   0.4999977  )
+        31           Fe3 tau(  31) = (   0.7525055   0.5311956   0.7499945  )
+        32           Fe4 tau(  32) = (   0.5037540   0.7934981   0.7499935  )
+
+     number of k points=   205  Marzari-Vanderbilt smearing, width (Ry)=  0.0400
+
+     Number of k-points >= 100: set verbosity='high' to print them.
+
+     Dense  grid:   343859 G-vectors     FFT dimensions: (  90,  96,  90)
+
+     Smooth grid:   184595 G-vectors     FFT dimensions: (  72,  75,  72)
+
+     Estimated max dynamical RAM per process >       1.21 GB
+
+     Estimated total dynamical RAM >      48.54 GB
+     Generating pointlists ...
+     new r_m :   0.1458 (alat units)  1.8869 (a.u.) for type    1
+     new r_m :   0.1458 (alat units)  1.8869 (a.u.) for type    2
+     new r_m :   0.1458 (alat units)  1.8869 (a.u.) for type    3
+     new r_m :   0.1458 (alat units)  1.8869 (a.u.) for type    4
+
+     Check: negative/imaginary core charge=   -0.000006    0.000000
+
+     Initial potential from superposition of free atoms
+
+     starting charge  511.98600, renormalised to  512.00000
+     Starting wfcs are  320 randomized atomic wfcs
+     Checking if some PAW data can be deallocated... 
+
+     total cpu time spent up to now is      138.2 secs
+
+     Self-consistent Calculation
+
+     iteration #  1     ecut=    71.00 Ry     beta= 0.10
+     Davidson diagonalization with overlap
+     ethr =  1.00E-02,  avg # of iterations =  3.7
+
+     Threshold (ethr) on eigenvalues was too large:
+     Diagonalizing with lowered threshold
+
+     Davidson diagonalization with overlap
+     ethr =  3.87E-04,  avg # of iterations =  3.8
+
+     total cpu time spent up to now is     1719.5 secs
+
+     total energy              =  -10536.63386275 Ry
+     Harris-Foulkes estimate   =  -10537.05721620 Ry
+     estimated scf accuracy    <       2.28661347 Ry
+
+     total magnetization       =     0.32 Bohr mag/cell
+     absolute magnetization    =    44.77 Bohr mag/cell
+
+     iteration #  2     ecut=    71.00 Ry     beta= 0.10
+     Davidson diagonalization with overlap
+     ethr =  4.47E-04,  avg # of iterations =  1.1
+
+     total cpu time spent up to now is     2104.9 secs
+
+     total energy              =  -10536.45837092 Ry
+     Harris-Foulkes estimate   =  -10536.69763087 Ry
+     estimated scf accuracy    <       1.53821041 Ry
+
+     total magnetization       =    -0.22 Bohr mag/cell
+     absolute magnetization    =    45.33 Bohr mag/cell
+
+     iteration #  3     ecut=    71.00 Ry     beta= 0.10
+     Davidson diagonalization with overlap
+     ethr =  3.00E-04,  avg # of iterations =  1.2
+
+     negative rho (up, down):  6.397E-04 0.000E+00
+
+     total cpu time spent up to now is     2509.4 secs
+
+     total energy              =  -10536.11505863 Ry
+     Harris-Foulkes estimate   =  -10536.55835774 Ry
+     estimated scf accuracy    <       1.66562228 Ry
+
+     total magnetization       =     0.47 Bohr mag/cell
+     absolute magnetization    =    45.80 Bohr mag/cell
+
+     iteration #  4     ecut=    71.00 Ry     beta= 0.10
+     Davidson diagonalization with overlap
+     ethr =  3.00E-04,  avg # of iterations =  2.9
+
+     negative rho (up, down):  1.155E-03 0.000E+00
+
+     total cpu time spent up to now is     3142.1 secs
+
+     total energy              =  -10536.17619584 Ry
+     Harris-Foulkes estimate   =  -10536.28370576 Ry
+     estimated scf accuracy    <       1.38187332 Ry
+
+     total magnetization       =     0.29 Bohr mag/cell
+     absolute magnetization    =    46.38 Bohr mag/cell
+
+     iteration #  5     ecut=    71.00 Ry     beta= 0.10
+     Davidson diagonalization with overlap
+     ethr =  2.70E-04,  avg # of iterations =  1.1
+
+     negative rho (up, down):  1.086E-03 0.000E+00
+
+     total cpu time spent up to now is     3541.4 secs
+
+     total energy              =  -10536.20125826 Ry
+     Harris-Foulkes estimate   =  -10536.22482572 Ry
+     estimated scf accuracy    <       0.12716927 Ry
+
+     total magnetization       =     0.02 Bohr mag/cell
+     absolute magnetization    =    46.68 Bohr mag/cell
+
+     iteration #  6     ecut=    71.00 Ry     beta= 0.10
+     Davidson diagonalization with overlap
+     ethr =  2.48E-05,  avg # of iterations =  3.3
+
+     negative rho (up, down):  1.128E-03 0.000E+00
+
+     total cpu time spent up to now is     4172.3 secs
+
+     total energy              =  -10536.18947399 Ry
+     Harris-Foulkes estimate   =  -10536.20846336 Ry
+     estimated scf accuracy    <       0.09005889 Ry
+
+     total magnetization       =    -0.24 Bohr mag/cell
+     absolute magnetization    =    46.58 Bohr mag/cell
+
+     iteration #  7     ecut=    71.00 Ry     beta= 0.10
+     Davidson diagonalization with overlap
+     ethr =  1.76E-05,  avg # of iterations =  1.7
+
+     negative rho (up, down):  1.374E-03 0.000E+00
+
+     total cpu time spent up to now is     4633.7 secs
+
+     total energy              =  -10536.16981777 Ry
+     Harris-Foulkes estimate   =  -10536.19348324 Ry
+     estimated scf accuracy    <       0.05400370 Ry
+
+     total magnetization       =    -0.02 Bohr mag/cell
+     absolute magnetization    =    46.59 Bohr mag/cell
+
+     iteration #  8     ecut=    71.00 Ry     beta= 0.10
+     Davidson diagonalization with overlap
+     ethr =  1.05E-05,  avg # of iterations =  3.1
+
+     negative rho (up, down):  1.514E-03 0.000E+00
+
+     total cpu time spent up to now is     5340.0 secs
+
+     total energy              =  -10536.16625488 Ry
+     Harris-Foulkes estimate   =  -10536.17520963 Ry
+     estimated scf accuracy    <       0.07708320 Ry
+
+     total magnetization       =     0.03 Bohr mag/cell
+     absolute magnetization    =    46.77 Bohr mag/cell
+
+     iteration #  9     ecut=    71.00 Ry     beta= 0.10
+     Davidson diagonalization with overlap
+     ethr =  1.05E-05,  avg # of iterations =  2.0
+
+     negative rho (up, down):  1.379E-03 0.000E+00
+
+     total cpu time spent up to now is     5851.0 secs
+
+     total energy              =  -10536.17326566 Ry
+     Harris-Foulkes estimate   =  -10536.16940885 Ry
+     estimated scf accuracy    <       0.03851015 Ry
+
+     total magnetization       =    -0.02 Bohr mag/cell
+     absolute magnetization    =    46.92 Bohr mag/cell
+
+     iteration # 10     ecut=    71.00 Ry     beta= 0.10
+     Davidson diagonalization with overlap
+     ethr =  7.52E-06,  avg # of iterations =  1.3
+
+     negative rho (up, down):  1.052E-04 0.000E+00
+
+     total cpu time spent up to now is     6277.4 secs
+
+     total energy              =  -10536.20592484 Ry
+     Harris-Foulkes estimate   =  -10536.17438506 Ry
+     estimated scf accuracy    <       0.03880067 Ry
+
+     total magnetization       =    -0.10 Bohr mag/cell
+     absolute magnetization    =    47.05 Bohr mag/cell
+
+     iteration # 11     ecut=    71.00 Ry     beta= 0.10
+     Davidson diagonalization with overlap
+     ethr =  7.52E-06,  avg # of iterations =  3.7
+
+     total cpu time spent up to now is     7188.2 secs
+
+     total energy              =  -10536.23530886 Ry
+     Harris-Foulkes estimate   =  -10536.22101332 Ry
+     estimated scf accuracy    <       0.04300780 Ry
+
+     total magnetization       =    -0.18 Bohr mag/cell
+     absolute magnetization    =    47.70 Bohr mag/cell
+
+     iteration # 12     ecut=    71.00 Ry     beta= 0.10
+     Davidson diagonalization with overlap
+     ethr =  7.52E-06,  avg # of iterations =  3.1
+
+     total cpu time spent up to now is     7961.2 secs
+
+     total energy              =  -10536.24705275 Ry
+     Harris-Foulkes estimate   =  -10536.24342160 Ry
+     estimated scf accuracy    <       0.01280166 Ry
+
+     total magnetization       =    -0.07 Bohr mag/cell
+     absolute magnetization    =    48.08 Bohr mag/cell
+
+     iteration # 13     ecut=    71.00 Ry     beta= 0.10
+     Davidson diagonalization with overlap
+     ethr =  2.50E-06,  avg # of iterations =  3.7
+
+     total cpu time spent up to now is     8864.0 secs
+
+     total energy              =  -10536.24498945 Ry
+     Harris-Foulkes estimate   =  -10536.24960568 Ry
+     estimated scf accuracy    <       0.01277880 Ry
+
+     total magnetization       =    -0.03 Bohr mag/cell
+     absolute magnetization    =    48.29 Bohr mag/cell
+
+     iteration # 14     ecut=    71.00 Ry     beta= 0.10
+     Davidson diagonalization with overlap
+     ethr =  2.50E-06,  avg # of iterations =  3.1
+
+     total cpu time spent up to now is     9639.3 secs
+
+     total energy              =  -10536.24715282 Ry
+     Harris-Foulkes estimate   =  -10536.24710811 Ry
+     estimated scf accuracy    <       0.00539177 Ry
+
+     total magnetization       =    -0.06 Bohr mag/cell
+     absolute magnetization    =    48.36 Bohr mag/cell
+
+     iteration # 15     ecut=    71.00 Ry     beta= 0.10
+     Davidson diagonalization with overlap
+     ethr =  1.05E-06,  avg # of iterations =  1.0
+
+     total cpu time spent up to now is    10023.9 secs
+
+     total energy              =  -10536.24771170 Ry
+     Harris-Foulkes estimate   =  -10536.24736018 Ry
+     estimated scf accuracy    <       0.00278843 Ry
+
+     total magnetization       =    -0.06 Bohr mag/cell
+     absolute magnetization    =    48.38 Bohr mag/cell
+
+     iteration # 16     ecut=    71.00 Ry     beta= 0.10
+     Davidson diagonalization with overlap
+     ethr =  5.45E-07,  avg # of iterations =  1.0
+
+     total cpu time spent up to now is    10412.8 secs
+
+     total energy              =  -10536.24785293 Ry
+     Harris-Foulkes estimate   =  -10536.24781223 Ry
+     estimated scf accuracy    <       0.00215169 Ry
+
+     total magnetization       =    -0.07 Bohr mag/cell
+     absolute magnetization    =    48.45 Bohr mag/cell
+
+     iteration # 17     ecut=    71.00 Ry     beta= 0.10
+     Davidson diagonalization with overlap
+     ethr =  4.20E-07,  avg # of iterations =  1.0
+
+     total cpu time spent up to now is    10800.1 secs
+
+     total energy              =  -10536.24819628 Ry
+     Harris-Foulkes estimate   =  -10536.24797805 Ry
+     estimated scf accuracy    <       0.00325621 Ry
+
+     total magnetization       =    -0.07 Bohr mag/cell
+     absolute magnetization    =    48.50 Bohr mag/cell
+
+     iteration # 18     ecut=    71.00 Ry     beta= 0.10
+     Davidson diagonalization with overlap
+     ethr =  4.20E-07,  avg # of iterations =  1.1
+
+     total cpu time spent up to now is    11198.2 secs
+
+     total energy              =  -10536.24843546 Ry
+     Harris-Foulkes estimate   =  -10536.24835378 Ry
+     estimated scf accuracy    <       0.00126237 Ry
+
+     total magnetization       =    -0.06 Bohr mag/cell
+     absolute magnetization    =    48.64 Bohr mag/cell
+
+     iteration # 19     ecut=    71.00 Ry     beta= 0.10
+     Davidson diagonalization with overlap
+     ethr =  2.47E-07,  avg # of iterations =  2.0
+
+     total cpu time spent up to now is    11703.0 secs
+
+     total energy              =  -10536.24862760 Ry
+     Harris-Foulkes estimate   =  -10536.24851061 Ry
+     estimated scf accuracy    <       0.00070874 Ry
+
+     total magnetization       =    -0.05 Bohr mag/cell
+     absolute magnetization    =    48.71 Bohr mag/cell
+
+     iteration # 20     ecut=    71.00 Ry     beta= 0.10
+     Davidson diagonalization with overlap
+     ethr =  1.38E-07,  avg # of iterations =  1.9
+
+     total cpu time spent up to now is    12184.6 secs
+
+     total energy              =  -10536.24873344 Ry
+     Harris-Foulkes estimate   =  -10536.24867252 Ry
+     estimated scf accuracy    <       0.00063388 Ry
+
+     total magnetization       =    -0.04 Bohr mag/cell
+     absolute magnetization    =    48.79 Bohr mag/cell
+
+     iteration # 21     ecut=    71.00 Ry     beta= 0.10
+     Davidson diagonalization with overlap
+     ethr =  1.24E-07,  avg # of iterations =  1.2
+
+     total cpu time spent up to now is    12591.7 secs
+
+     total energy              =  -10536.24874248 Ry
+     Harris-Foulkes estimate   =  -10536.24876625 Ry
+     estimated scf accuracy    <       0.00064370 Ry
+
+     total magnetization       =    -0.05 Bohr mag/cell
+     absolute magnetization    =    48.85 Bohr mag/cell
+
+     iteration # 22     ecut=    71.00 Ry     beta= 0.10
+     Davidson diagonalization with overlap
+     ethr =  1.24E-07,  avg # of iterations =  1.0
+
+     total cpu time spent up to now is    12977.5 secs
+
+     total energy              =  -10536.24888556 Ry
+     Harris-Foulkes estimate   =  -10536.24876800 Ry
+     estimated scf accuracy    <       0.00038795 Ry
+
+     total magnetization       =    -0.04 Bohr mag/cell
+     absolute magnetization    =    48.86 Bohr mag/cell
+
+     iteration # 23     ecut=    71.00 Ry     beta= 0.10
+     Davidson diagonalization with overlap
+     ethr =  7.58E-08,  avg # of iterations =  2.4
+
+     total cpu time spent up to now is    13536.7 secs
+
+     total energy              =  -10536.24896251 Ry
+     Harris-Foulkes estimate   =  -10536.24893014 Ry
+     estimated scf accuracy    <       0.00016794 Ry
+
+     total magnetization       =    -0.04 Bohr mag/cell
+     absolute magnetization    =    49.00 Bohr mag/cell
+
+     iteration # 24     ecut=    71.00 Ry     beta= 0.10
+     Davidson diagonalization with overlap
+     ethr =  3.28E-08,  avg # of iterations =  2.1
+
+     total cpu time spent up to now is    14049.4 secs
+
+     total energy              =  -10536.24901195 Ry
+     Harris-Foulkes estimate   =  -10536.24897175 Ry
+     estimated scf accuracy    <       0.00015832 Ry
+
+     total magnetization       =    -0.03 Bohr mag/cell
+     absolute magnetization    =    49.04 Bohr mag/cell
+
+     iteration # 25     ecut=    71.00 Ry     beta= 0.10
+     Davidson diagonalization with overlap
+     ethr =  3.09E-08,  avg # of iterations =  2.3
+
+     total cpu time spent up to now is    14587.8 secs
+
+     total energy              =  -10536.24905202 Ry
+     Harris-Foulkes estimate   =  -10536.24902224 Ry
+     estimated scf accuracy    <       0.00010383 Ry
+
+     total magnetization       =    -0.03 Bohr mag/cell
+     absolute magnetization    =    49.10 Bohr mag/cell
+
+     iteration # 26     ecut=    71.00 Ry     beta= 0.10
+     Davidson diagonalization with overlap
+     ethr =  2.03E-08,  avg # of iterations =  2.8
+
+     total cpu time spent up to now is    15203.8 secs
+
+     total energy              =  -10536.24907540 Ry
+     Harris-Foulkes estimate   =  -10536.24906502 Ry
+     estimated scf accuracy    <       0.00008794 Ry
+
+     total magnetization       =    -0.04 Bohr mag/cell
+     absolute magnetization    =    49.18 Bohr mag/cell
+
+     iteration # 27     ecut=    71.00 Ry     beta= 0.10
+     Davidson diagonalization with overlap
+     ethr =  1.72E-08,  avg # of iterations =  2.3
+
+     total cpu time spent up to now is    15752.3 secs
+
+     total energy              =  -10536.24909820 Ry
+     Harris-Foulkes estimate   =  -10536.24908480 Ry
+     estimated scf accuracy    <       0.00006224 Ry
+
+     total magnetization       =    -0.03 Bohr mag/cell
+     absolute magnetization    =    49.25 Bohr mag/cell
+
+     iteration # 28     ecut=    71.00 Ry     beta= 0.10
+     Davidson diagonalization with overlap
+     ethr =  1.22E-08,  avg # of iterations =  1.7
+
+     total cpu time spent up to now is    16223.9 secs
+
+     total energy              =  -10536.24910521 Ry
+     Harris-Foulkes estimate   =  -10536.24910218 Ry
+     estimated scf accuracy    <       0.00007437 Ry
+
+     total magnetization       =    -0.02 Bohr mag/cell
+     absolute magnetization    =    49.29 Bohr mag/cell
+
+     iteration # 29     ecut=    71.00 Ry     beta= 0.10
+     Davidson diagonalization with overlap
+     ethr =  1.22E-08,  avg # of iterations =  1.3
+
+     total cpu time spent up to now is    16644.4 secs
+
+     total energy              =  -10536.24912076 Ry
+     Harris-Foulkes estimate   =  -10536.24910876 Ry
+     estimated scf accuracy    <       0.00004236 Ry
+
+     total magnetization       =    -0.02 Bohr mag/cell
+     absolute magnetization    =    49.32 Bohr mag/cell
+
+     iteration # 30     ecut=    71.00 Ry     beta= 0.10
+     Davidson diagonalization with overlap
+     ethr =  8.27E-09,  avg # of iterations =  1.8
+
+     total cpu time spent up to now is    17127.0 secs
+
+     total energy              =  -10536.24913217 Ry
+     Harris-Foulkes estimate   =  -10536.24912313 Ry
+     estimated scf accuracy    <       0.00004076 Ry
+
+     total magnetization       =    -0.02 Bohr mag/cell
+     absolute magnetization    =    49.35 Bohr mag/cell
+
+     iteration # 31     ecut=    71.00 Ry     beta= 0.10
+     Davidson diagonalization with overlap
+     ethr =  7.96E-09,  avg # of iterations =  1.4
+
+     total cpu time spent up to now is    17560.8 secs
+
+     total energy              =  -10536.24913997 Ry
+     Harris-Foulkes estimate   =  -10536.24913429 Ry
+     estimated scf accuracy    <       0.00003083 Ry
+
+     total magnetization       =    -0.02 Bohr mag/cell
+     absolute magnetization    =    49.38 Bohr mag/cell
+
+     iteration # 32     ecut=    71.00 Ry     beta= 0.10
+     Davidson diagonalization with overlap
+     ethr =  6.02E-09,  avg # of iterations =  3.0
+
+     total cpu time spent up to now is    18258.8 secs
+
+     total energy              =  -10536.24915139 Ry
+     Harris-Foulkes estimate   =  -10536.24914901 Ry
+     estimated scf accuracy    <       0.00003030 Ry
+
+     total magnetization       =    -0.01 Bohr mag/cell
+     absolute magnetization    =    49.46 Bohr mag/cell
+
+     iteration # 33     ecut=    71.00 Ry     beta= 0.10
+     Davidson diagonalization with overlap
+     ethr =  5.92E-09,  avg # of iterations =  2.6
+
+     total cpu time spent up to now is    18857.4 secs
+
+     total energy              =  -10536.24915692 Ry
+     Harris-Foulkes estimate   =  -10536.24915627 Ry
+     estimated scf accuracy    <       0.00000516 Ry
+
+     total magnetization       =    -0.01 Bohr mag/cell
+     absolute magnetization    =    49.52 Bohr mag/cell
+
+     iteration # 34     ecut=    71.00 Ry     beta= 0.10
+     Davidson diagonalization with overlap
+     ethr =  1.01E-09,  avg # of iterations =  2.5
+
+     total cpu time spent up to now is    19434.4 secs
+
+     total energy              =  -10536.24915782 Ry
+     Harris-Foulkes estimate   =  -10536.24915727 Ry
+     estimated scf accuracy    <       0.00000624 Ry
+
+     total magnetization       =    -0.01 Bohr mag/cell
+     absolute magnetization    =    49.52 Bohr mag/cell
+
+     iteration # 35     ecut=    71.00 Ry     beta= 0.10
+     Davidson diagonalization with overlap
+     ethr =  1.01E-09,  avg # of iterations =  1.0
+
+     total cpu time spent up to now is    19819.6 secs
+
+     total energy              =  -10536.24915866 Ry
+     Harris-Foulkes estimate   =  -10536.24915801 Ry
+     estimated scf accuracy    <       0.00000325 Ry
+
+     total magnetization       =    -0.01 Bohr mag/cell
+     absolute magnetization    =    49.52 Bohr mag/cell
+
+     iteration # 36     ecut=    71.00 Ry     beta= 0.10
+     Davidson diagonalization with overlap
+     ethr =  6.34E-10,  avg # of iterations =  2.0
+
+     total cpu time spent up to now is    20318.0 secs
+
+     total energy              =  -10536.24915948 Ry
+     Harris-Foulkes estimate   =  -10536.24915899 Ry
+     estimated scf accuracy    <       0.00000308 Ry
+
+     total magnetization       =    -0.01 Bohr mag/cell
+     absolute magnetization    =    49.53 Bohr mag/cell
+
+     iteration # 37     ecut=    71.00 Ry     beta= 0.10
+     Davidson diagonalization with overlap
+     ethr =  6.01E-10,  avg # of iterations =  1.4
+
+     total cpu time spent up to now is    20753.2 secs
+
+     total energy              =  -10536.24916012 Ry
+     Harris-Foulkes estimate   =  -10536.24915970 Ry
+     estimated scf accuracy    <       0.00000103 Ry
+
+     total magnetization       =    -0.01 Bohr mag/cell
+     absolute magnetization    =    49.54 Bohr mag/cell
+
+     iteration # 38     ecut=    71.00 Ry     beta= 0.10
+     Davidson diagonalization with overlap
+     ethr =  2.02E-10,  avg # of iterations =  2.6
+ 
+     Magnetic moment per site:
+     atom:    1    charge:   14.3919    magn:    1.4900    constr:    0.0000
+     atom:    2    charge:   14.3916    magn:   -1.4928    constr:    0.0000
+     atom:    3    charge:   14.3912    magn:    1.4929    constr:    0.0000
+     atom:    4    charge:   14.3919    magn:   -1.4904    constr:    0.0000
+     atom:    5    charge:   14.3916    magn:    1.4917    constr:    0.0000
+     atom:    6    charge:   14.3917    magn:   -1.4931    constr:    0.0000
+     atom:    7    charge:   14.3912    magn:    1.4929    constr:    0.0000
+     atom:    8    charge:   14.3919    magn:   -1.4904    constr:    0.0000
+     atom:    9    charge:   14.3916    magn:    1.4903    constr:    0.0000
+     atom:   10    charge:   14.3915    magn:   -1.4981    constr:    0.0000
+     atom:   11    charge:   14.3913    magn:    1.4928    constr:    0.0000
+     atom:   12    charge:   14.3919    magn:   -1.4904    constr:    0.0000
+     atom:   13    charge:   14.3917    magn:    1.4914    constr:    0.0000
+     atom:   14    charge:   14.3917    magn:   -1.4931    constr:    0.0000
+     atom:   15    charge:   14.3913    magn:    1.4928    constr:    0.0000
+     atom:   16    charge:   14.3919    magn:   -1.4904    constr:    0.0000
+     atom:   17    charge:   14.3914    magn:    1.4910    constr:    0.0000
+     atom:   18    charge:   14.3915    magn:   -1.4981    constr:    0.0000
+     atom:   19    charge:   14.3912    magn:    1.4929    constr:    0.0000
+     atom:   20    charge:   14.3920    magn:   -1.4900    constr:    0.0000
+     atom:   21    charge:   14.3915    magn:    1.4921    constr:    0.0000
+     atom:   22    charge:   14.3917    magn:   -1.4931    constr:    0.0000
+     atom:   23    charge:   14.3912    magn:    1.4929    constr:    0.0000
+     atom:   24    charge:   14.3920    magn:   -1.4900    constr:    0.0000
+     atom:   25    charge:   14.3916    magn:    1.4893    constr:    0.0000
+     atom:   26    charge:   14.3916    magn:   -1.4928    constr:    0.0000
+     atom:   27    charge:   14.3913    magn:    1.4928    constr:    0.0000
+     atom:   28    charge:   14.3920    magn:   -1.4900    constr:    0.0000
+     atom:   29    charge:   14.3914    magn:    1.4901    constr:    0.0000
+     atom:   30    charge:   14.3917    magn:   -1.4931    constr:    0.0000
+     atom:   31    charge:   14.3913    magn:    1.4928    constr:    0.0000
+     atom:   32    charge:   14.3920    magn:   -1.4900    constr:    0.0000
+
+     total cpu time spent up to now is    21336.6 secs
+
+     End of self-consistent calculation
+
+     Number of k-points >= 100: set verbosity='high' to print the bands.
+
+     the Fermi energy is    20.1186 ev
+
+!    total energy              =  -10536.24916122 Ry
+     Harris-Foulkes estimate   =  -10536.24916018 Ry
+     estimated scf accuracy    <       0.00000095 Ry
+
+     total all-electron energy =    -81457.738219 Ry
+
+     The total energy is the sum of the following terms:
+
+     one-electron contribution =   -3292.47010315 Ry
+     hartree contribution      =    1996.55580355 Ry
+     xc contribution           =    -886.95720108 Ry
+     ewald contribution        =   -5703.83152086 Ry
+     one-center paw contrib.   =   -2649.56055412 Ry
+     smearing contrib. (-TS)   =       0.01441444 Ry
+
+     total magnetization       =    -0.01 Bohr mag/cell
+     absolute magnetization    =    49.54 Bohr mag/cell
+
+     convergence has been achieved in  38 iterations
+
+     Forces acting on atoms (cartesian axes, Ry/au):
+
+     atom    1 type  1   force =     0.00000000    0.00000000    0.00000000
+     atom    2 type  2   force =     0.00006122    0.00001332    0.00000000
+     atom    3 type  3   force =     0.00011266    0.00001507    0.00005046
+     atom    4 type  4   force =     0.00001374   -0.00009032   -0.00006711
+     atom    5 type  1   force =     0.00000000    0.00000000    0.00000000
+     atom    6 type  2   force =     0.00008131   -0.00014725    0.00000000
+     atom    7 type  3   force =     0.00011266    0.00001507   -0.00005046
+     atom    8 type  4   force =     0.00001374   -0.00009032    0.00006711
+     atom    9 type  1   force =     0.00000000    0.00000000    0.00000000
+     atom   10 type  2   force =    -0.00003003   -0.00006443    0.00000000
+     atom   11 type  3   force =    -0.00000126   -0.00009377   -0.00000024
+     atom   12 type  4   force =    -0.00001374    0.00009032   -0.00006711
+     atom   13 type  1   force =     0.00000000    0.00000000    0.00000000
+     atom   14 type  2   force =    -0.00001222    0.00002606    0.00000000
+     atom   15 type  3   force =    -0.00000126   -0.00009377    0.00000024
+     atom   16 type  4   force =    -0.00001374    0.00009032    0.00006711
+     atom   17 type  1   force =     0.00000000    0.00000000    0.00000000
+     atom   18 type  2   force =     0.00003003    0.00006443    0.00000000
+     atom   19 type  3   force =    -0.00011266   -0.00001507    0.00005046
+     atom   20 type  4   force =     0.00005629    0.00002157   -0.00005258
+     atom   21 type  1   force =     0.00000000    0.00000000    0.00000000
+     atom   22 type  2   force =     0.00001222   -0.00002606    0.00000000
+     atom   23 type  3   force =    -0.00011266   -0.00001507   -0.00005046
+     atom   24 type  4   force =     0.00005629    0.00002157    0.00005258
+     atom   25 type  1   force =     0.00000000    0.00000000    0.00000000
+     atom   26 type  2   force =    -0.00006122   -0.00001332    0.00000000
+     atom   27 type  3   force =     0.00000126    0.00009377   -0.00000024
+     atom   28 type  4   force =    -0.00005629   -0.00002157   -0.00005258
+     atom   29 type  1   force =     0.00000000    0.00000000    0.00000000
+     atom   30 type  2   force =    -0.00008131    0.00014725    0.00000000
+     atom   31 type  3   force =     0.00000126    0.00009377    0.00000024
+     atom   32 type  4   force =    -0.00005629   -0.00002157    0.00005258
+
+     Total force =     0.000500     Total SCF correction =     0.001988
+     SCF correction compared to forces is large: reduce conv_thr to get better values
+
+
+     Computing stress (Cartesian axis) and pressure
+
+          total   stress  (Ry/bohr**3)                   (kbar)     P=   -0.51
+  -0.00000304  -0.00012627   0.00000000         -0.45    -18.58      0.00
+  -0.00012627  -0.00000161   0.00000000        -18.58     -0.24      0.00
+   0.00000000   0.00000000  -0.00000574          0.00      0.00     -0.85
+
+
+     Writing output data file qijebWGqjLwwSClC.save/
+-------------------------------------------------------
+Primary job  terminated normally, but 1 process returned
+a non-zero exit code.. Per user-direction, the job has been aborted.
+-------------------------------------------------------
+--------------------------------------------------------------------------
+mpirun detected that one or more processes exited with non-zero status, thus causing
+the job to be terminated. The first process to do so was:
+
+  Process name: [[59376,1],0]
+  Exit code:    38
+--------------------------------------------------------------------------

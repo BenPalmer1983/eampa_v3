@@ -141,3 +141,6 @@ class pf_parameters:
       #print(rho)
     return rho
     
+    
+  def p_diff():
+    return (g.pfdata['params']['var'][1,:] - g.pfdata['params']['var'][0,:])

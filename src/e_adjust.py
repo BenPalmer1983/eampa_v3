@@ -50,7 +50,7 @@ class e_adjust:
                                             'calc_apaev': apaev,
                                            }
     
-    
+    print(g.dft_energy_adjustments)
 
     """
     # Pd,32,-1264.06398979,Ry,-6.5,eV

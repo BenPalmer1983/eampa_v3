@@ -8,17 +8,20 @@ class gd:
   rss_in = None
   p_out = None
   rss_out = None
-  
+  fix = None
 
   # Central Difference
   def df(p):
     d = numpy.zeros((len(p),),)
     for i in range(len(p)):
-      p_f = numpy.copy(p)
-      p_f[i] = p_f[i] + gd.h
-      p_b = numpy.copy(p)
-      p_b[i] = p_b[i] - gd.h
-      d[i] = (gd.rss(p_f) - gd.rss(p_b)) / (2 * gd.h)
+      if(gd.fix[i] == 0.0):
+        d[i] = 0.0
+      else:
+        p_f = numpy.copy(p)
+        p_f[i] = p_f[i] + gd.h
+        p_b = numpy.copy(p)
+        p_b[i] = p_b[i] - gd.h
+        d[i] = (gd.rss(p_f) - gd.rss(p_b)) / (2 * gd.h)
     return d
 
   def line_search(p, dp):
@@ -44,11 +47,23 @@ class gd:
     
 
   # Gradient Descent
-  def opt(f_rss, p0):
+  def opt(f_rss, p0, fix=None):
     gd.rss = f_rss   
     gd.last_gamma = 1.0
     p = p0
     
+    if(type(fix) == numpy.ndarray):
+      if(len(p) == len(fix)):
+        for i in range(len(fix)):
+          if(fix[i] != 0.0):
+            fix[i] = 1.0
+      else:
+        fix = numpy.zeros((len(p0),),)
+        fix[:] = 1.0
+    else:
+      fix = numpy.zeros((len(p0),),)
+      fix[:] = 1.0
+    gd.fix = fix  
     gd.p_in = numpy.copy(p)
     gd.rss_in = gd.rss(p)
     

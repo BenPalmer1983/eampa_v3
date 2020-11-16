@@ -8,14 +8,12 @@ import numpy
 #from isotopes import isotopes
 #import matplotlib.pyplot as plt
 import matplotlib.pyplot as plt
-from mask import mask
 from read_input import read_input
 from memory import memory
 from labels import labels
 from potential import potential
 from potential_vary import potential_vary
 from configs import configs
-from e_adjust import e_adjust
 from b_props import b_props
 from efs_calc import efs_calc
 from bp_calc import bp_calc
@@ -52,19 +50,13 @@ class eampa:
     
     # Set memory
     memory.run() 
-    
-    # Mask
-    mask.process()
-    
+        
     # Load potentials
     potential.load()
     
     # Load configs
     configs.load()
-    
-    # Energy Adjustments (dft)
-    e_adjust.load()
-    
+        
     # Bulk Properties
     b_props.load()
     
@@ -138,4 +130,8 @@ class eampa:
   
   
   
+
+  def exit():
+    print("End of Program")
+    exit()
   

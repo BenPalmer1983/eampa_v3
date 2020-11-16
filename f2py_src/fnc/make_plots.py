@@ -1,4 +1,9 @@
+
+#export PYTHONPATH=$PYTHONPATH:"/cloud/Code/python/eampa/f2py_lib"
+
+
 from f_fnc import fnc
+from eampa_lib.f_spline import spline
 import numpy
 import matplotlib.pyplot as plt
 
@@ -84,12 +89,12 @@ class make_plots:
     y = fnc.mendelev_embedding_v(x, numpy.asarray(p, dtype=numpy.float32), numpy.asarray(p_fixed, dtype=numpy.float32))
     make_plots.plot('mendelev_embedding', 'Mendelev Embedding', x, y)      
     
-    p = [1.0, 1.0, 1.0]
+    p = [-4., 3.5, -0.1]
     p_fixed = [0.0]
     y = fnc.triple_embedding_v(x, numpy.asarray(p, dtype=numpy.float32), numpy.asarray(p_fixed, dtype=numpy.float32))
     make_plots.plot('triple_embedding', 'Triple Embedding', x, y)       
     
-    p = [1.0, 1.0, 1.0]
+    p = [-4.5, 2.95, -0.2]
     p_fixed = [0.0]
     y = fnc.ackland_embedding_v(x, numpy.asarray(p, dtype=numpy.float32), numpy.asarray(p_fixed, dtype=numpy.float32))
     make_plots.plot('ackland_embedding', 'Ackland Embedding', x, y)  
@@ -104,24 +109,44 @@ class make_plots:
     #####################################
     
     x = numpy.linspace(0.0, 7.0, 100) 
-    p = [-165.0,-78.5,-78.15,1.868]
-    p_fixed = [0.976, 1.15, 1.216, 1.650]
+    p = [0.9, 2.0, -0.1, 0.1, 0.07]
+    p_fixed = [1.0, 2.0, 3.0, 5.0, 7.0]
     y = fnc.cubic_spline_v(x, numpy.asarray(p, dtype=numpy.float32), numpy.asarray(p_fixed, dtype=numpy.float32))
     make_plots.plot('cubic_spline', 'Cubic Spline', x, y)     
     
     x = numpy.linspace(0.0, 7.0, 100) 
-    p = [-165.0,-78.5,-78.15,1.868]
-    p_fixed = [0.976, 1.15, 1.216, 1.650]
+    p = [0.9, 2.0, -0.1, 0.1, 0.07]
+    p_fixed = [1.0, 2.0, 3.0, 5.0, 7.0]
     y = fnc.quintic_spline_v(x, numpy.asarray(p, dtype=numpy.float32), numpy.asarray(p_fixed, dtype=numpy.float32))
     make_plots.plot('quintic_spline', 'Quintic Spline', x, y)     
     
     
+    nodes = numpy.asarray([[0.0,2.1],[1.0,0.5],[2.0,1.0],[3.0,0.2],[4.0,-0.5],[5.0,0.05],[7.0,0.0]])
+
+    #xy = spline.get_nodes(x, y, 0.0, 7.0, 100, )
+    xy = spline.spline_nodes(1, nodes, 100)
+    make_plots.plot('poly3_node_spline', 'Poly3 Node Spline', xy[:,0], xy[:,1])   
+
+    xy = spline.spline_nodes(2, nodes, 100)
+    make_plots.plot('poly5_node_spline', 'Poly5 Node Spline', xy[:,0], xy[:,1])   
+
+
+#S
+#TYPE poly3
+#X   0.0        0.65       1.3        1.95       2.6        3.25       3.9        4.55       5.2        5.85       6.5        
+#Y   1.0        1.02352977 1.18823904 -0.0162325 0.04562567 0.02066891 0.00685261 0.00553381 0.00331582 0.00160056 0.0  
+#POINTS 1001
+
+    #x = numpy.linspace(0.0, 7.0, 100) 
+    #p = [1000, 20, 1.0,-0.1,0.1,0.0]
+    #p_fixed = [0.0, 1.0, 2.0, 3.0, 4.0, 7.0]
+    #y = fnc.quintic_spline_v(x, numpy.asarray(p, dtype=numpy.float32), numpy.asarray(p_fixed, dtype=numpy.float32))
+    #make_plots.plot('quintic_spline', 'Quintic Spline', x, y)  
     
     
+
     
-    
-    
-    
+    #spline_n_node(r, p, pf)
     
     
     

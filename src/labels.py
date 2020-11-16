@@ -3,6 +3,11 @@ class labels:
   @staticmethod
   def add(label):
     label = label.upper()
+    
+    # Check for mask
+    if(label in g.mask.keys()):
+      label = g.mask[label].upper()
+    
     if(label in g.labels.keys()):
       return label, g.labels[label]
     else: 

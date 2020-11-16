@@ -1,6 +1,6 @@
 #!/bin/bash
 
-
+mkdir -p ../../f2py_lib/eampa_lib/
 top=$("pwd")
 echo $top
 for d in */ ; do

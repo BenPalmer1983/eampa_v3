@@ -1,0 +1,69 @@
+###########################################################################
+Mon, 16 Nov 2020 01:06:20 +0000
+###########################################################################
+
+Script: /cloud/Code/python/eampa/eampa.py
+Loaded: input.in
+rssa0: 1.0
+b0: 1.0
+bp: 1.0
+config: 1.0
+e: 1.0
+e0: 1.0
+ec: 0.01
+energy: 1.0
+force: 1.0
+g: 1.0
+stress: 1.0
+v: 1.0
+cycles: 1
+enhance_every: 10
+enhance_top: 10
+exct_every: 5
+exct_factor: 0.6
+exct_top_bias: 0.5
+exct_var: 0.1
+fresh_size: 4
+fresh_we: 2.0
+fresh_ws: 0.1
+gen_var_factor: 0.95
+gens: 2
+mutate_chance: 0.05
+mutate_scale: 2.0
+no_clone_var: 0.05
+no_clones: True
+pool_size: 1000
+pop_size: 10
+rescale_default: 0.6
+rescale_density: 2
+rescale_max: 0.9
+rescale_min: 0.3
+sane_fraction: 0.95
+sane_seeds_a: 10
+sane_seeds_b: 100
+spline_cycles: 0
+spline_gens: 4
+wide_end: 15.0
+wide_start: 0.4
+pot_dir: None
+pot_name: None
+results_dir: results
+bp_file: bp.dat
+dir: bp
+ec_size: 6
+ec_strain: 0.001
+eos_size: 6
+eos_strain: 0.001
+FE1: FE
+FE2: FE
+FE3: FE
+FE4: FE
+1GB
+1GB
+BP Allocated Memory
+1GB
+127551 1530612 12755102
+
+###########################################################################
+Duration: 27.36578106880188
+###########################################################################

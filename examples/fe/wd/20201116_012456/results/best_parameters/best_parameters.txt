@@ -1,0 +1,1 @@
+Fn: 0   Type: splineFn: 1   Type: splineFn:2[A]   [0] -4.68635   [1] 6.071982   [2] -0.18531 

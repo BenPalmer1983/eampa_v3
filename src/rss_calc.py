@@ -52,7 +52,16 @@ class rss_calc:
     print('CONFIGS')    
     for n in range(efs.cc):    
       print('Config ' + str(n+1) + ':', efs.config_energy[n,2], efs.energies[n], (efs.config_energy[n,2]-efs.energies[n])**2)
-    print('All configs weighted: ' + str(efs.total_rss_weighted))
+    print('All configs:                   ' + str(efs.total_rss))
+    print('All configs (energy):          ' + str(efs.energy_rss))
+    print('All configs (force):           ' + str(efs.force_rss))
+    print('All configs (stress):          ' + str(efs.stress_rss))
+    print('All configs weighted:          ' + str(efs.total_rss_weighted))
+    print('All configs weighted (energy): ' + str(efs.energy_rss_weighted))
+    print('All configs weighted (force):  ' + str(efs.force_rss_weighted))
+    print('All configs weighted (stress): ' + str(efs.stress_rss_weighted))
+    
+
     
     print('')   
     for bp_id in range(bp.bp_configs_count):  

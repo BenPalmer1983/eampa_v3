@@ -15,7 +15,8 @@ class read_input:
     read_input.fit()
     read_input.fit_results()
     read_input.bp()
-
+    read_input.mask()
+    read_input.dft_ea()
 
 
   # READ TYPE
@@ -29,7 +30,9 @@ class read_input:
       g.run_type = g.inp['run']['type'].lower().strip()
     except:
       pass
-
+      
+    # SAVE
+    g.log_fh.write(g.run_type)
 
 
   # READ 
@@ -60,6 +63,8 @@ class read_input:
       # READ 
       
       
+    # SAVE
+    g.log_fh.write(std.dict_to_str(g.rss_weights))
       
       
   def fit():
@@ -116,7 +121,8 @@ class read_input:
     if(g.fit['fresh_size'] % 2 != 0):
       g.fit['fresh_size'] = g.fit['fresh_size'] + 1
       
-      
+    # SAVE
+    g.log_fh.write(std.dict_to_str(g.fit))
       
   def fit_results():
       
@@ -134,6 +140,9 @@ class read_input:
       except:
         pass
       
+    # SAVE
+    g.log_fh.write(std.dict_to_str(g.fit_results))
+    
 
   def bp():
       
@@ -153,11 +162,71 @@ class read_input:
         g.bp_input[k] = g.inp['bp'][k]
       except:
         pass
+        
+    # SAVE
+    g.log_fh.write(std.dict_to_str(g.bp_input))
+
+
+  
+  def mask():
+    g.mask = {}
+    if('mask' in g.inp):
+      try:
+        for k in g.inp['mask']:
+          g.mask[k.upper()] = g.inp['mask'][k].upper()
+      except:
+        pass
+        
+    # SAVE
+    g.log_fh.write(std.dict_to_str(g.mask))
 
 
 
 
-
-
-
-
+  def dft_ea():
+  
+    dftea = {}
+    if('dft' in g.inp):
+      try:
+        for k in g.inp['dft']:
+          dftea[k.upper()] = g.inp['dft'][k]
+      except:
+        pass
+        
+    
+    for k in dftea.keys():
+      label_str, label_id = labels.add(k)  
+      
+      atom_count = int(dftea[k][0])
+      relaxed_energy = float(dftea[k][1])
+      relaxed_energy_unit = str(dftea[k][2])
+      coh_energy = float(dftea[k][3])
+      coh_energy_unit = str(dftea[k][4])
+      
+      relaxed_dft_ev = units.convert(relaxed_energy_unit, "EV", relaxed_energy / atom_count) # relaxed per atom in eV
+      coh_ev = units.convert(coh_energy_unit, "EV", coh_energy)
+      apaev = coh_ev - relaxed_dft_ev # Adjustment per atom ev
+      g.dft_energy_adjustments[label_id] = {
+                                            'label_id': label_id,
+                                            'label_text': label_str,
+                                            'atom_count': atom_count,
+                                            'relaxed_energy': relaxed_energy,
+                                            'relaxed_energy_unit': relaxed_energy_unit,
+                                            'coh_energy': coh_energy,
+                                            'coh_energy_unit': coh_energy_unit,
+                                            'calc_relaxed_dft_ev': relaxed_dft_ev,
+                                            'calc_coh_ev': coh_ev,
+                                            'calc_apaev': apaev,
+                                           }
+      
+      #print(g.dft_energy_adjustments[label_id])
+ 
+    #exit()
+  
+  
+  
+  
+  
+  
+  
+  

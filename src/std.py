@@ -483,6 +483,16 @@ class std:
     
     
     
+  @staticmethod
+  def dict_to_str(d, pre=''):
+    out = ''
+    for k in sorted(d):
+      if(type(k) == dict):
+        out = out + '\n' + std.dict_to_str(k, pre + '  ')      
+      else:
+        out = out + pre + str(k) + ': ' + str(d[k]) + '\n'
+    return out
+    
     
     
     

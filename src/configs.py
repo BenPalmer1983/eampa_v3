@@ -232,11 +232,10 @@ class configs:
       line = line.strip() 
       f = std.to_fields(line, ' ')
       if(len(f) >= 4 and f[0][0] != "#"):    
-        if(len(f) >= 4):
-          # Check for mask
-          l = mask.get(f[0])        
-        
-          label_str, label_id = labels.add(l)
+        if(len(f) >= 4):   
+          
+          label_str, label_id = labels.add(f[0])            
+          #print(f[0], label_str, label_id)
           fd['coords_label_prim'][n] = label_str
           fd['coords_label_id_prim'][n] = label_id
           fd['coords_prim'][n,0] = float(f[1])
@@ -473,6 +472,7 @@ class configs:
         fh.write('file_path  ' + str(c['file_path']) + ' \n')
         fh.write('file_part  ' + str(c['file_part']) + ' \n')
         fh.write('alat  ' + str(c['alat']) + ' \n')
+        fh.write('c         ' + str(c['c'][0])  + ' ' + str(c['c'][1]) + ' ' + str(c['c'][2]) + ' ' + ' \n')
         fh.write('uv_prim   ' + str(c['uv_prim'][0,0]) + ' ' + str(c['uv_prim'][0,1]) + ' ' + str(c['uv_prim'][0,2]) + ' ' + ' \n')
         fh.write('          ' + str(c['uv_prim'][1,0]) + ' ' + str(c['uv_prim'][1,1]) + ' ' + str(c['uv_prim'][1,2]) + ' ' + ' \n')
         fh.write('          ' + str(c['uv_prim'][2,0]) + ' ' + str(c['uv_prim'][2,1]) + ' ' + str(c['uv_prim'][2,2]) + ' ' + ' \n')
@@ -482,12 +482,15 @@ class configs:
         fh.write('stress    ' + str(c['stress'][0,0]) + ' ' + str(c['stress'][0,1]) + ' ' + str(c['stress'][0,2]) + ' ' + ' \n')
         fh.write('          ' + str(c['stress'][1,0]) + ' ' + str(c['stress'][1,1]) + ' ' + str(c['stress'][1,2]) + ' ' + ' \n')
         fh.write('          ' + str(c['stress'][2,0]) + ' ' + str(c['stress'][2,1]) + ' ' + str(c['stress'][2,2]) + ' ' + ' \n')
-        fh.write('c         ' + str(c['c'][0])  + ' ' + str(c['c'][1]) + ' ' + str(c['c'][2]) + ' ' + ' \n')
+        fh.write('energy    ' + str(c['energy']) + ' \n')
+        fh.write('epa       ' + str(c['energy_per_atom']) + ' \n')
         fh.write('rcut      ' + str(c['rcut']) + ' \n')
         fh.write('rverlet   ' + str(c['rverlet']) + ' \n')
         fh.write('e         ' + str(c['e']) + ' \n')
         fh.write('f         ' + str(c['f']) + ' \n')
-        fh.write('s         ' + str(c['s']) + ' \n')
+        fh.write('s         ' + str(c['s']) + ' \n')    
+        
+        
         
         fh.write('\n')        
         fh.write('COORDS PRIM (' + str(c['coord_count_prim']) + ')\n')
@@ -668,8 +671,11 @@ class configs:
     for i in range(len(g.configs['configs'])):
       if(g.configs['configs'][i]['file_type'] == 'QE'):
         #print(g.configs['configs'][i]['coord_count'], g.configs['configs'][i]['coord_count_prim'])
-        for k in range(g.configs['configs'][i]['coord_count']):      
+        for k in range(g.configs['configs'][i]['coord_count']):  
           e_adj = g.dft_energy_adjustments[g.configs['configs'][i]['coords_label_id'][k]]          
+          #except:
+          #  print("Energy Adjustment Missing for " + str(k))
+          #  eampa.exit()
           g.configs['configs'][i]['energy'] = g.configs['configs'][i]['energy'] + e_adj['calc_apaev']
         g.configs['configs'][i]['energy_per_atom'] = g.configs['configs'][i]['energy'] / g.configs['configs'][i]['coord_count'] 
         #print(g.configs['configs'][i]['energy'], g.configs['configs'][i]['energy_per_atom'])  

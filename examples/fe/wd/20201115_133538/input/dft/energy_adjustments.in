@@ -1,0 +1,12 @@
+#   Adjustment file for espresso energies
+#
+#
+#  Run a relax calculation using the converged settings
+#  input the relaxed energy and the known or calculated cohesive energy
+#
+
+# Label, vc-relax atom count, vc-relax energy, vc-relax unit, cohesive energy/atom, ce unit
+
+Al,32,-1264.06398979,Ry,-3.36,eV
+Pd,32,-1264.06398979,Ry,-6.5,eV
+

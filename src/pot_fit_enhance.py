@@ -24,7 +24,10 @@ class pf_enhance:
     
     for p in range(pop_count):
       #print(p,gd.rss_out,g.pfdata['params']['pop_rss'][p])
-      params = gd.opt(pf_enhance.gd_rss, g.pfdata['params']['pop'][p,:])
+      p_diff = pf_parameters.p_diff()
+      #print(p_diff)
+      #exit()
+      params = gd.opt(pf_enhance.gd_rss, g.pfdata['params']['pop'][p,:], p_diff)
       if(gd.rss_out < g.pfdata['params']['pop_rss'][p]):
         g.pfdata['params']['pop_rss'][p] = gd.rss_out
         g.pfdata['params']['pop'][p,:] = numpy.copy(params)

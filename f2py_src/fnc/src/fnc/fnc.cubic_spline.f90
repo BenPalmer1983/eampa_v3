@@ -2,6 +2,7 @@
 ! CUBIC SPLINE
 ! sum (ai (r - ri)^3 H(ri - r)
 
+! SCALAR SUBROUTINE
 SUBROUTINE cubic_spline(r, p, p_fixed, y)
 !############################################################
 ! p coefficients
@@ -35,6 +36,7 @@ IF(SIZE(p,1) + 1 .EQ. SIZE(p_fixed,1))THEN
 END IF
 END SUBROUTINE cubic_spline
 
+! VECTOR SUBROUTINE
 SUBROUTINE cubic_spline_v(r, p, p_fixed, y)
 !############################################################
 ! CUBIC SPLINE
@@ -46,6 +48,7 @@ REAL(kind=DoubleReal), INTENT(IN) :: p_fixed(:)
 REAL(kind=DoubleReal), INTENT(OUT) :: y(1:SIZE(r,1))
 INTEGER(kind=StandardInteger) :: n
 !############################################################
+! Loop through all the values in r(:), calculate and store in y(:)
 DO n = 1, SIZE(r,1)
   CALL cubic_spline(r(n), p, p_fixed, y(n))
 END DO
