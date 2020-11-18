@@ -39,17 +39,15 @@ class g:
          'wd': 'wd',
          }
   
-  sub_dirs = {
-         'log': 'log',  
+  sub_dirs = { 
+         'input': 'input', 
          'output': 'output',   
          'results': 'results',   
-         'plots': 'plots',  
-         'eos': 'plots/eos', 
-         'ec': 'plots/ec', 
-         'pots': 'plots/pots',  
-         'fitting': 'fitting',  
+         'plots': 'plots',     
          'configs': 'configs',  
-         'input': 'input', 
+         'fitting': 'fitting', 
+         'fitting_generations': 'fitting/generations', 
+         'fitting_finished': 'fitting/finished', 
          }
   
   times = {
@@ -83,6 +81,7 @@ class g:
   
 # Read in from input
   run_type = 'efs'
+  wd_type = {}
   rss_weights = {}
   fit = {}
   fit_results = {}
@@ -594,7 +593,7 @@ class std:
   def dict_to_str(d, pre=''):
     out = ''
     for k in sorted(d):
-      if(type(k) == dict):
+      if(type(k) == dict or type(k) == list):
         out = out + '\n' + std.dict_to_str(k, pre + '  ')      
       else:
         out = out + pre + str(k) + ': ' + str(d[k]) + '\n'
@@ -743,12 +742,15 @@ class eampa:
  
   def run():
     print("RUNNING")
-    
-# Copy Input
-    eampa.copy_input()   
-    
+        
 # Read Input
     read_input.run()    
+    
+# Setup Dirs
+    setup_dirs.run()
+    
+# Copy Input
+#eampa.copy_input()
     
 # Set memory
     memory.run() 
@@ -837,7 +839,10 @@ class eampa:
 class read_input:
  
   def run():
+    main.log_title("Read Input")
+  
     read_input.run_type()
+    read_input.wd()
     read_input.rss_weights()
     read_input.fit()
     read_input.fit_results()
@@ -858,7 +863,19 @@ class read_input:
       pass
       
 # SAVE
-    g.log_fh.write(g.run_type)
+    main.log(g.run_type)
+
+# READ TYPE
+  def wd():
+    g.wd_type = {
+    'option': 1,
+    }    
+# TRY READING
+    for k in g.wd_type.keys():
+      try:
+        g.wd_type[k] = float(g.inp['wd'][k])
+      except:
+        pass
 
 # READ
   def rss_weights():
@@ -888,7 +905,7 @@ class read_input:
 # READ
       
 # SAVE
-    g.log_fh.write(std.dict_to_str(g.rss_weights))
+    main.log(std.dict_to_str(g.rss_weights))
       
   def fit():
   
@@ -945,7 +962,7 @@ class read_input:
       g.fit['fresh_size'] = g.fit['fresh_size'] + 1
       
 # SAVE
-    g.log_fh.write(std.dict_to_str(g.fit))
+    main.log(std.dict_to_str(g.fit))
       
   def fit_results():
       
@@ -964,7 +981,7 @@ class read_input:
         pass
       
 # SAVE
-    g.log_fh.write(std.dict_to_str(g.fit_results))
+    main.log(std.dict_to_str(g.fit_results))
     
   def bp():
       
@@ -986,7 +1003,7 @@ class read_input:
         pass
         
 # SAVE
-    g.log_fh.write(std.dict_to_str(g.bp_input))
+    main.log(std.dict_to_str(g.bp_input))
 
   def mask():
     g.mask = {}
@@ -998,7 +1015,7 @@ class read_input:
         pass
         
 # SAVE
-    g.log_fh.write(std.dict_to_str(g.mask))
+    main.log(std.dict_to_str(g.mask))
 
   def dft_ea():
   
@@ -1035,16 +1052,53 @@ class read_input:
                                             'calc_apaev': apaev,
                                            }
       
-#print(g.dft_energy_adjustments[label_id])
- 
-#exit()
+# Save
+    main.log(std.dict_to_str(g.dft_energy_adjustments))
   
+###########################################
+#  CLASS setup_dir
+###########################################
+class setup_dirs:
+ 
+  def run():
+    main.log_title("Setup Directories")
+ 
+    if(g.wd_type == 1):
+      
+# SET UP DIRS
+      now = datetime.datetime.now()
+      date_time = now.strftime("%m/%d/%Y, %H:%M:%S")
+      wd_prefix = now.strftime('wd/%Y%m%d_%H%M%S')
+  
+# Set wd
+      g.dirs['wd'] = wd_prefix
+    
+    else:
+  
+# Set wd
+      g.dirs['wd'] = 'wd/wd'
+      
+    main.log("WD: " + g.dirs['wd'])
+    
+# Set sub dirs
+    if('input' not in g.sub_dirs.keys()):
+      g.sub_dirs['input'] = 'input'  
+    for sd in g.sub_dirs.keys():
+      g.dirs[sd] = g.dirs['wd'] + '/' + g.sub_dirs[sd]
+  
+# MAKE DIRS
+    for d in g.dirs.keys():
+      std.make_dir(g.dirs[d])
+      main.log(str(d) + "   " + str(g.dirs[d]))
+    
 ###########################################
 #  CLASS memor
 ###########################################
 class memory:
 
   def run():
+  
+    main.log_title("Memory")
   
     g.memory = {}
 
@@ -1057,7 +1111,6 @@ class memory:
       mem = str(g.inp['mem']['bp'])
     except:
       mem = "500MB"
-    g.log_fh.write(mem + '\n')
     mem = std.mem_value(mem)    
     g.memory['bp']['mem'] = mem   
     g.memory['bp']['c'] = int(1 * (mem / 7840))
@@ -1069,12 +1122,21 @@ class memory:
       mem = str(g.inp['mem']['efs'])
     except:
       mem = "500MB"
-    g.log_fh.write(mem + '\n')
     mem = std.mem_value(mem)  
     g.memory['efs']['mem'] = mem    
     g.memory['efs']['c'] = int(1 * (mem / 7840))
     g.memory['efs']['g'] = int(12 * (mem / 7840))
     g.memory['efs']['nl'] = int(100 * (mem / 7840))
+    
+    main.log("EFS " + str(mem))
+    main.log("config size       " + str(g.memory['efs']['c']))
+    main.log("ghost size        " + str(g.memory['efs']['g']))
+    main.log("nl size           " + str(g.memory['efs']['nl']))
+
+    main.log("BP " + str(mem))
+    main.log("config size       " + str(g.memory['bp']['c']))
+    main.log("ghost size        " + str(g.memory['bp']['g']))
+    main.log("nl size           " + str(g.memory['bp']['nl']))
 
 #print(g.memory)
 
@@ -1147,13 +1209,18 @@ class potential:
     potential.plot_python_potentials()
     
   def load():
+    main.log_title("Potential Load")
+    
     if(g.inp['potential']['dir'].strip() == ""):
       g.inp['potential']['pot_file'] = g.inp['potential']['index_file']
     else:
       g.inp['potential']['pot_file'] = g.inp['potential']['dir'] + "/" + g.inp['potential']['index_file']
     pot_file = g.inp['potential']['pot_file']
     if(not os.path.isfile(pot_file)):
+      main.log("Potential load failed - no pot file")
       return False
+    main.log("Potential file: " + str(pot_file))
+      
 # Read potential index
     potential.read_potential(pot_file)
     potential.load_tabulated()
@@ -1165,6 +1232,10 @@ class potential:
     potential.load_fit_data()
     potential.pf_output()
     potential.make_copies()
+       
+    potential.plot_python_potentials(g.dirs['plots'] + "/starting_potential")   
+       
+#main.end()
        
     return True
   
@@ -1213,6 +1284,7 @@ class potential:
         if(i > 0):
           g.pot_functions['pot_dir'] += '/'
         g.pot_functions['pot_dir'] += lst[i]
+    main.log("Loading: " + str(file_name))
         
     index = std.config_file_to_list(file_name)  
     pot = potential.pot_function()
@@ -1268,6 +1340,7 @@ class potential:
         pot = potential.pot_function()
     
 # READ ZBL DATA
+    main.log("Load zbl")
     
     read_zbl = False
     for row in index:  
@@ -1306,7 +1379,9 @@ class potential:
             'spline_type': spline_type ,
             }
         g.pot_functions['zbl'].append(z)
-       
+        main.log("--zbl---")
+        main.log(std.dict_to_str(z))
+
 ###################
 # TABULATED
 ###################
@@ -1394,6 +1469,9 @@ class potential:
     
     splined = spline.spline_nodes(st, g.pot_functions['functions'][fn]['s_nodes'][:,:], 100)
     g.pot_functions['functions'][fn]['points'] = interp.fill(splined[:,0], splined[:,1], g.tab_size, g.tab_width)
+        
+# ZBL (if pair)
+    potential.make_zbl(fn)
 
 # Now treat as tabulated
     g.pot_functions['functions'][fn]['function_type'] = 1
@@ -1474,6 +1552,9 @@ class potential:
        
 # Interpfill
     g.pot_functions['functions'][fn]['points'] = interp.fill(temp[:,0],temp[:,1], g.tab_size, g.tab_width)
+    
+# ZBL (if pair)
+    potential.make_zbl(fn)
     
   @staticmethod
   def load_fit_data(): 
@@ -1775,6 +1856,7 @@ class potential:
       axs.set_ylim(min_y, max_y)
       axs.set_yscale('symlog', linthreshy=10)
       plt.savefig(dir + '/' + file_name, format='eps')
+      plt.close('all') 
       
   def print_parameters():  
     for fn in range(len(g.pot_functions['functions'])):          
@@ -1811,6 +1893,60 @@ class potential:
       elif(g.pot_functions['functions'][fn]['fit_type'] == 2):   # ANALYTIC
         p_count = p_count + g.pot_functions['functions'][fn]['fit_size']
     return p_count  
+      
+###########################################################
+# ZBL
+###########################################################
+      
+  def make_zbl(fn):
+    
+    if(g.pot_functions['functions'][fn]['f_type_id'] == 1):
+      zbl_n = -1
+      if(len(g.pot_functions['zbl'])>0):
+        for i in range(len(g.pot_functions['zbl'])): 
+          if((g.pot_functions['functions'][fn]['a'] == g.pot_functions['zbl'][i]['id_1'] 
+             and g.pot_functions['functions'][fn]['b'] == g.pot_functions['zbl'][i]['id_2'])
+             or (g.pot_functions['functions'][fn]['a'] == g.pot_functions['zbl'][i]['id_2'] 
+             and g.pot_functions['functions'][fn]['b'] == g.pot_functions['zbl'][i]['id_1'])):
+            zbl_n = i
+            break
+      
+      if(zbl_n>=0):
+        ra = g.pot_functions['zbl'][zbl_n]['ra']
+        rb = g.pot_functions['zbl'][zbl_n]['rb']
+        qa = g.pot_functions['zbl'][zbl_n]['z1']
+        qb = g.pot_functions['zbl'][zbl_n]['z2']
+        spline_type = g.pot_functions['zbl'][zbl_n]['spline_type']
+        
+# Find the point that need replacing
+        ra_n = -1
+        for n in range(len(g.pot_functions['functions'][fn]['points'])):
+          if(g.pot_functions['functions'][fn]['points'][n,0] <= ra):
+            ra_n = n
+          elif(g.pot_functions['functions'][fn]['points'][n,0] <= rb):
+            rb_n = n
+            
+# Get node values
+        ya = fnc.zbl(ra, [qa, qb], [0.0])  
+        yap = fnc.zbl_dydr(ra, [qa, qb], [0.0]) 
+        yb = interp.interpolate(rb, g.pot_functions['functions'][fn]['points'][:,0], g.pot_functions['functions'][fn]['points'][:,1], 4)
+        ybp = interp.interpolate_dydxn(rb, g.pot_functions['functions'][fn]['points'][:,0], g.pot_functions['functions'][fn]['points'][:,1], 1, 4)
+
+# Get spline coeffs
+        coeffs = spline.spline_ab(spline_type, [ra, ya, yap], [rb, yb, ybp])
+
+# Replace with ZBL and SPLINE
+        g.pot_functions['functions'][fn]['points'][:ra_n,1] = fnc.zbl_v(g.pot_functions['functions'][fn]['points'][:ra_n,0], [qa, qb], [0.0])        
+        g.pot_functions['functions'][fn]['points'][ra_n:rb_n,1] = potential.poly(g.pot_functions['functions'][fn]['points'][ra_n:rb_n,0], coeffs)
+        
+# Recalculate derivatives etc
+        g.pot_functions['functions'][fn]['points'] = interp.fill(g.pot_functions['functions'][fn]['points'][:,0],g.pot_functions['functions'][fn]['points'][:,1], g.tab_size, g.tab_width)
+    
+  def poly(x, c):
+    y = 0.0
+    for i in range(len(c)):
+      y = y + c[i] * x**i
+    return y
       
 ###########################################################
 # F2PY functions
@@ -2093,38 +2229,50 @@ class potential_functions:
 class potential_output:
 
   @staticmethod
-  def full():
+  def full(dir_out = None):
+  
+    if(dir_out==None):  
+      dir_out = g.dirs['wd'] + '/' + g.fit_results['results_dir'] 
   
 # Make output directory
-    g.dirs['results'] = g.dirs['wd'] + '/' + g.fit_results['results_dir'] 
-    std.make_dir(g.dirs['results'])
+    std.make_dir(dir_out)
     
-    potential_output.best_parameters() 
-    potential_output.eampa()
-    potential_output.data_file()
-    potential_output.dl_poly()
-    potential_output.plots()
+    potential_output.best_parameters(dir_out) 
+    potential_output.eampa(dir_out)
+    potential_output.data_file(dir_out)
+    potential_output.dl_poly(dir_out)
+    potential_output.plots(dir_out)
     
-  def best_parameters():
-    dir_out = g.dirs['results'] + '/best_parameters'
+  def best_parameters(dir_out = None):
+    if(dir_out==None):  
+      dir_out = g.dirs['results'] + '/best_parameters'
     std.make_dir(dir_out)
     
     fh = open(dir_out + '/best_parameters.txt', 'w')    
     for fn in range(len(g.pot_functions['functions'])):          
       if(g.pot_functions['functions'][fn]['fit_type'] == 1):     # SPLINE
-        fh.write("Fn: " + str(fn) + "   Type: spline")
+        fh.write("Fn: " + str(fn) + "[S]  ")
+        fh.write("\n")
+        for i in range(len(g.pot_functions['functions'][fn]['s_nodes'][:,1])):
+          fh.write("  [" + str(i) + "] " + display.pad_r(g.pot_functions['functions'][fn]['s_nodes'][i,0],8) + " ")
+        for i in range(len(g.pot_functions['functions'][fn]['s_nodes'][:,1])):
+          fh.write("  [" + str(i) + "] " + display.pad_r(g.pot_functions['functions'][fn]['s_nodes'][i,1],8) + " ")
+          
+        fh.write("\n")
 #for i in range(g.pot_functions['functions'][fn]['fit_size']):
 #  fh.write("[" + str(i) + "]" + display.pad_r(g.pot_functions['functions'][fn]['fit_parameters'][0,i],8))
       elif(g.pot_functions['functions'][fn]['fit_type'] == 2):   # ANALYTIC
-        fh.write("Fn:" + str(fn) + "[A] ")
+        fh.write("Fn:" + str(fn) + "[A]  ")
+        fh.write("\n")
         for i in range(g.pot_functions['functions'][fn]['fit_size']):
           fh.write("  [" + str(i) + "] " + display.pad_r(g.pot_functions['functions'][fn]['a_params'][i],8) + " ")
         fh.write("\n")
     fh.close()
        
   @staticmethod
-  def eampa():
-    dir_out = g.dirs['results'] + '/pot_save'
+  def eampa(dir_out = None):
+    if(dir_out==None):   
+      dir_out = g.dirs['results'] + '/pot_save'
     std.make_dir(dir_out)
     
     fh = open(dir_out + '/out.pot', 'w')
@@ -2185,8 +2333,9 @@ class potential_output:
     fh.close()
   
   @staticmethod
-  def data_file():
-    dir_out = g.dirs['results'] + '/pot_fortran'
+  def data_file(dir_out = None):
+    if(dir_out==None):  
+      dir_out = g.dirs['results'] + '/pot_fortran'
     std.make_dir(dir_out)
     
     fh = open(dir_out + '/data.pot', 'w')
@@ -2206,8 +2355,9 @@ class potential_output:
     fh.close()
     
   @staticmethod
-  def dl_poly():
-    dir_out = g.dirs['results'] + '/dl_poly'
+  def dl_poly(dir_out = None):
+    if(dir_out==None):  
+      dir_out = g.dirs['results'] + '/dl_poly'
     std.make_dir(dir_out)
     
     fh = open(dir_out + '/pot.eam', 'w')
@@ -2261,12 +2411,11 @@ class potential_output:
     fh.close()
     
   @staticmethod
-  def plots(): 
-    dir_out = g.dirs['results'] + '/plots/python'
-    std.make_dir(dir_out)   
+  def plots(dir_out = None): 
+    if(dir_out==None):  
+      dir_out = g.dirs['results'] + '/plots'
+    std.make_dir(dir_out)    
     potential.plot_python_potentials(dir_out)
-    dir_out = g.dirs['results'] + '/plots/fortran'
-    std.make_dir(dir_out)   
     potential.plot_fortran_potentials(dir_out)
   
   @staticmethod
@@ -4935,7 +5084,7 @@ class b_props:
   """      
         
   @staticmethod
-  def bp_eos_plot():       
+  def bp_eos_plot(dir):       
   
     for bp_id in range(bp.bp_configs_count):
     
@@ -4959,8 +5108,8 @@ class b_props:
       plt.plot(bp.calc_volumes[bp_id, 0, 0:s], bp.calc_energies[bp_id, 0, 0:s], color='k',  marker="x", ls='')
       plt.plot(bp.calc_volumes[bp_id, 0, 0:s], bp.calc_energies_fit[bp_id, 0, 0:s], color='k', ls='solid')
 
-      plt.savefig(g.dirs['eos'] + '/' + 'eos.svg')
-      plt.savefig(g.dirs['eos'] + '/' + 'eos.eps')
+      plt.savefig(dir + '/' + 'eos.svg')
+      plt.savefig(dir + '/' + 'eos.eps')
       
 # ELASTIC CONSTANTS
       
@@ -4987,8 +5136,8 @@ class b_props:
         axs[int(numpy.floor(dn/3)), dn % 3].set_xlabel('Strain (Expanded Alat)')
         axs[int(numpy.floor(dn/3)), dn % 3].set_ylabel('Energy (eV)')
                
-      plt.savefig(g.dirs['ec'] + '/' + 'ec.svg')
-      plt.savefig(g.dirs['ec'] + '/' + 'ec.eps')
+      plt.savefig(dir + '/' + 'ec.svg')
+      plt.savefig(dir + '/' + 'ec.eps')
       
     """
     n = globals.d['eos_data_size']
@@ -5708,6 +5857,10 @@ class rss_calc:
   def run():
     print("Calc RSS") 
     
+# Create Plot Dirs
+    std.make_dir(g.dirs['wd'] + '/rss')
+    std.make_dir(g.dirs['wd'] + '/rss/plots')
+    
 # Setup EFS
     efs.init()                         # Initialise (allocate arrays)
     efs_calc.set_weights()
@@ -5731,11 +5884,11 @@ class rss_calc:
 # Plots
 #potential.plot_fortran_potentials()
 #potential.plot_python_potentials()
-    potential.plot_python_potentials(g.dirs['wd'] + '/plots/potential_python')
-    potential.plot_fortran_potentials(g.dirs['wd'] + '/plots/potential_fortran')
+    potential.plot_python_potentials(g.dirs['wd'] + '/rss/plots/potential_python')
+    potential.plot_fortran_potentials(g.dirs['wd'] + '/rss/plots/potential_fortran')
     
     b_props.bp_output()
-    b_props.bp_eos_plot()
+    b_props.bp_eos_plot(g.dirs['wd'] + '/rss/plots')
     
     print('')     
     print('CONFIGS')    
@@ -5865,8 +6018,13 @@ class rss_calc:
 #  CLASS p
 ###########################################
 class pf:
-  
+
   def run():    
+  
+    main.log_title("Potential Fit")
+    
+# Create Plot Dirs
+    std.make_dir(g.dirs['wd'] + '/fitting')
     
 # Set up EFS and BP modules
     pf.set_up()
@@ -5881,6 +6039,7 @@ class pf:
     potential.plot_python_potentials(g.dirs['wd'] + '/plots/pots/start_potential')
 
 # Make Pool
+    pf_parameters.setup_pool()
     pf_parameters.make_pool()
    
 # Run
@@ -6544,10 +6703,15 @@ class gd:
 class pf_data:
   
   def make():
+    main.log("Make data structure")
 
     pop_size = g.fit['pop_size']
     fresh_size = g.fit['fresh_size']
     width = potential.parameter_count()
+    
+    main.log("Pop size:    " + str(pop_size))
+    main.log("Fresh size:  " + str(fresh_size))
+    main.log("Param width: " + str(width))
     
     top_size = 10
     if(top_size < 10):
@@ -6569,6 +6733,8 @@ class pf_data:
         'stage': 'Not Set', 
         'pool': {'params': None,
                  'pn': 0,
+                 'sane_a': 0,
+                 'sane_b': 0,
                  'pmax': 10000,
         },
         'params': {'count': width, 
@@ -6857,6 +7023,9 @@ class pf_generation:
 
   def run():
   
+    if(g.pfdata['generation']['counter']>1):
+      pf_parameters.make_pool()
+  
     pf_generation.pop_size = g.fit['pop_size']
     pf_generation.pop_size_half = g.fit['pop_size'] // 2
     pf_generation.fresh_size = g.fit['fresh_size']
@@ -6905,9 +7074,14 @@ class pf_generation:
     g.pfdata['stage'] = 'Enhance'   
     pf_enhance.run()
     
-#print(g.pfdata['bp'][g.pfdata['best_hash']])
-#print(g.bp_known)
-      
+    cstr = str(g.pfdata['generation']['counter'])
+    while(len(cstr)<5):
+      cstr = '0' + cstr    
+    gen_dir = g.dirs['wd'] + '/fitting/genetic/' +  cstr
+    std.make_dir(gen_dir)
+  
+    potential_output.full(gen_dir)
+    
   def breed_event(p, c, opt):
     pc = g.pfdata['params']['count']
     
@@ -7165,18 +7339,46 @@ class pf_parameters:
     g.pfdata['pool']['pn'] = g.pfdata['pool']['pn'] + 1                      # Increment
     return p                                                                 # Return
   
-  def make_pool():
-    print("Make Pool")
+  def setup_pool():
+    width = potential.parameter_count()
+    g.pfdata['pool']['sane_a'] = g.fit['sane_seeds_a']
+    g.pfdata['pool']['sane_b'] = g.fit['sane_seeds_b']
+    g.pfdata['pool']['pmax'] = g.fit['pool_size']
+    
+    if(g.pfdata['pool']['pmax'] < (g.pfdata['pool']['sane_a'] + g.pfdata['pool']['sane_b'])):
+      g.pfdata['pool']['pmax'] = g.pfdata['pool']['sane_a'] + g.pfdata['pool']['sane_b']
+    g.pfdata['pool']['params'] = numpy.zeros((g.pfdata['pool']['pmax'],width,),)
   
+  def make_pool(p = None):
+    print("Make Pool")
+    main.log_title("Make Pool")    
+    main.log("pool size:     " + str(g.fit['pool_size']))
+    main.log("pop size:      " + str(g.fit['pop_size']))
+    main.log("fresh size:    " + str(g.fit['fresh_size']))
+    
+    if(p == None):
+      if(g.pfdata['generation']['counter'] == 0):
+        c = 0.0
+        main.log("c:    " + str(c))
+      else:
+        c = g.pfdata['params']['best']
+        
+        str_c = ''
+        for i in range(len(c)):
+          str_c = str_c + str(c[i]) + ' '
+        main.log("c:    " + str(str_c))
+        
     w_start =g.fit['wide_start']
     w_end =g.fit['wide_end']
     pmax = g.fit['pool_size']
     pop_size = g.fit['pop_size']
     fresh_size = g.fit['fresh_size']
+    sa = g.pfdata['pool']['sane_a']
+    sb = g.pfdata['pool']['sane_b']
     width = potential.parameter_count()
-  
-    g.pfdata['pool']['params'] = numpy.zeros((pmax,width,),)
-    g.pfdata['pool']['pmax'] = pmax
+#width = potential.parameter_count()
+#g.pfdata['pool']['params'] = numpy.zeros((pmax,width,),)
+#g.pfdata['pool']['pmax'] = pmax
   
 # Any Density
     if(g.fit['rescale_density'] == 0):
@@ -7185,49 +7387,64 @@ class pf_parameters:
       w_inc = (w_end - w_start) / (pmax - 1)
       pn = 0
       for n in range(pmax):
-        p = pf_parameters.random_p(0.0, w)
+        p = pf_parameters.random_p(c, w)
         g.pfdata['pool']['params'][pn, :] = copy.deepcopy(p)
         pn = pn + 1
         w = w + w_inc
 #print(pn)
     elif(g.fit['rescale_density'] == 1 or g.fit['rescale_density'] == 2):
-      sa = g.fit['sane_seeds_a']
-      sb = g.fit['sane_seeds_b']
     
       sane_a = numpy.zeros((sa,width,),)
       sane_b = numpy.zeros((sb,width,),)
       
       print("Make Sane A")
+      main.log("make sane set A")
       pn = 0
       while(pn < sa):
-        params = pf_cycle.random_p()
-        pf_potential.update(params, True)
+        sane_a[pn,:] = pf_cycle.random_p(c)
+        a = 0
         for fn in range(len(g.pot_functions['functions'])): 
+          b = a + g.pot_functions['functions'][fn]['fit_size'] 
           if(g.pot_functions['functions'][fn]['f_type_id'] == 2):
-            rho = pf_parameters.estimate_density(fn)
-            if( rho > 0.0 and rho <=1.0):
-              sane_a[pn,:] = params
-              pn = pn + 1
+            loop = True
+            while(loop):
+              pf_potential.update(sane_a[pn,:], True)
+              rho = pf_parameters.estimate_density(fn)
+              if( rho > 0.0 and rho <=1.0):
+                loop = False
+              else:
+                ptemp = pf_cycle.random_p(c) 
+                sane_a[pn,a:b] = numpy.copy(ptemp[a:b])
+          a = b
+        pn = pn + 1
               
+      main.log(str(pn))      
       print("Make Sane B")
+      main.log("make sane set B")
       pn = 0        
       while(pn < sb):
-        r = numpy.random.rand(width)
-        params = (1.0 + 0.1 * (0.5-r)) * sane_a[pn%sa,:]
-        pf_potential.update(params, True)
-        for fn in range(len(g.pot_functions['functions'])): 
-          if(g.pot_functions['functions'][fn]['f_type_id'] == 2):
-            rho = pf_parameters.estimate_density(fn)
-            if( rho > 0.0 and rho <=1.0):
-              sane_b[pn,:] = params
-              pn = pn + 1
+        loop = True
+        while(loop):
+          loop = False
+          r = numpy.random.rand(width)
+          params = (1.0 + 0.1 * (0.5-r)) * sane_a[pn%sa,:]
+          pf_potential.update(params, True)
+          for fn in range(len(g.pot_functions['functions'])): 
+            if(g.pot_functions['functions'][fn]['f_type_id'] == 2):
+              rho = pf_parameters.estimate_density(fn)
+              if(not(rho > 0.0 and rho <=1.0)): 
+                loop = True             
+          sane_b[pn,:] = params
+        pn = pn + 1
+      main.log(str(pn))
         
       print("Make Pool")
+      main.log("make pool")
       w = w_start
-      w_inc = (w_end - w_start) / (pmax - 1)
+      w_inc = (w_end - w_start) / (pmax - (1+sa+sb))
       pn = 0
-      for n in range(pmax):
-        p = pf_parameters.random_p(0.0, w)
+      while(pn<pmax):
+        p = pf_parameters.random_p(c, w)
         if(g.fit['sane_fraction']>numpy.random.rand()):
           g.pfdata['pool']['params'][pn, :] = copy.deepcopy(pf_potential.take_density(p, sane_b[pn%sb,:]))  
         else:
@@ -7235,8 +7452,12 @@ class pf_parameters:
         pn = pn + 1
         w = w + w_inc
         
+#numpy.savetxt('test.out', g.pfdata['pool']['params'], delimiter=',')
+#exit()
+        
 # Shuffle
     print("Shuffle Pool")
+    main.log("shuffle pool")
     numpy.random.shuffle(g.pfdata['pool']['params'])
 
   def random_p(c=0.0, m=1.0):
@@ -7399,116 +7620,247 @@ class relax_calc:
 #es_calc.es_add()
 
 ###########################################
+#  CLASS main(
+###########################################
+class main():
+
+  log_info_count = 0
+
+  def start():
+  
+# RECORD START TIME
+    g.times['start'] = time.time()
+  
+    now = datetime.datetime.now()
+    date_time = now.strftime("%m/%d/%Y, %H:%M:%S")
+    print(date_time)	
+  
+# OPEN LOG
+    g.log_fh = open('job.log', 'w')
+    main.log_hr()
+    main.log(time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.gmtime()))
+    main.log_hr()
+    main.log_br()
+    main.log_info()
+    main.log('Script: ' + str(sys.argv[0]))
+    if(len(sys.argv)>1):
+      run_program = False
+      try:
+        g.inp = read_config.read_file(sys.argv[1])
+        main.log('Loaded: ' + str(sys.argv[1]))
+        run_program = True
+      
+# Copy input
+        std.copy(sys.argv[0], g.dirs['input'])
+        std.copy(sys.argv[1], g.dirs['input'])
+      except:
+        main.log('Unable to load, exiting\n')
+      
+# RUN
+      if(run_program):
+        eampa.run()
+        
+# End and close log
+      main.end()
+      
+  def log(line='', end='\n'): 
+    main.log_info_count = main.log_info_count + 1
+    if(main.log_info_count == 100):
+      main.log_info_count = 0
+      main.log_info()
+  
+    lines=line.split("\n")
+    for line in lines:
+      g.log_fh.write(str("{:.3E}".format(time.time() - g.times['start'])) + ' ###   ' + line + end) 
+      
+  def log_hr(): 
+    g.log_fh.write('#############################################################################\n') 
+    
+  def log_br(): 
+    g.log_fh.write('\n') 
+        
+  def log_info(): 
+    g.log_fh.write('####TIME#############LOG#####################################################\n') 
+    
+  def log_title(title=''): 
+    g.log_fh.write('#############################################\n') 
+    titles = title.split("\n")
+    for title in titles:
+      g.log_fh.write('  ' + title + '\n') 
+    g.log_fh.write('  Time: ' + str("{:.3E}".format(time.time() - g.times['start'])) + '\n') 
+    g.log_fh.write('#############################################\n') 
+  
+  def end(): 
+
+# CLOSE LOG
+    g.times['end'] = time.time()
+    main.log_br()
+    main.log_hr()
+    main.log('Duration: ' + str(g.times['end'] - g.times['start']))
+    main.log_hr()
+    g.log_fh.close()
+    exit()
+
+# Run
+main.start()
+
+###########################################
 ###########################################
 #  MAIN
 ###########################################
 ###########################################
 
-def main():
+class main():
+
+
+
+  log_info_count = 0
+
+
+
+  def start():
 
   
 
 # RECORD START TIME
-  g.times['start'] = time.time()
+    g.times['start'] = time.time()
 
   
 
-# SET UP DIRS
-  now = datetime.datetime.now()
+    now = datetime.datetime.now()
 
-  date_time = now.strftime("%m/%d/%Y, %H:%M:%S")
+    date_time = now.strftime("%m/%d/%Y, %H:%M:%S")
 
-  print(date_time)	
-
-  wd_prefix = now.strftime('wd/%Y%m%d_%H%M%S')
-
-  
-
-# Set wd
-  g.dirs['wd'] = wd_prefix
-
-  
-
-# Set sub dirs
-  if('input' not in g.sub_dirs.keys()):
-
-    g.sub_dirs['input'] = 'input'  
-
-  for sd in g.sub_dirs.keys():
-
-    g.dirs[sd] = g.dirs['wd'] + '/' + g.sub_dirs[sd]
-
-  
-
-# MAKE DIRS
-  for d in g.dirs.keys():
-
-    dir = g.dirs[d]
-
-    std.make_dir(dir)
+    print(date_time)	
 
   
 
 # OPEN LOG
-  g.log_fh = open(g.dirs['log'] + '/main.log', 'w')
+    g.log_fh = open('job.log', 'w')
 
-  g.log_fh.write('###########################################################################\n')
+    main.log_hr()
 
-  g.log_fh.write(time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.gmtime()) + '\n')
+    main.log(time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.gmtime()))
 
-  g.log_fh.write('###########################################################################\n')
+    main.log_hr()
 
-  g.log_fh.write('\n')
+    main.log_br()
 
-  g.log_fh.write('Script: ' + str(sys.argv[0]) + '\n')
+    main.log_info()
 
-  if(len(sys.argv)>1):
+    main.log('Script: ' + str(sys.argv[0]))
 
-    run_program = False
+    if(len(sys.argv)>1):
 
-    try:
+      run_program = False
 
-      g.inp = read_config.read_file(sys.argv[1])
+      try:
 
-      g.log_fh.write('Loaded: ' + str(sys.argv[1]) + '\n')
+        g.inp = read_config.read_file(sys.argv[1])
 
-      run_program = True
+        main.log('Loaded: ' + str(sys.argv[1]))
+
+        run_program = True
 
       
 
 # Copy input
-      std.copy(sys.argv[0], g.dirs['input'])
+        std.copy(sys.argv[0], g.dirs['input'])
 
-      std.copy(sys.argv[1], g.dirs['input'])
+        std.copy(sys.argv[1], g.dirs['input'])
 
-    except:
+      except:
 
-      g.log_fh.write('Unable to load, exiting\n')
+        main.log('Unable to load, exiting\n')
 
       
 
 # RUN
-    if(run_program):
+      if(run_program):
 
-      eampa.run()
+        eampa.run()
+
+        
+
+# End and close log
+      main.end()
+
+      
+
+  def log(line='', end='\n'): 
+
+    main.log_info_count = main.log_info_count + 1
+
+    if(main.log_info_count == 100):
+
+      main.log_info_count = 0
+
+      main.log_info()
+
+  
+
+    lines=line.split("\n")
+
+    for line in lines:
+
+      g.log_fh.write(str("{:.3E}".format(time.time() - g.times['start'])) + ' ###   ' + line + end) 
+
+      
+
+  def log_hr(): 
+
+    g.log_fh.write('#############################################################################\n') 
 
     
 
+  def log_br(): 
+
+    g.log_fh.write('\n') 
+
+        
+
+  def log_info(): 
+
+    g.log_fh.write('####TIME#############LOG#####################################################\n') 
+
+    
+
+  def log_title(title=''): 
+
+    g.log_fh.write('#############################################\n') 
+
+    titles = title.split("\n")
+
+    for title in titles:
+
+      g.log_fh.write('  ' + title + '\n') 
+
+    g.log_fh.write('  Time: ' + str("{:.3E}".format(time.time() - g.times['start'])) + '\n') 
+
+    g.log_fh.write('#############################################\n') 
+
+  
+
+  def end(): 
+
+
+
 # CLOSE LOG
-  g.times['end'] = time.time()
+    g.times['end'] = time.time()
 
-  g.log_fh.write('\n')
+    main.log_br()
 
-  g.log_fh.write('###########################################################################\n')
+    main.log_hr()
 
-  g.log_fh.write('Duration: ' + str(g.times['end'] - g.times['start']) + '\n')
+    main.log('Duration: ' + str(g.times['end'] - g.times['start']))
 
-  g.log_fh.write('###########################################################################\n')
+    main.log_hr()
 
-  g.log_fh.close()
+    g.log_fh.close()
+
+    exit()
 
 
 
 # Run
-main()
-
+main.start()

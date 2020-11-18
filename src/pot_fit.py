@@ -22,8 +22,13 @@ import hashlib
 
 
 class pf:
-  
+
   def run():    
+  
+    main.log_title("Potential Fit")
+    
+    # Create Plot Dirs
+    std.make_dir(g.dirs['wd'] + '/fitting')
     
     # Set up EFS and BP modules
     pf.set_up()
@@ -38,6 +43,7 @@ class pf:
     potential.plot_python_potentials(g.dirs['wd'] + '/plots/pots/start_potential')
 
     # Make Pool
+    pf_parameters.setup_pool()
     pf_parameters.make_pool()
    
     # Run

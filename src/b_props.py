@@ -654,7 +654,7 @@ class b_props:
 
         
   @staticmethod
-  def bp_eos_plot():       
+  def bp_eos_plot(dir):       
   
     for bp_id in range(bp.bp_configs_count):
     
@@ -679,8 +679,8 @@ class b_props:
       plt.plot(bp.calc_volumes[bp_id, 0, 0:s], bp.calc_energies_fit[bp_id, 0, 0:s], color='k', ls='solid')
 
       
-      plt.savefig(g.dirs['eos'] + '/' + 'eos.svg')
-      plt.savefig(g.dirs['eos'] + '/' + 'eos.eps')
+      plt.savefig(dir + '/' + 'eos.svg')
+      plt.savefig(dir + '/' + 'eos.eps')
       
       
       # ELASTIC CONSTANTS
@@ -709,8 +709,8 @@ class b_props:
         axs[int(numpy.floor(dn/3)), dn % 3].set_ylabel('Energy (eV)')
                
  
-      plt.savefig(g.dirs['ec'] + '/' + 'ec.svg')
-      plt.savefig(g.dirs['ec'] + '/' + 'ec.eps')
+      plt.savefig(dir + '/' + 'ec.svg')
+      plt.savefig(dir + '/' + 'ec.eps')
       
     """
     n = globals.d['eos_data_size']

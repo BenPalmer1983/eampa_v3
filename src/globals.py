@@ -9,17 +9,15 @@ class g:
          'wd': 'wd',
          }
   
-  sub_dirs = {
-         'log': 'log',  
+  sub_dirs = { 
+         'input': 'input', 
          'output': 'output',   
          'results': 'results',   
-         'plots': 'plots',  
-         'eos': 'plots/eos', 
-         'ec': 'plots/ec', 
-         'pots': 'plots/pots',  
-         'fitting': 'fitting',  
+         'plots': 'plots',     
          'configs': 'configs',  
-         'input': 'input', 
+         'fitting': 'fitting', 
+         'fitting_generations': 'fitting/generations', 
+         'fitting_finished': 'fitting/finished', 
          }
   
   times = {
@@ -55,6 +53,7 @@ class g:
   
   # Read in from input
   run_type = 'efs'
+  wd_type = {}
   rss_weights = {}
   fit = {}
   fit_results = {}
@@ -85,7 +84,7 @@ class g:
   
   pfdata = {}
   
-
+  
 
 
   ######################################

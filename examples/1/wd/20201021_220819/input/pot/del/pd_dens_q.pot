@@ -1,6 +1,0 @@
-#A
-#TYPE quartic_poly
-#P 1.0 1.0 1.0
-#PF 3.5
-#L 0.0
-#U 7.0

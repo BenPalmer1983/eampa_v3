@@ -14,6 +14,10 @@ class rss_calc:
   def run():
     print("Calc RSS") 
     
+    # Create Plot Dirs
+    std.make_dir(g.dirs['wd'] + '/rss')
+    std.make_dir(g.dirs['wd'] + '/rss/plots')
+    
     
     # Setup EFS
     efs.init()                         # Initialise (allocate arrays)
@@ -40,11 +44,11 @@ class rss_calc:
     # Plots
     #potential.plot_fortran_potentials()
     #potential.plot_python_potentials()
-    potential.plot_python_potentials(g.dirs['wd'] + '/plots/potential_python')
-    potential.plot_fortran_potentials(g.dirs['wd'] + '/plots/potential_fortran')
+    potential.plot_python_potentials(g.dirs['wd'] + '/rss/plots/potential_python')
+    potential.plot_fortran_potentials(g.dirs['wd'] + '/rss/plots/potential_fortran')
     
     b_props.bp_output()
-    b_props.bp_eos_plot()
+    b_props.bp_eos_plot(g.dirs['wd'] + '/rss/plots')
     
     
     

@@ -17,6 +17,9 @@ class pf_generation:
 
   def run():
   
+    if(g.pfdata['generation']['counter']>1):
+      pf_parameters.make_pool()
+  
     pf_generation.pop_size = g.fit['pop_size']
     pf_generation.pop_size_half = g.fit['pop_size'] // 2
     pf_generation.fresh_size = g.fit['fresh_size']
@@ -67,9 +70,17 @@ class pf_generation:
     pf_enhance.run()
     
     
-    #print(g.pfdata['bp'][g.pfdata['best_hash']])  
-    #print(g.bp_known)  
-      
+    
+    
+    cstr = str(g.pfdata['generation']['counter'])
+    while(len(cstr)<5):
+      cstr = '0' + cstr    
+    gen_dir = g.dirs['wd'] + '/fitting/genetic/' +  cstr
+    std.make_dir(gen_dir)
+  
+    
+    potential_output.full(gen_dir)
+    
     
     
     

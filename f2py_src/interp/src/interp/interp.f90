@@ -30,10 +30,11 @@ INCLUDE "interp.interp4dydx.f90"
 
 INCLUDE "interp.interpn.f90"
 INCLUDE "interp.interpndydx.f90"
+INCLUDE "interp.interpndydxn.f90"
 
 
-
-INCLUDE "interp.interp.f90"
+INCLUDE "interp.interpolate.f90"
+INCLUDE "interp.interpolate_dydxn.f90"
 INCLUDE "interp.trap.f90"
 
 INCLUDE "interp.fill.f90"

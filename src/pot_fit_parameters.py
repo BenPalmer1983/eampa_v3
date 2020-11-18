@@ -10,18 +10,52 @@ class pf_parameters:
     g.pfdata['pool']['pn'] = g.pfdata['pool']['pn'] + 1                      # Increment
     return p                                                                 # Return
   
-  def make_pool():
+  
+  
+  def setup_pool():
+    width = potential.parameter_count()
+    g.pfdata['pool']['sane_a'] = g.fit['sane_seeds_a']
+    g.pfdata['pool']['sane_b'] = g.fit['sane_seeds_b']
+    g.pfdata['pool']['pmax'] = g.fit['pool_size']
+    
+    if(g.pfdata['pool']['pmax'] < (g.pfdata['pool']['sane_a'] + g.pfdata['pool']['sane_b'])):
+      g.pfdata['pool']['pmax'] = g.pfdata['pool']['sane_a'] + g.pfdata['pool']['sane_b']
+    g.pfdata['pool']['params'] = numpy.zeros((g.pfdata['pool']['pmax'],width,),)
+  
+  def make_pool(p = None):
     print("Make Pool")
+    main.log_title("Make Pool")    
+    main.log("pool size:     " + str(g.fit['pool_size']))
+    main.log("pop size:      " + str(g.fit['pop_size']))
+    main.log("fresh size:    " + str(g.fit['fresh_size']))
+    
+    
+    if(p == None):
+      if(g.pfdata['generation']['counter'] == 0):
+        c = 0.0
+        main.log("c:    " + str(c))
+      else:
+        c = g.pfdata['params']['best']
+        
+        str_c = ''
+        for i in range(len(c)):
+          str_c = str_c + str(c[i]) + ' '
+        main.log("c:    " + str(str_c))
+        
+   
+   
   
     w_start =g.fit['wide_start']
     w_end =g.fit['wide_end']
     pmax = g.fit['pool_size']
     pop_size = g.fit['pop_size']
     fresh_size = g.fit['fresh_size']
+    sa = g.pfdata['pool']['sane_a']
+    sb = g.pfdata['pool']['sane_b']
     width = potential.parameter_count()
-  
-    g.pfdata['pool']['params'] = numpy.zeros((pmax,width,),)
-    g.pfdata['pool']['pmax'] = pmax
+    #width = potential.parameter_count()  
+    #g.pfdata['pool']['params'] = numpy.zeros((pmax,width,),)
+    #g.pfdata['pool']['pmax'] = pmax
   
   
     # Any Density
@@ -31,50 +65,65 @@ class pf_parameters:
       w_inc = (w_end - w_start) / (pmax - 1)
       pn = 0
       for n in range(pmax):
-        p = pf_parameters.random_p(0.0, w)
+        p = pf_parameters.random_p(c, w)
         g.pfdata['pool']['params'][pn, :] = copy.deepcopy(p)
         pn = pn + 1
         w = w + w_inc
         #print(pn)
     elif(g.fit['rescale_density'] == 1 or g.fit['rescale_density'] == 2):
-      sa = g.fit['sane_seeds_a']
-      sb = g.fit['sane_seeds_b']
     
       sane_a = numpy.zeros((sa,width,),)
       sane_b = numpy.zeros((sb,width,),)
       
       print("Make Sane A")
+      main.log("make sane set A")
       pn = 0
       while(pn < sa):
-        params = pf_cycle.random_p()
-        pf_potential.update(params, True)
+        sane_a[pn,:] = pf_cycle.random_p(c)
+        a = 0
         for fn in range(len(g.pot_functions['functions'])): 
+          b = a + g.pot_functions['functions'][fn]['fit_size'] 
           if(g.pot_functions['functions'][fn]['f_type_id'] == 2):
-            rho = pf_parameters.estimate_density(fn)
-            if( rho > 0.0 and rho <=1.0):
-              sane_a[pn,:] = params
-              pn = pn + 1
+            loop = True
+            while(loop):
+              pf_potential.update(sane_a[pn,:], True)
+              rho = pf_parameters.estimate_density(fn)
+              if( rho > 0.0 and rho <=1.0):
+                loop = False
+              else:
+                ptemp = pf_cycle.random_p(c) 
+                sane_a[pn,a:b] = numpy.copy(ptemp[a:b])
+          a = b
+        pn = pn + 1
               
+      main.log(str(pn))      
       print("Make Sane B")
+      main.log("make sane set B")
       pn = 0        
       while(pn < sb):
-        r = numpy.random.rand(width)
-        params = (1.0 + 0.1 * (0.5-r)) * sane_a[pn%sa,:]
-        pf_potential.update(params, True)
-        for fn in range(len(g.pot_functions['functions'])): 
-          if(g.pot_functions['functions'][fn]['f_type_id'] == 2):
-            rho = pf_parameters.estimate_density(fn)
-            if( rho > 0.0 and rho <=1.0):
-              sane_b[pn,:] = params
-              pn = pn + 1
+        loop = True
+        while(loop):
+          loop = False
+          r = numpy.random.rand(width)
+          params = (1.0 + 0.1 * (0.5-r)) * sane_a[pn%sa,:]
+          pf_potential.update(params, True)
+          for fn in range(len(g.pot_functions['functions'])): 
+            if(g.pot_functions['functions'][fn]['f_type_id'] == 2):
+              rho = pf_parameters.estimate_density(fn)
+              if(not(rho > 0.0 and rho <=1.0)): 
+                loop = True             
+          sane_b[pn,:] = params
+        pn = pn + 1
+      main.log(str(pn))
         
       
       print("Make Pool")
+      main.log("make pool")
       w = w_start
-      w_inc = (w_end - w_start) / (pmax - 1)
+      w_inc = (w_end - w_start) / (pmax - (1+sa+sb))
       pn = 0
-      for n in range(pmax):
-        p = pf_parameters.random_p(0.0, w)
+      while(pn<pmax):
+        p = pf_parameters.random_p(c, w)
         if(g.fit['sane_fraction']>numpy.random.rand()):
           g.pfdata['pool']['params'][pn, :] = copy.deepcopy(pf_potential.take_density(p, sane_b[pn%sb,:]))  
         else:
@@ -82,8 +131,12 @@ class pf_parameters:
         pn = pn + 1
         w = w + w_inc
         
+      #numpy.savetxt('test.out', g.pfdata['pool']['params'], delimiter=',') 
+      #exit()  
+        
     # Shuffle    
     print("Shuffle Pool")
+    main.log("shuffle pool")
     numpy.random.shuffle(g.pfdata['pool']['params'])
 
             

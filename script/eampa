@@ -1,0 +1,3 @@
+#!/bin/bash
+args=("$@")
+python3 eampa.py

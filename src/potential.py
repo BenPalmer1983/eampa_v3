@@ -30,13 +30,18 @@ class potential:
     
 
   def load():
+    main.log_title("Potential Load")
+    
     if(g.inp['potential']['dir'].strip() == ""):
       g.inp['potential']['pot_file'] = g.inp['potential']['index_file']
     else:
       g.inp['potential']['pot_file'] = g.inp['potential']['dir'] + "/" + g.inp['potential']['index_file']
     pot_file = g.inp['potential']['pot_file']
     if(not os.path.isfile(pot_file)):
+      main.log("Potential load failed - no pot file")
       return False
+    main.log("Potential file: " + str(pot_file))
+      
     # Read potential index
     potential.read_potential(pot_file)
     potential.load_tabulated()
@@ -48,6 +53,10 @@ class potential:
     potential.load_fit_data()
     potential.pf_output()
     potential.make_copies()
+       
+    potential.plot_python_potentials(g.dirs['plots'] + "/starting_potential")   
+       
+    #main.end()   
        
     return True
   
@@ -103,6 +112,7 @@ class potential:
         if(i > 0):
           g.pot_functions['pot_dir'] += '/'
         g.pot_functions['pot_dir'] += lst[i]
+    main.log("Loading: " + str(file_name))
         
     index = std.config_file_to_list(file_name)  
     pot = potential.pot_function()
@@ -161,6 +171,7 @@ class potential:
   
     
     # READ ZBL DATA
+    main.log("Load zbl")
     
     read_zbl = False
     for row in index:  
@@ -199,8 +210,9 @@ class potential:
             'spline_type': spline_type ,
             }
         g.pot_functions['zbl'].append(z)
-       
-       
+        main.log("--zbl---")
+        main.log(std.dict_to_str(z))
+
        
   ###################
   # TABULATED
@@ -294,6 +306,9 @@ class potential:
     
     splined = spline.spline_nodes(st, g.pot_functions['functions'][fn]['s_nodes'][:,:], 100)
     g.pot_functions['functions'][fn]['points'] = interp.fill(splined[:,0], splined[:,1], g.tab_size, g.tab_width)
+        
+    # ZBL (if pair)
+    potential.make_zbl(fn)
 
     # Now treat as tabulated
     g.pot_functions['functions'][fn]['function_type'] = 1
@@ -377,6 +392,9 @@ class potential:
        
     # Interpfill
     g.pot_functions['functions'][fn]['points'] = interp.fill(temp[:,0],temp[:,1], g.tab_size, g.tab_width)
+    
+    # ZBL (if pair)
+    potential.make_zbl(fn)
     
 
   @staticmethod
@@ -698,7 +716,7 @@ class potential:
       axs.set_ylim(min_y, max_y)
       axs.set_yscale('symlog', linthreshy=10)
       plt.savefig(dir + '/' + file_name, format='eps')
-      
+      plt.close('all') 
       
       
   def print_parameters():  
@@ -739,6 +757,62 @@ class potential:
         p_count = p_count + g.pot_functions['functions'][fn]['fit_size']
     return p_count  
       
+      
+###########################################################
+# ZBL
+###########################################################      
+      
+  def make_zbl(fn):
+    
+    if(g.pot_functions['functions'][fn]['f_type_id'] == 1):
+      zbl_n = -1
+      if(len(g.pot_functions['zbl'])>0):
+        for i in range(len(g.pot_functions['zbl'])): 
+          if((g.pot_functions['functions'][fn]['a'] == g.pot_functions['zbl'][i]['id_1'] 
+             and g.pot_functions['functions'][fn]['b'] == g.pot_functions['zbl'][i]['id_2'])
+             or (g.pot_functions['functions'][fn]['a'] == g.pot_functions['zbl'][i]['id_2'] 
+             and g.pot_functions['functions'][fn]['b'] == g.pot_functions['zbl'][i]['id_1'])):
+            zbl_n = i
+            break
+      
+      if(zbl_n>=0):
+        ra = g.pot_functions['zbl'][zbl_n]['ra']
+        rb = g.pot_functions['zbl'][zbl_n]['rb']
+        qa = g.pot_functions['zbl'][zbl_n]['z1']
+        qb = g.pot_functions['zbl'][zbl_n]['z2']
+        spline_type = g.pot_functions['zbl'][zbl_n]['spline_type']
+        
+        # Find the point that need replacing
+        ra_n = -1
+        for n in range(len(g.pot_functions['functions'][fn]['points'])):
+          if(g.pot_functions['functions'][fn]['points'][n,0] <= ra):
+            ra_n = n
+          elif(g.pot_functions['functions'][fn]['points'][n,0] <= rb):
+            rb_n = n
+            
+        # Get node values
+        ya = fnc.zbl(ra, [qa, qb], [0.0])  
+        yap = fnc.zbl_dydr(ra, [qa, qb], [0.0]) 
+        yb = interp.interpolate(rb, g.pot_functions['functions'][fn]['points'][:,0], g.pot_functions['functions'][fn]['points'][:,1], 4)
+        ybp = interp.interpolate_dydxn(rb, g.pot_functions['functions'][fn]['points'][:,0], g.pot_functions['functions'][fn]['points'][:,1], 1, 4)
+
+        # Get spline coeffs
+        coeffs = spline.spline_ab(spline_type, [ra, ya, yap], [rb, yb, ybp])
+
+        # Replace with ZBL and SPLINE
+        g.pot_functions['functions'][fn]['points'][:ra_n,1] = fnc.zbl_v(g.pot_functions['functions'][fn]['points'][:ra_n,0], [qa, qb], [0.0])        
+        g.pot_functions['functions'][fn]['points'][ra_n:rb_n,1] = potential.poly(g.pot_functions['functions'][fn]['points'][ra_n:rb_n,0], coeffs)
+        
+        # Recalculate derivatives etc
+        g.pot_functions['functions'][fn]['points'] = interp.fill(g.pot_functions['functions'][fn]['points'][:,0],g.pot_functions['functions'][fn]['points'][:,1], g.tab_size, g.tab_width)
+    
+    
+    
+  def poly(x, c):
+    y = 0.0
+    for i in range(len(c)):
+      y = y + c[i] * x**i
+    return y
       
 ###########################################################
 # F2PY functions

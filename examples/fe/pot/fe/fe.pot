@@ -24,8 +24,8 @@ END
 
 ! FE Density
 START
-FILE              fe_dens.pot
-FIT               fe_dens.fit
+FILE              fe_dden.pot
+FIT               fe_dden.fit
 LABEL             FE
 F_ON true
 F_TYPE            DENS            ! PAIR DENS EMBE
@@ -36,8 +36,8 @@ END
 
 ! FE Embedding
 START
-FILE              fe_embe.pot
-FIT               fe_embe.fit
+FILE              fe_demb.pot
+FIT               fe_demb.fit
 LABEL             FE
 F_ON true
 F_TYPE            EMBE            ! PAIR DENS EMBE
@@ -48,12 +48,39 @@ END
 
 
 
+! FE Density
+START
+FILE              fe_dden.pot
+FIT               fe_dden.fit
+LABEL             FE
+F_ON true
+F_TYPE            DENS            ! PAIR DENS EMBE
+F_GROUP           2
+R_CUT             6.5
+END
+
+
+! FE Embedding
+START
+FILE              fe_demb.pot
+FIT               fe_demb.fit
+LABEL             FE
+F_ON true
+F_TYPE            EMBE            ! PAIR DENS EMBE
+F_GROUP           2
+R_CUT              6.5
+ZOOR     true  ! zero out of range
+END
 
 
 
-#ZBLSTART
-FE FE on 26 26 1.0 2.0 exp3
-#ZBLEND
+
+
+ZBLSTART
+FE FE on 26 26 1.0 1.5 poly3
+FE PD on 26 46 1.0 1.5 poly3
+PD PD on 46 46 1.0 1.5 poly3
+ZBLEND
 
 
 

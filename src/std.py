@@ -487,7 +487,7 @@ class std:
   def dict_to_str(d, pre=''):
     out = ''
     for k in sorted(d):
-      if(type(k) == dict):
+      if(type(k) == dict or type(k) == list):
         out = out + '\n' + std.dict_to_str(k, pre + '  ')      
       else:
         out = out + pre + str(k) + ': ' + str(d[k]) + '\n'

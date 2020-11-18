@@ -9,6 +9,7 @@ import numpy
 #import matplotlib.pyplot as plt
 import matplotlib.pyplot as plt
 from read_input import read_input
+from setup_dirs import setup_dirs
 from memory import memory
 from labels import labels
 from potential import potential
@@ -41,12 +42,15 @@ class eampa:
  
   def run():
     print("RUNNING")
-    
-    # Copy Input
-    eampa.copy_input()   
-    
+        
     # Read Input
     read_input.run()    
+    
+    # Setup Dirs
+    setup_dirs.run()
+    
+    # Copy Input
+    #eampa.copy_input()   
     
     # Set memory
     memory.run() 

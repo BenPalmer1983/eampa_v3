@@ -45,6 +45,7 @@ INCLUDE "interp.interpndydxn.f90"
 
 
 INCLUDE "interp.interpolate.f90"
+INCLUDE "interp.interpolate_dydxn.f90"
 INCLUDE "interp.trap.f90"
 
 INCLUDE "interp.fill.f90"

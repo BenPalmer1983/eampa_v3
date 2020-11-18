@@ -1,5 +1,0 @@
-#A
-#TYPE ackland_embedding
-#P -1.0 1.0 1.0
-#L 0.0
-#U 1.0

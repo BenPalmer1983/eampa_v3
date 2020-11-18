@@ -5,10 +5,15 @@
 class pf_data:
   
   def make():
+    main.log("Make data structure")
 
     pop_size = g.fit['pop_size']
     fresh_size = g.fit['fresh_size']
     width = potential.parameter_count()
+    
+    main.log("Pop size:    " + str(pop_size))
+    main.log("Fresh size:  " + str(fresh_size))
+    main.log("Param width: " + str(width))
     
     top_size = 10
     if(top_size < 10):
@@ -35,6 +40,8 @@ class pf_data:
         'stage': 'Not Set', 
         'pool': {'params': None,
                  'pn': 0,
+                 'sane_a': 0,
+                 'sane_b': 0,
                  'pmax': 10000,
         },
         'params': {'count': width, 

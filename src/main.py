@@ -17,66 +17,88 @@ from std import std
 from read_config import read_config
 from eampa import eampa
 
+class main():
 
-def main():
+  log_info_count = 0
+
+  def start():
   
-  # RECORD START TIME
-  g.times['start'] = time.time()
+    # RECORD START TIME
+    g.times['start'] = time.time()
   
-  # SET UP DIRS
-  now = datetime.datetime.now()
-  date_time = now.strftime("%m/%d/%Y, %H:%M:%S")
-  print(date_time)	
-  wd_prefix = now.strftime('wd/%Y%m%d_%H%M%S')
+    now = datetime.datetime.now()
+    date_time = now.strftime("%m/%d/%Y, %H:%M:%S")
+    print(date_time)	
   
-  # Set wd
-  g.dirs['wd'] = wd_prefix
-  
-  # Set sub dirs
-  if('input' not in g.sub_dirs.keys()):
-    g.sub_dirs['input'] = 'input'  
-  for sd in g.sub_dirs.keys():
-    g.dirs[sd] = g.dirs['wd'] + '/' + g.sub_dirs[sd]
-  
-  # MAKE DIRS
-  for d in g.dirs.keys():
-    dir = g.dirs[d]
-    std.make_dir(dir)
-  
-  # OPEN LOG
-  g.log_fh = open(g.dirs['log'] + '/main.log', 'w')
-  g.log_fh.write('###########################################################################\n')
-  g.log_fh.write(time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.gmtime()) + '\n')
-  g.log_fh.write('###########################################################################\n')
-  g.log_fh.write('\n')
-  g.log_fh.write('Script: ' + str(sys.argv[0]) + '\n')
-  if(len(sys.argv)>1):
-    run_program = False
-    try:
-      g.inp = read_config.read_file(sys.argv[1])
-      g.log_fh.write('Loaded: ' + str(sys.argv[1]) + '\n')
-      run_program = True
+    # OPEN LOG
+    g.log_fh = open('job.log', 'w')
+    main.log_hr()
+    main.log(time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.gmtime()))
+    main.log_hr()
+    main.log_br()
+    main.log_info()
+    main.log('Script: ' + str(sys.argv[0]))
+    if(len(sys.argv)>1):
+      run_program = False
+      try:
+        g.inp = read_config.read_file(sys.argv[1])
+        main.log('Loaded: ' + str(sys.argv[1]))
+        run_program = True
       
-      # Copy input
-      std.copy(sys.argv[0], g.dirs['input'])
-      std.copy(sys.argv[1], g.dirs['input'])
-    except:
-      g.log_fh.write('Unable to load, exiting\n')
+        # Copy input
+        std.copy(sys.argv[0], g.dirs['input'])
+        std.copy(sys.argv[1], g.dirs['input'])
+      except:
+        main.log('Unable to load, exiting\n')
       
-    # RUN
-    if(run_program):
-      eampa.run()
+      # RUN
+      if(run_program):
+        eampa.run()
+        
+      # End and close log
+      main.end()
+      
+      
+  def log(line='', end='\n'): 
+    main.log_info_count = main.log_info_count + 1
+    if(main.log_info_count == 100):
+      main.log_info_count = 0
+      main.log_info()
+  
+    lines=line.split("\n")
+    for line in lines:
+      g.log_fh.write(str("{:.3E}".format(time.time() - g.times['start'])) + ' ###   ' + line + end) 
+      
+  def log_hr(): 
+    g.log_fh.write('#############################################################################\n') 
     
+  def log_br(): 
+    g.log_fh.write('\n') 
+        
+  def log_info(): 
+    g.log_fh.write('####TIME#############LOG#####################################################\n') 
+    
+  def log_title(title=''): 
+    g.log_fh.write('#############################################\n') 
+    titles = title.split("\n")
+    for title in titles:
+      g.log_fh.write('  ' + title + '\n') 
+    g.log_fh.write('  Time: ' + str("{:.3E}".format(time.time() - g.times['start'])) + '\n') 
+    g.log_fh.write('#############################################\n') 
+  
+   
+  def end(): 
 
-  # CLOSE LOG
-  g.times['end'] = time.time()
-  g.log_fh.write('\n')
-  g.log_fh.write('###########################################################################\n')
-  g.log_fh.write('Duration: ' + str(g.times['end'] - g.times['start']) + '\n')
-  g.log_fh.write('###########################################################################\n')
-  g.log_fh.close()
+    # CLOSE LOG
+    g.times['end'] = time.time()
+    main.log_br()
+    main.log_hr()
+    main.log('Duration: ' + str(g.times['end'] - g.times['start']))
+    main.log_hr()
+    g.log_fh.close()
+    exit()
 
 
 
 # Run
-main()
+main.start()

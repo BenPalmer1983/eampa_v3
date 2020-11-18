@@ -8,32 +8,44 @@ class potential_output:
 
 
   @staticmethod
-  def full():
+  def full(dir_out = None):
+  
+    if(dir_out==None):  
+      dir_out = g.dirs['wd'] + '/' + g.fit_results['results_dir'] 
   
     # Make output directory
-    g.dirs['results'] = g.dirs['wd'] + '/' + g.fit_results['results_dir'] 
-    std.make_dir(g.dirs['results'])
+    std.make_dir(dir_out)
     
     
-    potential_output.best_parameters() 
-    potential_output.eampa()
-    potential_output.data_file()
-    potential_output.dl_poly()
-    potential_output.plots()
+    potential_output.best_parameters(dir_out) 
+    potential_output.eampa(dir_out)
+    potential_output.data_file(dir_out)
+    potential_output.dl_poly(dir_out)
+    potential_output.plots(dir_out)
     
     
-  def best_parameters():
-    dir_out = g.dirs['results'] + '/best_parameters'
+  def best_parameters(dir_out = None):
+    if(dir_out==None):  
+      dir_out = g.dirs['results'] + '/best_parameters'
     std.make_dir(dir_out)
     
     fh = open(dir_out + '/best_parameters.txt', 'w')    
     for fn in range(len(g.pot_functions['functions'])):          
       if(g.pot_functions['functions'][fn]['fit_type'] == 1):     # SPLINE
-        fh.write("Fn: " + str(fn) + "   Type: spline")
+        fh.write("Fn: " + str(fn) + "[S]  ")
+        fh.write("\n")
+        for i in range(len(g.pot_functions['functions'][fn]['s_nodes'][:,1])):
+          fh.write("  [" + str(i) + "] " + display.pad_r(g.pot_functions['functions'][fn]['s_nodes'][i,0],8) + " ")
+        for i in range(len(g.pot_functions['functions'][fn]['s_nodes'][:,1])):
+          fh.write("  [" + str(i) + "] " + display.pad_r(g.pot_functions['functions'][fn]['s_nodes'][i,1],8) + " ")
+          
+          
+        fh.write("\n")
         #for i in range(g.pot_functions['functions'][fn]['fit_size']):
         #  fh.write("[" + str(i) + "]" + display.pad_r(g.pot_functions['functions'][fn]['fit_parameters'][0,i],8))
       elif(g.pot_functions['functions'][fn]['fit_type'] == 2):   # ANALYTIC
-        fh.write("Fn:" + str(fn) + "[A] ")
+        fh.write("Fn:" + str(fn) + "[A]  ")
+        fh.write("\n")
         for i in range(g.pot_functions['functions'][fn]['fit_size']):
           fh.write("  [" + str(i) + "] " + display.pad_r(g.pot_functions['functions'][fn]['a_params'][i],8) + " ")
         fh.write("\n")
@@ -43,8 +55,9 @@ class potential_output:
     
     
   @staticmethod
-  def eampa():
-    dir_out = g.dirs['results'] + '/pot_save'
+  def eampa(dir_out = None):
+    if(dir_out==None):   
+      dir_out = g.dirs['results'] + '/pot_save'
     std.make_dir(dir_out)
     
       
@@ -111,8 +124,9 @@ class potential_output:
   
   
   @staticmethod
-  def data_file():
-    dir_out = g.dirs['results'] + '/pot_fortran'
+  def data_file(dir_out = None):
+    if(dir_out==None):  
+      dir_out = g.dirs['results'] + '/pot_fortran'
     std.make_dir(dir_out)
     
     fh = open(dir_out + '/data.pot', 'w')
@@ -134,8 +148,9 @@ class potential_output:
     
     
   @staticmethod
-  def dl_poly():
-    dir_out = g.dirs['results'] + '/dl_poly'
+  def dl_poly(dir_out = None):
+    if(dir_out==None):  
+      dir_out = g.dirs['results'] + '/dl_poly'
     std.make_dir(dir_out)
     
     fh = open(dir_out + '/pot.eam', 'w')
@@ -194,12 +209,11 @@ class potential_output:
     
     
   @staticmethod
-  def plots(): 
-    dir_out = g.dirs['results'] + '/plots/python'
-    std.make_dir(dir_out)   
+  def plots(dir_out = None): 
+    if(dir_out==None):  
+      dir_out = g.dirs['results'] + '/plots'
+    std.make_dir(dir_out)    
     potential.plot_python_potentials(dir_out)
-    dir_out = g.dirs['results'] + '/plots/fortran'
-    std.make_dir(dir_out)   
     potential.plot_fortran_potentials(dir_out)
   
   @staticmethod

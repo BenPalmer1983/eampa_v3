@@ -1,0 +1,160 @@
+#############################################################################
+4.137E-02 ###   Wed, 18 Nov 2020 11:03:18 +0000
+#############################################################################
+
+####TIME#############LOG#####################################################
+4.140E-02 ###   Script: /cloud/Code/python/eampa/eampa.py
+4.288E-02 ###   Loaded: input.in
+4.289E-02 ###   Unable to load, exiting
+4.289E-02 ###   
+#############################################
+  Read Input
+  Time: 4.291E-02
+#############################################
+4.291E-02 ###   fit
+4.294E-02 ###   a0: 10.0
+4.294E-02 ###   b0: 1.0
+4.294E-02 ###   bp: 1.0
+4.294E-02 ###   config: 1.0
+4.294E-02 ###   e: 1.0
+4.294E-02 ###   e0: 1.0
+4.295E-02 ###   ec: 10.0
+4.295E-02 ###   energy: 1.0
+4.295E-02 ###   force: 1.0
+4.295E-02 ###   g: 1.0
+4.295E-02 ###   stress: 1.0
+4.295E-02 ###   v: 1.0
+4.295E-02 ###   
+4.300E-02 ###   cycles: 1
+4.300E-02 ###   enhance_every: 10
+4.300E-02 ###   enhance_top: 10
+4.300E-02 ###   exct_every: 5
+4.300E-02 ###   exct_factor: 0.6
+4.300E-02 ###   exct_top_bias: 0.5
+4.300E-02 ###   exct_var: 0.1
+4.300E-02 ###   fresh_size: 4
+4.301E-02 ###   fresh_we: 2.0
+4.301E-02 ###   fresh_ws: 0.1
+4.301E-02 ###   gen_var_factor: 0.95
+4.301E-02 ###   gens: 13
+4.301E-02 ###   mutate_chance: 0.05
+4.301E-02 ###   mutate_scale: 2.0
+4.301E-02 ###   no_clone_var: 0.05
+4.301E-02 ###   no_clones: True
+4.301E-02 ###   pool_size: 5000
+4.301E-02 ###   pop_size: 10
+4.301E-02 ###   rescale_default: 0.6
+4.301E-02 ###   rescale_density: 2
+4.302E-02 ###   rescale_max: 0.9
+4.302E-02 ###   rescale_min: 0.3
+4.302E-02 ###   sane_fraction: 0.95
+4.302E-02 ###   sane_seeds_a: 1000
+4.302E-02 ###   sane_seeds_b: 2000
+4.302E-02 ###   spline_cycles: 0
+4.302E-02 ###   spline_gens: 4
+4.302E-02 ###   wide_end: 15.0
+4.302E-02 ###   wide_start: 0.4
+4.302E-02 ###   
+4.303E-02 ###   pot_dir: None
+4.303E-02 ###   pot_name: None
+4.303E-02 ###   results_dir: results
+4.303E-02 ###   
+4.304E-02 ###   bp_file: bp.dat
+4.304E-02 ###   dir: bp
+4.305E-02 ###   ec_size: 6
+4.305E-02 ###   ec_strain: 0.001
+4.305E-02 ###   eos_size: 6
+4.305E-02 ###   eos_strain: 0.001
+4.305E-02 ###   
+4.306E-02 ###   FE1: FE
+4.306E-02 ###   FE2: FE
+4.306E-02 ###   FE3: FE
+4.306E-02 ###   FE4: FE
+4.306E-02 ###   
+4.311E-02 ###   1: {'label_id': 1, 'label_text': 'AL', 'atom_count': 32, 'relaxed_energy': -1264.06398979, 'relaxed_energy_unit': 'Ry', 'coh_energy': -3.36, 'coh_energy_unit': 'eV', 'calc_relaxed_dft_ev': -537.454181036, 'calc_coh_ev': -3.36, 'calc_apaev': 534.094181036}
+4.311E-02 ###   2: {'label_id': 2, 'label_text': 'FE', 'atom_count': 16, 'relaxed_energy': -5268.188, 'relaxed_energy_unit': 'Ry', 'coh_energy': -4.316, 'coh_energy_unit': 'eV', 'calc_relaxed_dft_ev': -4479.851795407, 'calc_coh_ev': -4.316, 'calc_apaev': 4475.5357954070005}
+4.311E-02 ###   3: {'label_id': 3, 'label_text': 'PD', 'atom_count': 32, 'relaxed_energy': -16384.958, 'relaxed_energy_unit': 'Ry', 'coh_energy': -3.91, 'coh_energy_unit': 'eV', 'calc_relaxed_dft_ev': -6966.549363269, 'calc_coh_ev': -3.91, 'calc_apaev': 6962.639363269001}
+4.312E-02 ###   
+#############################################
+  Setup Directories
+  Time: 4.312E-02
+#############################################
+4.312E-02 ###   WD: wd/wd
+4.374E-02 ###   wd   wd/wd
+4.432E-02 ###   input   wd/wd/input
+4.464E-02 ###   output   wd/wd/output
+4.493E-02 ###   results   wd/wd/results
+4.525E-02 ###   plots   wd/wd/plots
+4.555E-02 ###   configs   wd/wd/configs
+4.592E-02 ###   fitting   wd/wd/fitting
+4.659E-02 ###   fitting_generations   wd/wd/fitting/generations
+4.696E-02 ###   fitting_finished   wd/wd/fitting/finished
+#############################################
+  Memory
+  Time: 4.696E-02
+#############################################
+4.697E-02 ###   EFS 2000000000.0
+4.697E-02 ###   config size       255102
+4.698E-02 ###   ghost size        3061224
+4.698E-02 ###   nl size           25510204
+4.698E-02 ###   BP 2000000000.0
+4.698E-02 ###   config size       255102
+4.698E-02 ###   ghost size        3061224
+4.698E-02 ###   nl size           25510204
+#############################################
+  Potential Load
+  Time: 4.699E-02
+#############################################
+4.824E-02 ###   Potential file: pot/fe/fe.pot
+4.825E-02 ###   Loading: pot/fe/fe.pot
+3.620E-01 ###   Load zbl
+3.621E-01 ###   --zbl---
+3.621E-01 ###   id_1: 2
+3.621E-01 ###   id_2: 2
+3.621E-01 ###   on: True
+3.621E-01 ###   ra: 1.0
+3.621E-01 ###   rb: 1.5
+3.621E-01 ###   spline_type: 1
+3.621E-01 ###   z1: 26.0
+3.621E-01 ###   z2: 26.0
+3.621E-01 ###   
+3.621E-01 ###   --zbl---
+3.621E-01 ###   id_1: 2
+3.621E-01 ###   id_2: 3
+3.621E-01 ###   on: True
+3.621E-01 ###   ra: 1.0
+3.621E-01 ###   rb: 1.5
+3.621E-01 ###   spline_type: 1
+3.621E-01 ###   z1: 26.0
+3.621E-01 ###   z2: 46.0
+3.621E-01 ###   
+3.621E-01 ###   --zbl---
+3.621E-01 ###   id_1: 3
+3.621E-01 ###   id_2: 3
+3.621E-01 ###   on: True
+3.621E-01 ###   ra: 1.0
+3.621E-01 ###   rb: 1.5
+3.621E-01 ###   spline_type: 1
+3.621E-01 ###   z1: 46.0
+3.621E-01 ###   z2: 46.0
+3.621E-01 ###   
+#############################################
+  Potential Fit
+  Time: 5.532E+00
+#############################################
+BP Allocated Memory
+2GB
+255102 3061224 25510204
+6.325E+00 ###   Make data structure
+6.325E+00 ###   Pop size:    10
+6.325E+00 ###   Fresh size:  4
+6.325E+00 ###   Param width: 40
+#############################################
+  Make Pool
+  Time: 9.865E+00
+#############################################
+9.865E+00 ###   pool size:     5000
+9.865E+00 ###   pop size:      10
+9.865E+00 ###   fresh size:    4
+9.865E+00 ###   c:    0.0
+9.865E+00 ###   make sane set A

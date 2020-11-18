@@ -1,9 +1,20 @@
 #!/bin/bash
+echo "Python code packaged"
 python3 pack/pack.py eampa.py
 
-libdir=$("pwd")"/f2py_lib/eampa_lib"
+bindir=$HOME"/pybin"
+echo "Make bin dir: "$bindir
+mkdir -p $bindir
+
+libdir=$HOME"/pylib"
+echo "Make lib dir: "$libdir
 mkdir -p $libdir
-echo $libdir
+
+
+eampalibdir=$HOME"/pylib/eampa_lib"
+echo "Make eampa lib dir: "$eampalibdir
+mkdir -p $eampalibdir
+
 
 top=$("pwd")
 cd f2py_src
@@ -13,10 +24,10 @@ for d in */ ; do
   echo $d
   echo "####################################"
   cd $d
-  #if test -f "build.sh"; then
-  #  ./build.sh
-  #  cp *.so $libdir
-  #fi
+  if test -f "build.sh"; then
+    ./build.sh
+    cp *.so $eampalibdir
+  fi
   cd $srcdir
 done
 

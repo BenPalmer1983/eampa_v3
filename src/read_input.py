@@ -10,7 +10,10 @@ class read_input:
  
  
   def run():
+    main.log_title("Read Input")
+  
     read_input.run_type()
+    read_input.wd()
     read_input.rss_weights()
     read_input.fit()
     read_input.fit_results()
@@ -32,7 +35,21 @@ class read_input:
       pass
       
     # SAVE
-    g.log_fh.write(g.run_type)
+    main.log(g.run_type)
+
+
+
+  # READ TYPE
+  def wd():
+    g.wd_type = {
+    'option': 1,
+    }    
+    # TRY READING
+    for k in g.wd_type.keys():
+      try:
+        g.wd_type[k] = float(g.inp['wd'][k])
+      except:
+        pass
 
 
   # READ 
@@ -64,7 +81,7 @@ class read_input:
       
       
     # SAVE
-    g.log_fh.write(std.dict_to_str(g.rss_weights))
+    main.log(std.dict_to_str(g.rss_weights))
       
       
   def fit():
@@ -122,7 +139,7 @@ class read_input:
       g.fit['fresh_size'] = g.fit['fresh_size'] + 1
       
     # SAVE
-    g.log_fh.write(std.dict_to_str(g.fit))
+    main.log(std.dict_to_str(g.fit))
       
   def fit_results():
       
@@ -141,7 +158,8 @@ class read_input:
         pass
       
     # SAVE
-    g.log_fh.write(std.dict_to_str(g.fit_results))
+    main.log(std.dict_to_str(g.fit_results))
+    
     
 
   def bp():
@@ -164,7 +182,7 @@ class read_input:
         pass
         
     # SAVE
-    g.log_fh.write(std.dict_to_str(g.bp_input))
+    main.log(std.dict_to_str(g.bp_input))
 
 
   
@@ -178,7 +196,7 @@ class read_input:
         pass
         
     # SAVE
-    g.log_fh.write(std.dict_to_str(g.mask))
+    main.log(std.dict_to_str(g.mask))
 
 
 
@@ -219,9 +237,8 @@ class read_input:
                                             'calc_apaev': apaev,
                                            }
       
-      #print(g.dft_energy_adjustments[label_id])
- 
-    #exit()
+    # Save  
+    main.log(std.dict_to_str(g.dft_energy_adjustments))
   
   
   
