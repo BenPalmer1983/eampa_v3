@@ -48,29 +48,6 @@ END
 
 
 
-! FE Density
-START
-FILE              fe_dden.pot
-FIT               fe_dden.fit
-LABEL             FE
-F_ON true
-F_TYPE            DENS            ! PAIR DENS EMBE
-F_GROUP           2
-R_CUT             6.5
-END
-
-
-! FE Embedding
-START
-FILE              fe_demb.pot
-FIT               fe_demb.fit
-LABEL             FE
-F_ON true
-F_TYPE            EMBE            ! PAIR DENS EMBE
-F_GROUP           2
-R_CUT              6.5
-ZOOR     true  ! zero out of range
-END
 
 
 

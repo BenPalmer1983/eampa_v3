@@ -23,7 +23,11 @@ import hashlib
 
 class pf:
 
+  start_time = 0
+
   def run():    
+  
+    pf.start_time = time.time()
   
     main.log_title("Potential Fit")
     
@@ -206,6 +210,26 @@ class pf:
     
     
   def save():  
+   
+    main.log_hr()
+    main.log("End of fit")
+    main.log("Time spent in potfit:   " + str(time.time() - pf.start_time))
+    main.log("RSS Counter:            " + str(g.rss['counter']))
+    main.log("Configs:                " + str(g.benchmark['configs']))
+    main.log("Total atoms:            " + str(g.benchmark['total_atoms']))
+    main.log("Total Interactions:     " + str(g.benchmark['total_interactions']))
+    main.log("Time:                   " + str(g.benchmark['total_time']))
+    main.log("Configs/Sec:            " + str(g.benchmark['configspersec']))
+    main.log("Atoms/Sec:              " + str(g.benchmark['atomspersec']))
+    main.log("Interactions/Sec:       " + str(g.benchmark['interationspersec']))
+    
+    main.log_hr()
+    main.log("Parameters")    
+    for i in range(len(g.pfdata['params']['best'])):
+      main.log("P" + str(i) + " " + str(g.pfdata['params']['best'][i]))
+    main.log_hr()
+   
+   
    
     # Load best
     pf_potential.update(g.pfdata['params']['best'][:])

@@ -16,7 +16,10 @@ class pf_generation:
   fresh_size = None
 
   def run():
-  
+    main.log_hr()
+    main.log("Generation " + str(g.pfdata['generation']['counter']))
+    main.log_hr()
+    
     if(g.pfdata['generation']['counter']>1):
       pf_parameters.make_pool()
   

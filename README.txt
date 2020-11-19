@@ -5,6 +5,20 @@ Embedded Atom Method Potential Analyser
 Written in Python and Fortran (uses F2PY).
 
 
+
+Install on Standard Linux Desktop
+#####################################################
+
+CD to where you want the python code to be installed.
+
+git clone https://github.com/BenPalmer1983/eampa_v3.git
+
+cd eampa_v3
+
+./install.sh
+
+
+
 What does it do?
 #####################################################
 

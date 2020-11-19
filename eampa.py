@@ -2532,7 +2532,7 @@ class configs:
   def read():
 # Loop through files and read in
     for file in g.configs['config_files']: 
-      print(file) #DEL
+      main.log(file[1] + "  " + file[0])
       if(file[1] == 'std'):        
         configs.std(file[0])
       elif(file[1] == 'qe'):
@@ -5502,17 +5502,17 @@ class bp_calc:
     
   def init():
 # Log
-    g.log_fh.write('BP Allocated Memory\n')
+    main.log('BP Allocated Memory\n')
     try:
       mem = str(g.inp['mem']['bp'])
     except:
       mem = "500MB"
-    g.log_fh.write(mem + '\n')
+    main.log(mem + '\n')
     mem = std.mem_value(mem)    
     g.memory['bp']['c'] = int(1 * (mem / 7840))
     g.memory['bp']['g'] = int(12 * (mem / 7840))
     g.memory['bp']['nl'] = int(100 * (mem / 7840))
-    g.log_fh.write(str(g.memory['bp']['c']) + " " + str(g.memory['bp']['g']) + " " + str(g.memory['bp']['nl']) + '\n')
+    main.log(str(g.memory['bp']['c']) + " " + str(g.memory['bp']['g']) + " " + str(g.memory['bp']['nl']) + '\n')
     
 # Initialise
     bp.init(g.memory['bp']['c'], g.memory['bp']['g'], g.memory['bp']['nl'])
@@ -6019,7 +6019,11 @@ class rss_calc:
 ###########################################
 class pf:
 
+  start_time = 0
+
   def run():    
+  
+    pf.start_time = time.time()
   
     main.log_title("Potential Fit")
     
@@ -6178,6 +6182,24 @@ class pf:
     return hashlib.md5(hstr.encode()).hexdigest()
     
   def save():  
+   
+    main.log_hr()
+    main.log("End of fit")
+    main.log("Time spent in potfit:   " + str(time.time() - pf.start_time))
+    main.log("RSS Counter:            " + str(g.rss['counter']))
+    main.log("Configs:                " + str(g.benchmark['configs']))
+    main.log("Total atoms:            " + str(g.benchmark['total_atoms']))
+    main.log("Total Interactions:     " + str(g.benchmark['total_interactions']))
+    main.log("Time:                   " + str(g.benchmark['total_time']))
+    main.log("Configs/Sec:            " + str(g.benchmark['configspersec']))
+    main.log("Atoms/Sec:              " + str(g.benchmark['atomspersec']))
+    main.log("Interactions/Sec:       " + str(g.benchmark['interationspersec']))
+    
+    main.log_hr()
+    main.log("Parameters")    
+    for i in range(len(g.pfdata['params']['best'])):
+      main.log("P" + str(i) + " " + str(g.pfdata['params']['best'][i]))
+    main.log_hr()
    
 # Load best
     pf_potential.update(g.pfdata['params']['best'][:])
@@ -7022,7 +7044,10 @@ class pf_generation:
   fresh_size = None
 
   def run():
-  
+    main.log_hr()
+    main.log("Generation " + str(g.pfdata['generation']['counter']))
+    main.log_hr()
+    
     if(g.pfdata['generation']['counter']>1):
       pf_parameters.make_pool()
   
@@ -7630,19 +7655,14 @@ class main():
   
 # RECORD START TIME
     g.times['start'] = time.time()
-  
+    
     now = datetime.datetime.now()
     date_time = now.strftime("%m/%d/%Y, %H:%M:%S")
     print(date_time)	
   
 # OPEN LOG
-    g.log_fh = open('job.log', 'w')
-    main.log_hr()
-    main.log(time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.gmtime()))
-    main.log_hr()
-    main.log_br()
-    main.log_info()
-    main.log('Script: ' + str(sys.argv[0]))
+    main.log_start()
+
     if(len(sys.argv)>1):
       run_program = False
       try:
@@ -7663,42 +7683,62 @@ class main():
 # End and close log
       main.end()
       
-  def log(line='', end='\n'): 
-    main.log_info_count = main.log_info_count + 1
-    if(main.log_info_count == 100):
-      main.log_info_count = 0
-      main.log_info()
-  
-    lines=line.split("\n")
-    for line in lines:
-      g.log_fh.write(str("{:.3E}".format(time.time() - g.times['start'])) + ' ###   ' + line + end) 
-      
-  def log_hr(): 
-    g.log_fh.write('#############################################################################\n') 
+  def log_start():
+    fh = open('job.log', 'w')
+    fh.close()
+    main.log_hr()
+    main.log(time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.gmtime()))
+    main.log_hr()
+    main.log_br()
+    main.log_info()
+    main.log('Script: ' + str(sys.argv[0]))
     
-  def log_br(): 
-    g.log_fh.write('\n') 
-        
-  def log_info(): 
-    g.log_fh.write('####TIME#############LOG#####################################################\n') 
-    
-  def log_title(title=''): 
-    g.log_fh.write('#############################################\n') 
-    titles = title.split("\n")
-    for title in titles:
-      g.log_fh.write('  ' + title + '\n') 
-    g.log_fh.write('  Time: ' + str("{:.3E}".format(time.time() - g.times['start'])) + '\n') 
-    g.log_fh.write('#############################################\n') 
-  
-  def end(): 
-
-# CLOSE LOG
-    g.times['end'] = time.time()
+  def log_end():
     main.log_br()
     main.log_hr()
     main.log('Duration: ' + str(g.times['end'] - g.times['start']))
-    main.log_hr()
-    g.log_fh.close()
+    main.log_hr() 
+      
+  def log(line='', end='\n'):
+    fh = open('job.log', 'a') 
+    main.log_info_count = main.log_info_count + 1
+    if(main.log_info_count == 100):
+      main.log_info_count = 0
+      main.log_info()  
+    lines=line.split("\n")
+    for line in lines:
+      fh.write(str("{:.3E}".format(time.time() - g.times['start'])) + ' ###   ' + line + end) 
+    fh.close()
+      
+  def log_hr(): 
+    fh = open('job.log', 'a') 
+    fh.write('#############################################################################\n')
+    fh.close() 
+    
+  def log_br():
+    fh = open('job.log', 'a')  
+    fh.write('\n') 
+    fh.close()
+        
+  def log_info():
+    fh = open('job.log', 'a')  
+    fh.write('####TIME#############LOG#####################################################\n') 
+    fh.close()
+    
+  def log_title(title=''): 
+    fh = open('job.log', 'a') 
+    fh.write('#############################################\n') 
+    titles = title.split("\n")
+    for title in titles:
+      fh.write('  ' + title + '\n') 
+    fh.write('  Time: ' + str("{:.3E}".format(time.time() - g.times['start'])) + '\n') 
+    fh.write('#############################################\n')
+    fh.close() 
+  
+  def end(): 
+# CLOSE LOG
+    g.times['end'] = time.time()
+    main.log_end()
     exit()
 
 # Run
@@ -7725,7 +7765,7 @@ class main():
 # RECORD START TIME
     g.times['start'] = time.time()
 
-  
+    
 
     now = datetime.datetime.now()
 
@@ -7736,19 +7776,9 @@ class main():
   
 
 # OPEN LOG
-    g.log_fh = open('job.log', 'w')
+    main.log_start()
 
-    main.log_hr()
 
-    main.log(time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.gmtime()))
-
-    main.log_hr()
-
-    main.log_br()
-
-    main.log_info()
-
-    main.log('Script: ' + str(sys.argv[0]))
 
     if(len(sys.argv)>1):
 
@@ -7787,66 +7817,27 @@ class main():
 
       
 
-  def log(line='', end='\n'): 
+  def log_start():
 
-    main.log_info_count = main.log_info_count + 1
+    fh = open('job.log', 'w')
 
-    if(main.log_info_count == 100):
+    fh.close()
 
-      main.log_info_count = 0
+    main.log_hr()
 
-      main.log_info()
+    main.log(time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.gmtime()))
 
-  
+    main.log_hr()
 
-    lines=line.split("\n")
+    main.log_br()
 
-    for line in lines:
+    main.log_info()
 
-      g.log_fh.write(str("{:.3E}".format(time.time() - g.times['start'])) + ' ###   ' + line + end) 
-
-      
-
-  def log_hr(): 
-
-    g.log_fh.write('#############################################################################\n') 
+    main.log('Script: ' + str(sys.argv[0]))
 
     
 
-  def log_br(): 
-
-    g.log_fh.write('\n') 
-
-        
-
-  def log_info(): 
-
-    g.log_fh.write('####TIME#############LOG#####################################################\n') 
-
-    
-
-  def log_title(title=''): 
-
-    g.log_fh.write('#############################################\n') 
-
-    titles = title.split("\n")
-
-    for title in titles:
-
-      g.log_fh.write('  ' + title + '\n') 
-
-    g.log_fh.write('  Time: ' + str("{:.3E}".format(time.time() - g.times['start'])) + '\n') 
-
-    g.log_fh.write('#############################################\n') 
-
-  
-
-  def end(): 
-
-
-
-# CLOSE LOG
-    g.times['end'] = time.time()
+  def log_end():
 
     main.log_br()
 
@@ -7854,9 +7845,88 @@ class main():
 
     main.log('Duration: ' + str(g.times['end'] - g.times['start']))
 
-    main.log_hr()
+    main.log_hr() 
 
-    g.log_fh.close()
+      
+
+  def log(line='', end='\n'):
+
+    fh = open('job.log', 'a') 
+
+    main.log_info_count = main.log_info_count + 1
+
+    if(main.log_info_count == 100):
+
+      main.log_info_count = 0
+
+      main.log_info()  
+
+    lines=line.split("\n")
+
+    for line in lines:
+
+      fh.write(str("{:.3E}".format(time.time() - g.times['start'])) + ' ###   ' + line + end) 
+
+    fh.close()
+
+      
+
+  def log_hr(): 
+
+    fh = open('job.log', 'a') 
+
+    fh.write('#############################################################################\n')
+
+    fh.close() 
+
+    
+
+  def log_br():
+
+    fh = open('job.log', 'a')  
+
+    fh.write('\n') 
+
+    fh.close()
+
+        
+
+  def log_info():
+
+    fh = open('job.log', 'a')  
+
+    fh.write('####TIME#############LOG#####################################################\n') 
+
+    fh.close()
+
+    
+
+  def log_title(title=''): 
+
+    fh = open('job.log', 'a') 
+
+    fh.write('#############################################\n') 
+
+    titles = title.split("\n")
+
+    for title in titles:
+
+      fh.write('  ' + title + '\n') 
+
+    fh.write('  Time: ' + str("{:.3E}".format(time.time() - g.times['start'])) + '\n') 
+
+    fh.write('#############################################\n')
+
+    fh.close() 
+
+  
+
+  def end(): 
+
+# CLOSE LOG
+    g.times['end'] = time.time()
+
+    main.log_end()
 
     exit()
 

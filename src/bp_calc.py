@@ -65,17 +65,17 @@ class bp_calc:
     
   def init():
     # Log
-    g.log_fh.write('BP Allocated Memory\n')
+    main.log('BP Allocated Memory\n')
     try:
       mem = str(g.inp['mem']['bp'])
     except:
       mem = "500MB"
-    g.log_fh.write(mem + '\n')
+    main.log(mem + '\n')
     mem = std.mem_value(mem)    
     g.memory['bp']['c'] = int(1 * (mem / 7840))
     g.memory['bp']['g'] = int(12 * (mem / 7840))
     g.memory['bp']['nl'] = int(100 * (mem / 7840))
-    g.log_fh.write(str(g.memory['bp']['c']) + " " + str(g.memory['bp']['g']) + " " + str(g.memory['bp']['nl']) + '\n')
+    main.log(str(g.memory['bp']['c']) + " " + str(g.memory['bp']['g']) + " " + str(g.memory['bp']['nl']) + '\n')
     
     # Initialise
     bp.init(g.memory['bp']['c'], g.memory['bp']['g'], g.memory['bp']['nl'])

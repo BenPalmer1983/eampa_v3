@@ -34,25 +34,3 @@ R_CUT 6.5
 END
 
 
-! DENS  FE  
-START
-F_ON true
-F_TYPE DENS
-FILE dens_fe_2.pot
-LABEL FE  
-F_GROUP 2
-R_CUT 6.5
-END
-
-
-! EMBE  FE  
-START
-F_ON true
-F_TYPE EMBE
-FILE embe_fe_2.pot
-LABEL FE  
-F_GROUP 2
-R_CUT 6.5
-END
-
-

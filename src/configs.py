@@ -45,7 +45,7 @@ class configs:
   def read():
     # Loop through files and read in
     for file in g.configs['config_files']: 
-      print(file) #DEL
+      main.log(file[1] + "  " + file[0])
       if(file[1] == 'std'):        
         configs.std(file[0])
       elif(file[1] == 'qe'):
