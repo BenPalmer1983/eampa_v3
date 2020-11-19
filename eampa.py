@@ -5988,6 +5988,7 @@ class rss_calc:
       g.rss['since_improvement'] = 0
     g.rss['since_improvement'] = g.rss['since_improvement'] + 1
     if(g.rss['best'] == None or g.rss['current'] < g.rss['best']):
+      main.log('Best rss: ' + str(g.rss['best']) + ' (since last: ' + str(g.rss['since_improvement']) + ')')
       g.rss['best'] = g.rss['current']
       g.rss['since_improvement'] = 0
       
@@ -7671,8 +7672,8 @@ class main():
         run_program = True
       
 # Copy input
-        std.copy(sys.argv[0], g.dirs['input'])
-        std.copy(sys.argv[1], g.dirs['input'])
+#std.copy(sys.argv[0], g.dirs['input'])
+#std.copy(sys.argv[1], g.dirs['input'])
       except:
         main.log('Unable to load, exiting\n')
       
@@ -7795,10 +7796,8 @@ class main():
       
 
 # Copy input
-        std.copy(sys.argv[0], g.dirs['input'])
-
-        std.copy(sys.argv[1], g.dirs['input'])
-
+#std.copy(sys.argv[0], g.dirs['input'])
+#std.copy(sys.argv[1], g.dirs['input'])
       except:
 
         main.log('Unable to load, exiting\n')

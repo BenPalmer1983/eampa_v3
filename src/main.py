@@ -41,8 +41,8 @@ class main():
         run_program = True
       
         # Copy input
-        std.copy(sys.argv[0], g.dirs['input'])
-        std.copy(sys.argv[1], g.dirs['input'])
+        #std.copy(sys.argv[0], g.dirs['input'])
+        #std.copy(sys.argv[1], g.dirs['input'])
       except:
         main.log('Unable to load, exiting\n')
       

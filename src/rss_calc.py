@@ -158,6 +158,7 @@ class rss_calc:
       g.rss['since_improvement'] = 0
     g.rss['since_improvement'] = g.rss['since_improvement'] + 1
     if(g.rss['best'] == None or g.rss['current'] < g.rss['best']):
+      main.log('Best rss: ' + str(g.rss['best']) + ' (since last: ' + str(g.rss['since_improvement']) + ')')
       g.rss['best'] = g.rss['current']
       g.rss['since_improvement'] = 0
       
