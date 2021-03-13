@@ -19,9 +19,7 @@ class pf_generation:
     main.log_hr()
     main.log("Generation " + str(g.pfdata['generation']['counter']))
     main.log_hr()
-    
-    if(g.pfdata['generation']['counter']>1):
-      pf_parameters.make_pool()
+
   
     pf_generation.pop_size = g.fit['pop_size']
     pf_generation.pop_size_half = g.fit['pop_size'] // 2
@@ -71,6 +69,10 @@ class pf_generation:
     # Enhance
     g.pfdata['stage'] = 'Enhance'   
     pf_enhance.run()
+
+
+    #g.pfdata['generation']['counter']
+    #pf_setop
     
     
     
@@ -184,7 +186,10 @@ class pf_generation:
       loop = True
       while(loop):
         try:
-          g.pfdata['params']['fresh'][p, :] = pf_parameters.get_p()
+          rn = min(len(g.top_parameters) - 1, numpy.floor((len(g.top_parameters) + 1) * random.uniform(0.0, 1.0)**3))
+          pbest = numpy.copy(g.top_parameters[rn][1])
+
+          g.pfdata['params']['fresh'][p, :] = pf_parameters.random_p(pbest)
           pf_potential.update(g.pfdata['params']['fresh'][p, :])
           rss = pf.get_rss()
           if(g.pfdata['rss']['current'] is not None):
@@ -192,31 +197,7 @@ class pf_generation:
             g.pfdata['params']['fresh_rss'][p] = rss
         except:
           pass 
-      
-      
-    
-  def make_fresh_old():    
-    w = g.fit['fresh_ws']
-    w_inc = (g.fit['fresh_we'] - g.fit['fresh_ws']) / (g.fit['fresh_size'] // 2 - 1)
-    for p in range(g.fit['fresh_size']):
-      loop = True
-      while(loop):   
-        if(p % 2 == 0):
-          g.pfdata['params']['fresh'][p, :] = pf_cycle.random_p(g.pfdata['top']['p'][0,:], w)       
-        else:  
-          r = random.randint(0, 9)
-          g.pfdata['params']['fresh'][p, :] = pf_cycle.random_p(g.pfdata['top']['p'][r,:], w)              
-        loop = False
-        try:
-          pf_potential.update(g.pfdata['params']['fresh'][p, :])
-          rss = pf.get_rss()
-          if(g.pfdata['rss']['current'] is not None):
-            loop = False
-            g.pfdata['params']['fresh_rss'][p] = rss
-        except:
-          pass 
-      if(p % 2 == 1):
-        w = w + w_inc
+
           
         
   # Used to merge parents, fresh and all children into ordered array      
@@ -246,4 +227,52 @@ class pf_generation:
 
   
   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+###############################################################################################
+#
+# Delete some day
+#
+###############################################################################################    
+
+  def make_fresh_old():    
+    w = g.fit['fresh_ws']
+    w_inc = (g.fit['fresh_we'] - g.fit['fresh_ws']) / (g.fit['fresh_size'] // 2 - 1)
+    for p in range(g.fit['fresh_size']):
+      loop = True
+      while(loop):   
+        if(p % 2 == 0):
+          g.pfdata['params']['fresh'][p, :] = pf_cycle.random_p(g.pfdata['top']['p'][0,:], w)       
+        else:  
+          r = random.randint(0, 9)
+          g.pfdata['params']['fresh'][p, :] = pf_cycle.random_p(g.pfdata['top']['p'][r,:], w)              
+        loop = False
+        try:
+          pf_potential.update(g.pfdata['params']['fresh'][p, :])
+          rss = pf.get_rss()
+          if(g.pfdata['rss']['current'] is not None):
+            loop = False
+            g.pfdata['params']['fresh_rss'][p] = rss
+        except:
+          pass 
+      if(p % 2 == 1):
+        w = w + w_inc
   

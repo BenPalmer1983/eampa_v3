@@ -51,7 +51,10 @@ class potential_output:
         fh.write("\n")
     fh.close()
        
-    
+  
+
+
+
     
     
   @staticmethod
@@ -69,17 +72,15 @@ class potential_output:
     
     for fn in range(len(g.pot_functions['functions'])): 
       f = g.pot_functions['functions'][fn]
-      #print("F ", fn)
-      #print(f)
-      #print()
-      #print()
+
       # File Name        
-      pf_name = f['f_type'] + '_' + f['a_text'].strip()
-      if(f['b_text'].strip() != ''):
-        pf_name += '_' + f['b_text'].strip()
-      if(str(f['f_group']).strip() != ''):
-        pf_name += '_' + str(f['f_group'])
-      pf_name = pf_name.lower() + '.pot'
+      #pf_name = f['f_type'] + '_' + f['a_text'].strip()
+      #if(f['b_text'].strip() != ''):
+      #  pf_name += '_' + f['b_text'].strip()
+      #if(str(f['f_group']).strip() != ''):
+      #  pf_name += '_' + str(f['f_group'])
+      #pf_name = pf_name.lower() + '.pot'
+      pf_name = f['file']
       
       a = labels.get(f['a'])
       b = labels.get(f['b'])
@@ -98,6 +99,7 @@ class potential_output:
       fh.write('\n')  
       fh.write('\n')  
       
+      # Write Function File
       fh_pf = open(dir_out + '/' + pf_name, 'w')
       if(f['function_type'] == 1):
         pass
@@ -116,7 +118,28 @@ class potential_output:
           fh_pf.write('\n')
         fh_pf.write('#L ' + str(f['a_l']) + '\n')
         fh_pf.write('#U ' + str(f['a_u']) + '\n')
-        fh_pf.close()
+      fh_pf.close()
+
+      # Write Function File
+      if(f['function_type'] == 2):
+        fh_pfit = open(dir_out + '/' + f['fit_file'], 'w')
+        fh_pfit.write('#FIT A' + '\n')
+        fh_pfit.write('#PS ')
+        for p in f['a_params']:        
+          fh_pfit.write(' ' + str(p))
+        fh_pfit.write('\n')
+        fh_pfit.write('#PL ')
+        for i in range(len(f['a_params'])):    
+          fh_pfit.write(' ' + str(str(f['a_params'][i] - 0.5 * (f['fit_parameters'][1,i] - f['fit_parameters'][0,i]))))
+        fh_pfit.write('\n')
+        fh_pfit.write('#PU ')
+        for i in range(len(f['a_params'])):    
+          fh_pfit.write(' ' + str(str(f['a_params'][i] + 0.5 * (f['fit_parameters'][1,i] - f['fit_parameters'][0,i]))))
+        fh_pfit.write('\n')
+        fh_pfit.close()
+        
+
+
     fh.close()
   
   

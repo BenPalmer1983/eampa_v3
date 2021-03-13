@@ -27,7 +27,6 @@ class configs:
     # Read files in
     configs.read()
 
-    
     return True
 
   @staticmethod
@@ -81,10 +80,12 @@ class configs:
     # Read each config  
     for i in range(len(config_list)):
       configs.add_config(config_list[i], file_path, i)
+
   
   @staticmethod
   def make_config():
     return {
+    'f_id': None, 
     'file_type': '',  
     'file_path': '',  
     'file_part': 0,  
@@ -126,6 +127,10 @@ class configs:
     fd['file_type'] = config_type
     fd['file_path'] = file_path
     fd['file_part'] = i
+
+    fd['c'][0] = 1
+    fd['c'][1] = 1
+    fd['c'][2] = 1
     
     # FIRST READ
     for line in content:
@@ -190,14 +195,14 @@ class configs:
         fd['s_units'] = f[1]
       if(len(f) >= 4 and f[0][0] != "#"):    
         count_coord = False
+        #print(f)
         if(len(f) >= 4):
           count_coord = True
         if(len(f) >= 7):
           fd['f'] = 1
         if(count_coord):
           fd['coord_count_prim'] = fd['coord_count_prim'] + 1
-          
- 
+
     # COORD SIZE
     c = numpy.identity(3)
     
@@ -231,9 +236,8 @@ class configs:
     for line in content:
       line = line.strip() 
       f = std.to_fields(line, ' ')
-      if(len(f) >= 4 and f[0][0] != "#"):    
-        if(len(f) >= 4):   
-          
+      if(len(f) >= 4 and f[0][0] != "#"):   
+        if(len(f) >= 4):             
           label_str, label_id = labels.add(f[0])            
           #print(f[0], label_str, label_id)
           fd['coords_label_prim'][n] = label_str
@@ -247,6 +251,9 @@ class configs:
           fd['forces_prim'][n,1] = float(f[5])
           fd['forces_prim'][n,2] = float(f[6])
         n = n + 1
+    
+    
+
         
     # EXPAND COORDS
     m = 0
@@ -264,6 +271,8 @@ class configs:
               fd['forces'][m,1] = fd['forces_prim'][n,1]
               fd['forces'][m,2] = fd['forces_prim'][n,2]
             m = m + 1
+
+
             
     # SORT ENERGY       
     if(fd['e'] == 1 and fd['energy_per_atom'] != None and fd['energy'] == None):
@@ -705,7 +714,14 @@ class configs:
   
   @staticmethod
   def efs_add_config():  
-    for c in g.configs['configs']:
+
+    while(len(g.configs['config_results'])<len(g.configs['configs'])):
+      g.configs['config_results'].append({'f_id': None, 'energy': None, 'stress': None, 'force': None,})
+
+    for n in range(len(g.configs['configs'])):
+      c = g.configs['configs'][n]
+
+      #print(c)
       efs.add_config( 
                      6.5,
                      c['alat'], 
@@ -717,10 +733,26 @@ class configs:
                      c['stress'], 
                      c['f'], 
                      c['s']
-                    )                 
+                    )    
+      g.configs['configs'][n]['f_id'] = efs.cc
+      g.configs['config_results'][n]['f_id'] = efs.cc
     efs.make_nl()
+
+
   
-  
+
+  @staticmethod
+  def efs_results(): 
+    while(len(g.configs['config_results'])<len(g.configs['configs'])):
+      cc = g.configs['config_results'][n]['f_id']
+      print(efs.energies[cc])
+
+
+
+
+
+
+    
   #@staticmethod
   #def efs_add_config(): 
     

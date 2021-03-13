@@ -1,6 +1,0 @@
-# Set Units
-units pressure=GPA length=ang energy=ev
-
-# Energy Surface File
-ALFCC1 potlabel=AL alat=4.05 uv=1.0 type=fcc expansion=4 rcut=6.5 surface_energy=0.0
-ALFCC2 potlabel=AL alat=3.2 uv=1.0 type=bcc expansion=4 rcut=6.5 surface_energy=0.0

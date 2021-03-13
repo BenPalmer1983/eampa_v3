@@ -88,4 +88,4 @@ class gd:
     gd.p_out = numpy.copy(best_p)
     gd.rss_out = best_rss
     
-    return p
+    return p, rss

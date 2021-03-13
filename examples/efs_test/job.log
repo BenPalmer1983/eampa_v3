@@ -1,0 +1,91 @@
+#############################################################################
+1.194E-02 ###   Mon, 01 Mar 2021 15:37:03 +0000
+#############################################################################
+
+####TIME#############LOG#####################################################
+3.219E-02 ###   Script: /cloud/Code/python/eampa/eampa.py
+4.021E-02 ###   Loaded: input.in
+#############################################
+  Read Input
+  Time: 4.434E-02
+#############################################
+4.920E-02 ###   efs
+5.242E-02 ###   a0: 25.0
+5.243E-02 ###   b0: 1.0
+5.243E-02 ###   bp: 1000.0
+5.243E-02 ###   config: 1.7
+5.243E-02 ###   e: 1.0
+5.243E-02 ###   e0: 25.0
+5.244E-02 ###   ec: 1.0
+5.244E-02 ###   energy: 1.2
+5.244E-02 ###   force: 1.5
+5.244E-02 ###   g: 1.0
+5.244E-02 ###   negec: 1000.0
+5.244E-02 ###   stress: 1.3
+5.244E-02 ###   v: 1.0
+5.244E-02 ###   
+5.591E-02 ###   max: 100.0
+5.593E-02 ###   min: 0.1
+5.593E-02 ###   scale_exponent: 4.0
+5.593E-02 ###   scale_factor: 10.0
+5.593E-02 ###   zero_density_factor: 100000000.0
+5.593E-02 ###   
+6.462E-02 ###   pot_dir: None
+6.464E-02 ###   pot_name: None
+6.464E-02 ###   results_dir: results
+6.464E-02 ###   
+6.852E-02 ###   bp_file: bp.dat
+6.854E-02 ###   dir: bp
+6.854E-02 ###   ec_size: 6
+6.854E-02 ###   ec_strain: 0.001
+6.855E-02 ###   eos_size: 6
+6.855E-02 ###   eos_strain: 0.001
+6.855E-02 ###   
+7.233E-02 ###   FE1: FE
+7.234E-02 ###   FE2: FE
+7.235E-02 ###   FE3: FE
+7.235E-02 ###   FE4: FE
+7.235E-02 ###   PD: PD
+7.235E-02 ###   
+7.638E-02 ###   1: {'label_id': 1, 'label_text': 'AL', 'atom_count': 32, 'relaxed_energy': -1264.06398979, 'relaxed_energy_unit': 'Ry', 'coh_energy': -3.36, 'coh_energy_unit': 'eV', 'calc_relaxed_dft_ev': -537.454181036, 'calc_coh_ev': -3.36, 'calc_apaev': 534.094181036}
+7.640E-02 ###   2: {'label_id': 2, 'label_text': 'FE', 'atom_count': 16, 'relaxed_energy': -5268.188, 'relaxed_energy_unit': 'Ry', 'coh_energy': -4.316, 'coh_energy_unit': 'eV', 'calc_relaxed_dft_ev': -4479.851795407, 'calc_coh_ev': -4.316, 'calc_apaev': 4475.5357954070005}
+7.640E-02 ###   3: {'label_id': 3, 'label_text': 'PD', 'atom_count': 32, 'relaxed_energy': -16384.958, 'relaxed_energy_unit': 'Ry', 'coh_energy': -3.91, 'coh_energy_unit': 'eV', 'calc_relaxed_dft_ev': -6966.549363269, 'calc_coh_ev': -3.91, 'calc_apaev': 6962.639363269001}
+7.640E-02 ###   
+#############################################
+  Setup Directories
+  Time: 8.079E-02
+#############################################
+8.513E-02 ###   WD: wd/wd
+9.040E-02 ###   wd   wd/wd
+9.521E-02 ###   input   wd/wd/input
+9.976E-02 ###   output   wd/wd/output
+1.042E-01 ###   results   wd/wd/results
+1.096E-01 ###   plots   wd/wd/plots
+1.146E-01 ###   configs   wd/wd/configs
+1.197E-01 ###   fitting   wd/wd/fitting
+1.242E-01 ###   fitting_generations   wd/wd/fitting/generations
+1.299E-01 ###   fitting_finished   wd/wd/fitting/finished
+#############################################
+  Memory
+  Time: 1.344E-01
+#############################################
+1.384E-01 ###   EFS 2000000000.0
+1.429E-01 ###   config size       255102
+1.469E-01 ###   ghost size        3061224
+1.507E-01 ###   nl size           25510204
+1.552E-01 ###   BP 2000000000.0
+1.579E-01 ###   config size       255102
+1.610E-01 ###   ghost size        3061224
+1.645E-01 ###   nl size           25510204
+#############################################
+  Potential Load
+  Time: 1.697E-01
+#############################################
+1.766E-01 ###   Potential file: pot/fe_pd/fe_pd.pot
+1.806E-01 ###   Loading: pot/fe_pd/fe_pd.pot
+1.914E-01 ###   Load zbl
+2.456E+00 ###   std  configs/config_0001.out
+
+#############################################################################
+3.048E+00 ###   Duration: 3.0373713970184326
+#############################################################################

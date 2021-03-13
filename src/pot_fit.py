@@ -5,9 +5,11 @@
 
 import numpy
 from potential import potential
-from display import display
 from gd import gd
 from rescale_density import rescale_density
+from pot_fit_start import pf_start
+from pot_fit_steps import pf_steps
+from pot_fit_genetic import pf_genetic
 from pot_fit_data import pf_data
 from pot_fit_cycle import pf_cycle
 from pot_fit_potential import pf_potential
@@ -15,6 +17,20 @@ from pot_fit_generation import pf_generation
 from pot_fit_extinction import pf_extinction
 from pot_fit_enhance import pf_enhance
 from pot_fit_parameters import pf_parameters
+from pot_fit_setop import pf_setop
+from pot_fit_gd import pf_gd
+from pot_fit_ng import pf_ng
+from pot_fit_sa import pf_sa
+from pot_fit_saa import pf_saa
+from pot_fit_saved import pf_saved
+from pot_fit_random import pf_saved
+from pot_fit_top import pf_top
+from pot_fit_pgradient import pf_top
+from pot_fit_display import pf_display
+from pot_fit_display_simple import pf_display_simple
+from pot_fit_init import pf_init
+from pot_fit_save import pf_save
+from pot_fit_final import pf_final
 import matplotlib.pyplot as plt
 import time
 import random
@@ -23,236 +39,192 @@ import hashlib
 
 class pf:
 
-  start_time = 0
-
-  def run():    
+  start_time = 0.0
+  end_time = 0.0  
   
+
+  def run():   
+  
+    # Start Time
     pf.start_time = time.time()
   
+    # Log
     main.log_title("Potential Fit")
-    
+      
+    # Set up EFS and BP modules and g.pfdata
+    pf_init.run()
+
     # Create Plot Dirs
     std.make_dir(g.dirs['wd'] + '/fitting')
-    
-    # Set up EFS and BP modules
-    pf.set_up()
-    
-    # Make data structure
-    g.pfdata = pf_data.make()
-    
-    # Print start screen
-    pf.startup()
-    
-    # Output
-    potential.plot_python_potentials(g.dirs['wd'] + '/plots/pots/start_potential')
+    pf.fh = open(g.dirs['wd'] + '/fitting/fitting_summary.txt', 'w')
 
-    # Make Pool
-    pf_parameters.setup_pool()
-    pf_parameters.make_pool()
-   
-    # Run
-    pf.run_fit()
+    # Run once with initial parameters
+    g.pfdata['stage'] = 'START - INITIAL PARAMETERS'
+    g.pfdata['stage_brief'] = 'START'
+    p = potential.get_start_parameters()
+    pf_potential.update(p)
+    rss = pf.get_rss()
+    pf.set_current(p)
+
+    # Load saved
+    pf_saved.run()
+
+    #pf_saa.run()
+
+    for fit in g.fit:
+      pf.fit = fit
+      if(pf.fit['type'].lower() == "random"):        
+        pf_random.run()
+      elif(pf.fit['type'].lower() == "sa"): 
+        pf_sa.run()
+      elif(pf.fit['type'].lower() == "ga"): 
+        pf_genetic.run()
+      elif(pf.fit['type'].lower() == "ng"): 
+        pf_ng.run()
+
+    pf_top.save(g.dirs['wd'] + '/save', 'top_parameters.txt')
+
+    # Output
+    potential_output.full()
+          
+    # End Time
+    pf.end_time = time.time()
+  
+    # Log fit time
+    main.log("Fit time: ", str(pf.end_time - pf.start_time))
+
+    print(g.top_parameters[0][0])
+    print(g.top_parameters[0][1])
+    print(g.top_parameters[0][2])
+    print(g.top_parameters[0][3])
+    print(g.top_parameters[0][4])
+    print(g.top_parameters[0][5])
+
+
+    # Final
+    pf_final.run()
+
+
+    #pf_ng.run()
+
+
+    # Enhance top
+    #pf_setop.run()
+
+    # Run Genetic
+    #pf_genetic.run()
     
-    # Save Results
-    pf.save()
-    
-    
+    # Run Sim Annealing on Best Result
+    #pf_sa.run()
+
+
+    #pf_gd.run()
+    #pf_steps.run()
+  
+    #pf_ng.run()
+
+
+    # Display
+    #g.pfdata['stage'] = 'Finished'
+    #display.finish()
+      
+
+
+  
+  
+  
+  
+  
   ######################################################     
   # SET UP - initialise EFS, BP and any other modules
   #          and run first calc
   ###################################################### 
-  def set_up():  
-    # If a spline fit, convert into a spline with the set number of nodes
-    for fn in range(len(g.pot_functions['functions'])):       
-      if(g.pot_functions['functions'][fn]['fit_type'] == 1):     
-        potential.vary_tabulated_points(fn)
 
-  
-    # Setup EFS
-    efs.init()                         # Initialise (allocate arrays)
-    potential.efs_add_potentials()     # Load potentials
-    configs.efs_add_config()           # Add configs
+  def set_current(p):
+    g.pfdata['p']['current'] = numpy.copy(p)
     
-    # Setup BP    
-    bp_calc.init()
-    potential.bp_add_potentials()
-    b_props.bp_add()
-    bp_calc.get_known()
-    
-    # Rescale density function
-    if(g.fit['rescale_density'] == 2):
-      rescale_density.run()      
-    
-    
-    
-  def startup():
-    display.clear() 
-    
-    
-    print("###################################################")      
-    print("Starting RSS: ", g.pfdata['rss']['start'])   
-    print("###################################################") 
-    print("Potential Parameters")
-    print("###################################################")   
-    potential.print_parameters() 
-    
-    time.sleep(2.5)
-
-    
-  def run_fit():
-  
-
-    for c in range(g.fit['cycles']):
-      pf_cycle.run()
-  
-    
-     
-     
-     
-     
-     
-     
-     
-    
-  def get_rss(top=True):  
-    rss = rss_calc.run_calc()  
-    
-    
+  def get_rss(save_in_top=True):  
+    rss = rss_calc.run_calc(save_in_top)  
+        
     g.pfdata['rss']['current'] = rss
     g.pfdata['rss']['counter'] += 1
+    g.pfdata['max_density']['bp_current'] = bp.max_density
+    g.pfdata['max_density']['efs_current'] = efs.max_density
     
-    if(rss is not None):    
-      # Hash of Parameters
-      h = pf.param_hash(g.pfdata['params']['current'])    
-      
+    # If successful
+    if(rss is not None):   
+    
       # Store Details
       g.pfdata['rss']['counter_successful'] += 1
       g.pfdata['rss']['since_improvement'] += 1    
       if(g.pfdata['rss']['start'] == None):
         g.pfdata['rss']['start'] = rss
       if(g.pfdata['rss']['best'] == None or rss < g.pfdata['rss']['best']):
-        g.pfdata['params']['best'][:] = copy.deepcopy(g.pfdata['params']['current'])
-        g.pfdata['best_hash'] = h
+        g.pfdata['p']['best'] = numpy.copy(g.pfdata['p']['current'])
         g.pfdata['rss']['best'] = rss
-        g.pfdata['bp_best'] = copy.deepcopy(g.bp_results)        
+        g.pfdata['bp']['best'] = copy.deepcopy(g.bp_results)        
         g.pfdata['rss']['since_improvement'] = 0
+        g.pfdata['max_density']['bp_best'] = bp.max_density
+        g.pfdata['max_density']['efs_best'] = efs.max_density
         
-      # Fill in top 
-      if(top):
-        pf.top(g.pfdata['params']['current'], rss)
+      # Save in top
+      if(save_in_top):
+        list_len = g.fitting['top_parameters']
+
+        # COPY ARRAYS
+        p_now = numpy.copy(potential.get_parameters())
+        efs_results = copy.deepcopy(g.efs_results)
+        bp_results = copy.deepcopy(g.bp_results)
+        rss_details = copy.deepcopy(g.rss)
+
+        if(len(g.top_parameters) == 0):
+          g.top_parameters.append([rss, p_now, efs_results, bp_results, bp.max_density, efs.max_density, rss_details])
+        else:    
+          i = 0
+          while(i<len(g.top_parameters)):
+            if(rss < g.top_parameters[i][0]):
+              break
+            elif(rss == g.top_parameters[i][0] and g.top_parameters[i][1].all() == p_now.all()):
+              i = list_len
+              break
+            else:
+              i = i + 1
+          if(i < list_len):
+            g.top_parameters.insert(i, [rss, p_now, efs_results,bp_results, bp.max_density, efs.max_density, rss_details])
+          if(len(g.top_parameters) > list_len):
+            g.top_parameters.pop()    
+
+
 
     # DISPLAY
-    display.output()    
+    pf_display.output()    
     return rss
     
     
-  def top(p, rss):  
-    g.pfdata['top']['counter'] += 1
-    if(g.pfdata['top']['filled']):
-      if(rss < g.pfdata['top']['rss'][-1]):
-        g.pfdata['top']['rss'][-1] = copy.deepcopy(rss)
-        g.pfdata['top']['p'][-1,:] = copy.deepcopy(p)
-    else:
-      for n in range(g.pfdata['top']['size']):
-        breakout = False
-        if(g.pfdata['top']['rss'][n] == -1.0):
-          g.pfdata['top']['rss'][n] = copy.deepcopy(rss)
-          g.pfdata['top']['p'][n,:] = copy.deepcopy(p)
-          breakout = True
-        if(breakout):
-          break
-      if(breakout == False):
-        g.pfdata['top']['filled'] = True
     
-    sort.sort_1d_dp_asc(g.pfdata['top']['rss'][:])
-    g.pfdata['top']['rss'] = sort.apply_keytable_1d_dp(g.pfdata['top']['rss'])
-    g.pfdata['top']['p'] = sort.apply_keytable_2d_dp(g.pfdata['top']['p'])
+    
 
-    #top = {'size': top_size, 'rss': numpy.zeros((top_size,),), 'p': numpy.zeros((top_size, width,),),}
-    #pass
-  
-    """
-    p = g.pfdata['params']['current']
-    for i in range(10):
-      if(rss == g.pfdata['top_ten'][i][0]):
-        return 0
-      if(g.pfdata['top_ten'][i][0] == None):
-        g.pfdata['top_ten'][i][0] = rss
-        g.pfdata['top_ten'][i][1] = p
-        return 0
-      if(rss < g.pfdata['top_ten'][i][0]):
-        if(i < 9):
-          g.pfdata['top_ten'][i+1:9] = copy.deepcopy(g.pfdata['top_ten'][i:8])
-        g.pfdata['top_ten'][i][0] = rss
-        g.pfdata['top_ten'][i][1] = p
-        return 0
-    """
+  def summary_line(opt_type, t_start, t_end, rss_start, rss_end):
+    
+    t_taken = str('{:6.3f}'.format(t_end - t_start))
+    while(len(t_taken)<16):
+      t_taken = t_taken + " "
+    
+    rss_start = str('{:12.4e}'.format(rss_start))
+    while(len(rss_start)<16):
+      rss_start = rss_start + " "
+    
+    rss_end = str('{:12.4e}'.format(rss_end))
+    while(len(rss_end)<16):
+      rss_end = rss_end + " "
+
+    opt_type = str(opt_type)
+    while(len(opt_type)<30):
+      opt_type = opt_type + " "
+
+    pf.fh.write(opt_type + rss_start + "-->  " + rss_end + "  " + t_taken + "\n")
     
     
-  def print_top_ten():  
-    print()  
-    print("=====================")  
-    for i in range(10):
-      print(i, g.pfdata['top_ten'][i][0])
-    print("=====================")  
-    print()  
-    print()  
-    
-    
-  def param_hash(p):
-    hstr = ''
-    for i in range(len(p)):
-      hstr = hstr + str(p[i])
-    return hashlib.md5(hstr.encode()).hexdigest()
-    
-    
-    
-    
-    
-  def save():  
-   
-    main.log_hr()
-    main.log("End of fit")
-    main.log("Time spent in potfit:   " + str(time.time() - pf.start_time))
-    main.log("RSS Counter:            " + str(g.rss['counter']))
-    main.log("Configs:                " + str(g.benchmark['configs']))
-    main.log("Total atoms:            " + str(g.benchmark['total_atoms']))
-    main.log("Total Interactions:     " + str(g.benchmark['total_interactions']))
-    main.log("Time:                   " + str(g.benchmark['total_time']))
-    main.log("Configs/Sec:            " + str(g.benchmark['configspersec']))
-    main.log("Atoms/Sec:              " + str(g.benchmark['atomspersec']))
-    main.log("Interactions/Sec:       " + str(g.benchmark['interationspersec']))
-    
-    main.log_hr()
-    main.log("Parameters")    
-    for i in range(len(g.pfdata['params']['best'])):
-      main.log("P" + str(i) + " " + str(g.pfdata['params']['best'][i]))
-    main.log_hr()
-   
-   
-   
-    # Load best
-    pf_potential.update(g.pfdata['params']['best'][:])
-    
-    # Display
-    g.pfdata['stage'] = 'Finished'
-    display.finish()
-    
-    # Output
-    potential_output.full()
-    
-  
-  
-  
-  
-  
-  
-   
-  
-  
-  
-  
-  
-  
-  
-  
+
+
+

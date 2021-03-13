@@ -164,7 +164,7 @@ DO WHILE(bp_keys_i(n, 1) .NE. -1)
   END IF
   n = n + 1
 END DO
-
+calc_count = max(calc_count, bp_id)
 
 IF(bp_id .EQ. 0)THEN
 
@@ -243,6 +243,8 @@ IF(bp_id .EQ. 0)THEN
     cn_counter = cn_counter + 1
     bp_configs(bp_id, cn_counter) = cc 
     CALL make_nl(cc)
+
+    !print *, bp_id, n, cc, rcut_in, alat_in, m
 
     ! RECORD DATA
     calc_strains(bp_id, 1, n) = sigma

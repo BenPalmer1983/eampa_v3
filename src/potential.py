@@ -14,12 +14,11 @@ from rescale_density import rescale_density
 
 class potential:
 
-
+  rescale_density_on = False
+  rescale_embedding_on = False
+  parameters = None
 
   def run():
-
-  
-    print("Potential") 
   
     efs.init()                           # Initialise (allocate arrays)
     potential.efs_add_potentials()       # Load potentials
@@ -41,9 +40,17 @@ class potential:
       main.log("Potential load failed - no pot file")
       return False
     main.log("Potential file: " + str(pot_file))
+
+    if('rescale_density' in g.inp['potential'].keys() and g.inp['potential']['rescale_density'].upper().strip() == "TRUE"):
+      potential.rescale_density_on = True
+
+    if('rescale_embedding' in g.inp['potential'].keys() and g.inp['potential']['rescale_embedding'].upper().strip() == "TRUE"):
+      potential.rescale_embedding_on = True
+
       
     # Read potential index
     potential.read_potential(pot_file)
+    potential.make_find_fn()
     potential.load_tabulated()
     potential.make_tabulated_points()
     potential.load_analytic()
@@ -51,20 +58,50 @@ class potential:
     potential.load_spline()
     potential.make_spline_points()
     potential.load_fit_data()
+    potential.rescale_embedding()
     potential.pf_output()
     potential.make_copies()
-       
+    potential.parameters = numpy.copy(potential.get_parameters())
+
     potential.plot_python_potentials(g.dirs['plots'] + "/starting_potential")   
-       
+    potential.pf_output_file(g.dirs['input'] + '/start.pot')
     #main.end()   
        
     return True
   
   
   
+  @staticmethod
+  def make_find_fn():
+    for fn in range(len(g.pot_functions['functions'])): 
+      t_id = g.pot_functions['functions'][fn]['f_type_id']
+      if(g.pot_functions['functions'][fn]['f_type_id'] == 1):
+        a_id = g.pot_functions['functions'][fn]['a']
+        b_id = g.pot_functions['functions'][fn]['b']
+      elif(g.pot_functions['functions'][fn]['f_type_id'] == 2):
+        a_id = g.pot_functions['functions'][fn]['a']
+        b_id = g.pot_functions['functions'][fn]['f_group']
+      elif(g.pot_functions['functions'][fn]['f_type_id'] == 3):
+        a_id = g.pot_functions['functions'][fn]['a']
+        b_id = g.pot_functions['functions'][fn]['f_group']
+      if(t_id not in g.pot_fn.keys()):
+        g.pot_fn[t_id] = {}
+      if(a_id not in g.pot_fn[t_id].keys()):
+        g.pot_fn[t_id][a_id] = {}
+      g.pot_fn[t_id][a_id][b_id] = fn
   
-  
-  
+  @staticmethod
+  def find_fn(t_id, a_id, b_id): 
+    if(t_id not in g.pot_fn.keys()):
+      return -1
+    if(a_id not in g.pot_fn[t_id].keys()):
+      return -1
+    if(b_id not in g.pot_fn[t_id][a_id].keys()):
+      return -1
+    return g.pot_fn[t_id][a_id][b_id]
+
+
+
   @staticmethod
   def pot_function():
     return {      
@@ -96,9 +133,91 @@ class potential:
     'fit_type': None,         # 1 spline, 2 analytic
     'fit_spline_type': None,  # 1 poly3, 2 poly5
     'fit_parameters': None,
+    'fit_parameters_start': None,
     'fit_size': None,
     'fit_mult': None,
+    'function_file_name': '',
     }
+
+
+
+
+  @staticmethod
+  def rescale_density():
+    # NOT WORKING YET
+    if(potential.rescale_density_on):
+      print("Rescale")
+      m = {}
+      for fn in range(len(g.pot_functions['functions'])): 
+        if(g.pot_functions['functions'][fn]['f_type_id'] == 2):
+          a_id = g.pot_functions['functions'][fn]['a']
+          f_id = g.pot_functions['functions'][fn]['f_group']
+          m_rho = rescale_density.estimate_density(fn)
+          m[fn] = 1.0 / m_rho
+          fn_emb = potential.find_fn(3, a_id, f_id)
+          m[fn_emb] = 1.0 / m_rho
+          print(m_rho)
+      # Get parameters 
+      p = potential.get_parameters()
+
+      # Update potential
+      a = 0
+      for fn in range(len(g.pot_functions['functions'])): 
+        multf = 1.0
+        #if(fn in m.keys()):
+        #  multf = m[fn] 
+
+        b = a + g.pot_functions['functions'][fn]['fit_size'] 
+        if(g.pot_functions['functions'][fn]['fit_type'] == 1):     # NODE SPLINE   
+          # Calc b 
+          g.pot_functions['functions'][fn]['s_nodes'][:,1] = multf * p[a:b]
+          potential.make_spline_points_inner(fn)  
+        
+        elif(g.pot_functions['functions'][fn]['fit_type'] == 2):   # ANALYTIC  
+          # Make Analytic Points
+          g.pot_functions['functions'][fn]['a_params'][:] = multf * p[a:b]
+          potential.make_analytic_points_inner(fn)
+
+        # Update a
+        a = b    
+
+  # Where the embedding function is analytic, rescale the tab points to range
+  # from 0.0 up to predicted max density
+  @staticmethod
+  def rescale_embedding():
+    if(potential.rescale_embedding_on):
+      m = {}
+      for fn in range(len(g.pot_functions['functions'])):         
+        if(g.pot_functions['functions'][fn]['f_type_id'] == 2):  # Density function
+          a_id = g.pot_functions['functions'][fn]['a']
+          f_id = g.pot_functions['functions'][fn]['f_group']
+          fn_emb = potential.find_fn(3, a_id, f_id)
+          m_rho = rescale_density.estimate_density(fn)
+          if(fn_emb >= 0):
+            m[fn_emb] = m_rho
+
+      for fn in m.keys():
+        if(g.pot_functions['functions'][fn]['fit_type'] == 2):   # ANALYTIC  
+          g.pot_functions['functions'][fn]['a_u'] = m[fn_emb]
+          potential.make_analytic_points_inner(fn)
+
+
+
+  @staticmethod
+  def estimate_density(fn):
+    # Symetric simple cubic used as test case
+    sc = {0.86602539999999995: 8, 0.80039053000000004: 24, 0.75: 24, 0.71807032999999998: 24, 0.70710678000000005: 12, 0.72886899000000005: 24, 0.67314560000000001: 48, 0.63737743999999996: 48, 0.625: 24, 0.61237244000000002: 24, 0.57282195999999996: 48, 0.55901699000000005: 24, 0.53033008999999998: 36, 0.51538819999999996: 48, 0.5: 6, 0.64951904999999999: 8, 0.58630196999999995: 24, 0.54486237000000004: 24, 0.46770717000000001: 48, 0.45069390999999998: 24, 0.4145781: 24, 0.39528470999999998: 24, 0.375: 30, 0.43301269999999997: 8, 0.35355339000000002: 12, 0.30618622000000001: 24, 0.27950849999999999: 24, 0.25: 6, 0.21650634999999999: 8, 0.17677670000000001: 12, 0.125: 7}
+    a_prim = 0.125
+    a = [2.0,3.0,4.0,5.0] 
+    m_rho = 0.0
+    for a0 in a:
+      a0 = (1 / a_prim) * a0
+      rho = 0.0    
+      for k in sc.keys():
+        y = interp.search_x(a0 * k, g.pot_functions['functions'][fn]['points'][:,0], g.pot_functions['functions'][fn]['points'][:,1])
+        rho = rho + sc[k] * y
+      m_rho = max(m_rho, rho)
+    return m_rho
 
 
 
@@ -112,10 +231,11 @@ class potential:
         if(i > 0):
           g.pot_functions['pot_dir'] += '/'
         g.pot_functions['pot_dir'] += lst[i]
-    main.log("Loading: " + str(file_name))
-        
+    main.log("Loading: " + str(file_name))        
+
     index = std.config_file_to_list(file_name)  
     pot = potential.pot_function()
+    g.pot_functions['pot_file_name'] = file_name
     for row in index:    
       if(len(row) > 1 and row[0].upper() == "POTNAME"):
         g.pot_functions['pot_name'] = row[1]
@@ -129,10 +249,14 @@ class potential:
           pot['f_on'] = 0
       elif(len(row) > 1 and row[0].upper() == "LABEL"):
         label_str, label_id = labels.add(row[1])
+        if(label_str not in g.pot_labels):
+          g.pot_labels.append(label_str)  # Record potential labels
         pot['a_text'] = label_str
         pot['a'] = label_id
         if(len(row) > 2):
           label_str, label_id = labels.add(row[2])
+          if(label_str not in g.pot_labels):
+            g.pot_labels.append(label_str)  # Record potential labels
           pot['b_text'] = label_str
           pot['b'] = label_id
       elif(len(row) > 1 and row[0].upper() == "FILE"):
@@ -154,15 +278,30 @@ class potential:
           pot['f_type'] = 'NONE'
       elif(len(row) > 1 and row[0].upper() == "F_GROUP"):
         pot['f_group_label'] = row[1].strip() 
+      elif(len(row) == 1 and row[0].upper() == "F_GROUP"):
+        pot['f_group_label'] = "DEFAULT"
       elif(len(row) > 1 and row[0].upper() == "ZOOR"):
         val = row[1].upper() 
         pot['zoor'] = 0  
         if(val[0] == "T" or val[0] == "1" or val[0] == "Y"):
           pot['zoor'] = 1  
       elif(len(row) > 0 and row[0].upper() == "END"):
-        if(pot['a_text'] != None and pot['f_group_label'] != None):
-          label, id = labels.add_group(pot['a_text'], pot['f_group_label'], len(g.pot_functions['functions']))
-          pot['f_group'] = id
+        # END OF POTENTIAL READ
+        if(pot['f_type_id'] == 1):
+          pot['f_group'] = 0
+        else:
+          if(pot['a_text'] != None and pot['f_group_label'] != None):
+            if(pot['f_group_label'] == ""):
+              pot['f_group_label'] = "zzzemptyzzz"
+            if(pot['f_group_label'] in g.fgroups.keys()):
+              pot['f_group'] = g.fgroups[pot['f_group_label']]
+            else:
+              id = len(g.fgroups) + 1
+              g.fgroups[pot['f_group_label']] = id
+              pot['f_group'] = id
+
+        
+
       
         g.pot_functions['functions'].append(pot)
         pot = potential.pot_function()
@@ -406,6 +545,7 @@ class potential:
         fit_file = g.pot_functions['pot_dir'] + '/' + g.pot_functions['functions'][fn]['fit_file']
         if(os.path.isfile(fit_file)):
           # Read File
+          params_start = None
           fh = open(fit_file, 'r')
           for line in fh:
             line = std.one_space(line.strip().upper())
@@ -418,7 +558,9 @@ class potential:
             if(line[0:3] == "#PL"):
               params_lower = f[1:]                     
             if(line[0:3] == "#PU"):
-              params_upper = f[1:]                      
+              params_upper = f[1:]                     
+            if(line[0:3] == "#PS"):
+              params_start = f[1:]                      
             if(line[0:2] == "#N"):
               spline_nodes = f[1:]                      
             if(line[0:3] == "#ST"):
@@ -447,11 +589,18 @@ class potential:
             elif(g.pot_functions['functions'][fn]['fit_type'] == 2 and
                g.pot_functions['functions'][fn]['function_type'] == 2):
               g.pot_functions['functions'][fn]['fit_size'] = len(g.pot_functions['functions'][fn]['a_params'])
-              g.pot_functions['functions'][fn]['fit_parameters'] = numpy.zeros((3,len(g.pot_functions['functions'][fn]['a_params']),),)     
+              g.pot_functions['functions'][fn]['fit_parameters'] = numpy.zeros((3,len(g.pot_functions['functions'][fn]['a_params']),),) 
+              g.pot_functions['functions'][fn]['fit_parameters_start'] = numpy.zeros((len(g.pot_functions['functions'][fn]['a_params']),),)    
             
               for i in range(g.pot_functions['functions'][fn]['fit_size']):
                 g.pot_functions['functions'][fn]['fit_parameters'][0,i] = float(params_lower[i])
                 g.pot_functions['functions'][fn]['fit_parameters'][1,i] = float(params_upper[i])
+                #g.pot_functions['functions'][fn]['fit_parameters_start'][i] = float(params_start[i])
+                
+                if(params_start is None):
+                  g.pot_functions['functions'][fn]['fit_parameters_start'][i] = 0.5 * (float(params_lower[i]) + float(params_upper[i]))
+                else:
+                  g.pot_functions['functions'][fn]['fit_parameters_start'][i] = float(params_start[i])
               
             # Spline fitting
             elif(g.pot_functions['functions'][fn]['fit_type'] == 1):
@@ -499,7 +648,12 @@ class potential:
   @staticmethod
   def pf_output(): 
     if(g.outputs):     
-      fh = open(g.dirs['output'] + '/' + 'pot.dat', 'w')
+      potential.pf_output_file(g.dirs['output'] + '/' + 'pot.dat')
+    
+  @staticmethod
+  def pf_output_file(file_path): 
+
+      fh = open(file_path, 'w')
       
       n = 0
       for pf in g.pot_functions['functions']:
@@ -552,6 +706,51 @@ class potential:
       fh.close()
       
 
+    
+     
+    
+  @staticmethod
+  def get_parameters():  
+    w = 0
+    for fn in range(len(g.pot_functions['functions'])): 
+      if(g.pot_functions['functions'][fn]['fit_size'] != None):
+        w = w + g.pot_functions['functions'][fn]['fit_size']
+    p = numpy.zeros((w,),)  
+      
+    # Update potential
+    a = 0
+    for fn in range(len(g.pot_functions['functions'])): 
+      if(g.pot_functions['functions'][fn]['fit_size'] != None):
+        b = a + g.pot_functions['functions'][fn]['fit_size']  
+        if(g.pot_functions['functions'][fn]['fit_type'] == 1):     # NODE SPLINE   
+          p[a:b] = g.pot_functions['functions'][fn]['s_nodes'][:,1]
+        elif(g.pot_functions['functions'][fn]['fit_type'] == 2):   # ANALYTIC  
+          p[a:b] = g.pot_functions['functions'][fn]['a_params'][:]
+        # Update a
+        a = b    
+    
+    return p
+    
+   
+  @staticmethod
+  def get_start_parameters():   
+    w = 0
+    for fn in range(len(g.pot_functions['functions'])): 
+      w = w + g.pot_functions['functions'][fn]['fit_size']
+    p = numpy.zeros((w,),)  
+      
+    # Update potential
+    a = 0
+    for fn in range(len(g.pot_functions['functions'])): 
+      b = a + g.pot_functions['functions'][fn]['fit_size']  
+      if(g.pot_functions['functions'][fn]['fit_type'] == 1):     # NODE SPLINE   
+        p[a:b] = g.pot_functions['functions'][fn]['fit_parameters_start'][:,1]
+      elif(g.pot_functions['functions'][fn]['fit_type'] == 2):   # ANALYTIC  
+        p[a:b] = g.pot_functions['functions'][fn]['fit_parameters_start'][:]
+      # Update a
+      a = b    
+      
+    return p
     
     
   @staticmethod
@@ -826,6 +1025,7 @@ class potential:
     # ADD POTENTIALS
     for pn in range(len(g.pot_functions['functions'])):
       pf = g.pot_functions['functions'][pn]
+      #print(pf['f_type_id'], pf['a'], pf['f_group'])
       if(pf['f_on']):
         if(pf['f_type_id'] == 1):
           fortran_id = efs.add_potential(
@@ -847,22 +1047,10 @@ class potential:
                             pn
                            )   
           g.pot_functions['functions'][pn]['fortran_id'] = fortran_id
-        
-    # ADD ZBL   
-    for zbl in g.pot_functions['zbl']:
-      efs.add_zbl(
-                  zbl['id_1'],
-                  zbl['id_2'], 
-                  zbl['on'],  
-                  zbl['z1'], 
-                  zbl['z2'] , 
-                  zbl['ra'] , 
-                  zbl['rb'] , 
-                  zbl['spline_type'] 
-                 )    
-
+    
     # SET POTENTIALS
-    efs.set_potentials()   
+    efs.set_potentials() 
+    #exit()  
     
 
   def es_add_potentials():

@@ -20,18 +20,14 @@ INTEGER(kind=StandardInteger) :: n
 !############################################################
 y = 0.0D0
 DO n = 1, SIZE(p,1)
-  IF((p_fixed(n) - r) < 0.0D0)THEN
-    H = 0.0D0
-  ELSE
-    H = 1.0D0
-  END IF
-  y = y + p(n) * (r - p_fixed(n))**3 * H
+  CALL heaviside((p_fixed(n) - r), H)
+  y = y + p(n) * (p_fixed(n) - r)**3 * H
 END DO
 IF(SIZE(p,1) + 1 .EQ. SIZE(p_fixed,1))THEN
   IF(r .GE. p_fixed(SIZE(p_fixed,1)))THEN
     y = 0.0D0
   ELSE
-    y = y * (r - p_fixed(SIZE(p_fixed,1)))**3
+    y = y * ( p_fixed(SIZE(p_fixed,1) - r))**3
   END IF
 END IF
 END SUBROUTINE cubic_spline

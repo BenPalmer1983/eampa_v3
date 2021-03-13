@@ -1,0 +1,4 @@
+RANDOM SEARCH 1                 2.7245e+06    -->    2.7245e+06      162.908         
+RANDOM SEARCH 2                 2.7245e+06    -->    2.7245e+06      167.856         
+GENETIC ALGORITHM 1             2.7245e+06    -->    3.0136e+03      3579.444        
+SIMULATED ANNEALING 1           3.0136e+03    -->    1.6733e+01      2609.224        

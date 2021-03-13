@@ -1,0 +1,80 @@
+POTNAME 
+
+
+! PAIR  FE  PD
+START
+F_ON true
+F_TYPE PAIR
+FILE pair_fe_pd_1.pot
+LABEL FE  PD
+F_GROUP 1
+R_CUT 6.5
+END
+
+
+! PAIR  FE  FE
+START
+F_ON true
+F_TYPE PAIR
+FILE pair_fe_fe_1.pot
+LABEL FE  FE
+F_GROUP 1
+R_CUT 6.5
+END
+
+
+! DENS  FE  
+START
+F_ON true
+F_TYPE DENS
+FILE dens_fe_1.pot
+LABEL FE  
+F_GROUP 1
+R_CUT 6.5
+END
+
+
+! EMBE  FE  
+START
+F_ON true
+F_TYPE EMBE
+FILE embe_fe_1.pot
+LABEL FE  
+F_GROUP 1
+R_CUT 6.5
+END
+
+
+! PAIR  PD  PD
+START
+F_ON true
+F_TYPE PAIR
+FILE pair_pd_pd_1.pot
+LABEL PD  PD
+F_GROUP 1
+R_CUT 6.5
+END
+
+
+! DENS  PD  
+START
+F_ON true
+F_TYPE DENS
+FILE dens_pd_2.pot
+LABEL PD  
+F_GROUP 2
+R_CUT 6.5
+END
+
+
+! EMBE  PD  
+START
+F_ON true
+F_TYPE EMBE
+FILE embe_pd_2.pot
+LABEL PD  
+F_GROUP 2
+R_CUT 6.5
+END
+
+

@@ -75,8 +75,8 @@ ALLOCATE(ids(1:2000000))                   ! 16MB
 ALLOCATE(labels(1:2000000))                ! 16MB
 ALLOCATE(coords(1:2000000,1:6))            ! 32MB
 ALLOCATE(energies(1:2000000))             
-ALLOCATE(forces(1:2000000,1:3))            ! 16MB
-ALLOCATE(stresses(1:3000,1:3))             ! 74KB
+ALLOCATE(forces(1:100, 1:20000, 1:3))      ! 48MB
+ALLOCATE(stresses(1:1000,1:3,1:3))         ! 74KB
 
 ALLOCATE(ghostids(1:2000000))              ! 16MB
 ALLOCATE(ghostlabels(1:2000000))           ! 16MB
@@ -87,8 +87,8 @@ ALLOCATE(nlist_l(1:2000000, 1:4))
 ALLOCATE(nlist_r(1:2000000, 1:4))
 ALLOCATE(nlisthalo(1:2000000))
 
-ALLOCATE(config_forces(1:2000000,1:3))     ! 16MB
-ALLOCATE(config_stresses(1:3000,1:3))             ! 74KB
+ALLOCATE(config_forces(1:100, 1:20000, 1:3))     ! 48MB
+ALLOCATE(config_stresses(1:1000,1:3,1:3))        ! 74KB
 
 rcut = 0.0D0
 alat = 0.0D0

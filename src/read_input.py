@@ -15,6 +15,8 @@ class read_input:
     read_input.run_type()
     read_input.wd()
     read_input.rss_weights()
+    read_input.rss_max_density()
+    read_input.fitting()
     read_input.fit()
     read_input.fit_results()
     read_input.bp()
@@ -69,6 +71,7 @@ class read_input:
     'g': 1.0,
     'e': 1.0,
     'v': 1.0,
+    'negec': 1.0,
     }
     
     # TRY READING
@@ -84,24 +87,78 @@ class read_input:
     main.log(std.dict_to_str(g.rss_weights))
       
       
+      
+   
+  # READ 
+  def rss_max_density():   
+      
+    # DEFAULT
+    g.rss_max_density = {          
+    'min': 0.2,
+    'max': 0.8,
+    'scale_factor': 10.0,
+    'scale_exponent': 4.0,
+    'zero_density_factor': 1.0e8,
+    }
+    
+    # TRY READING
+    for k in g.rss_max_density.keys():
+      try:
+        g.rss_max_density[k] = float(g.inp['rss_max_density'][k])
+      except:
+        pass
+      # READ 
+      
+      
+    # SAVE
+    main.log(std.dict_to_str(g.rss_max_density))
+    
+      
+   
+  # READ 
+  def fitting():   
+      
+    # DEFAULT
+    g.fitting = {
+    'oversized_parameters': [10.0,0.05,0.05,0.05],   
+    'top_parameters': 100,
+    'load_top_parameters': 10,
+    }
+    if('fitting' in g.inp.keys()):
+      for k in g.fitting.keys():
+        try:
+          g.fitting[k] = g.inp['fitting'][k]
+        except:
+          pass
+
+      
   def fit():
   
-    # DEFAULT
-    g.fit = {
-    'cycles': 1,
-    'gens': 4,
+    # List of fit types
+    g.fit = []
+    if('fit' in g.inp.keys()):
+      g.fit.append(read_input.read_fit('fit'))
+    for i in range(100):
+      if("fit" + str(i) in g.inp.keys()):
+        g.fit.append(read_input.read_fit("fit" + str(i)))
+
+  def read_fit(inp_key):  
+    
+    fit_data = {
+    'type': None,
+    'random_size': 100,
+    'cycles': 0,
+    'gens': 0,
     'spline_cycles': 0,
     'spline_gens': 0,
     'pop_size': 20,
     'fresh_size': 10,
+    'gen_variation_multiplier': 0.1,
     'exct_factor': 0.5,
     'exct_every': 5,
     'exct_var': 0.1,
     'exct_top_bias': 0.5,
     'rescale_density': 0,
-    'rescale_min': 0.3,
-    'rescale_max': 0.9,
-    'rescale_default': 0.6,
     'wide_start': 0.5,
     'wide_end': 10.0,
     'mutate_chance': 0.01,
@@ -116,30 +173,42 @@ class read_input:
     'pool_size': 1000,
     'sane_seeds_a': 50,
     'sane_seeds_b': 200,
-    'sane_fraction': 0.5,
+    'sane_fraction': 0.5, 
+    'sa_loops_t': 10,
+    'sa_loops_i': 100,
+    'sa_temp_start': 10,
+    'sa_temp_end': 0.1,
+    'sa_step': 0.01,
+    'sa_step_factor': 0.3,
     }
 
     # TRY READING
-    for k in g.fit.keys():
+    for k in fit_data.keys():
       try:
-        g.fit[k] = g.inp['fit'][k]
+        fit_data[k] = g.inp[inp_key][k]
       except:
         pass
         
     # POP SIZE - must be even
-    if(g.fit['pop_size'] < 2):
-      g.fit['pop_size'] = 2
-    if(g.fit['pop_size'] % 2 != 0):
-      g.fit['pop_size'] = g.fit['pop_size'] + 1
+    if(fit_data['pop_size'] < 2):
+      fit_data['pop_size'] = 2
+    if(fit_data['pop_size'] % 2 != 0):
+      fit_data['pop_size'] = fit_data['pop_size'] + 1
       
     # FRESH SIZE - must be even
-    if(g.fit['fresh_size'] < 2):
-      g.fit['fresh_size'] = 2
-    if(g.fit['fresh_size'] % 2 != 0):
-      g.fit['fresh_size'] = g.fit['fresh_size'] + 1
-      
-    # SAVE
-    main.log(std.dict_to_str(g.fit))
+    if(fit_data['fresh_size'] < 2):
+      fit_data['fresh_size'] = 2
+    if(fit_data['fresh_size'] % 2 != 0):
+      fit_data['fresh_size'] = fit_data['fresh_size'] + 1
+
+    if(fit_data['type'] is None):
+      fit_data['type'] = 'RANDOM'
+
+
+    return fit_data
+
+
+
       
   def fit_results():
       

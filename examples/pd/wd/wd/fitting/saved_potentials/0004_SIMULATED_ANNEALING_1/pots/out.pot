@@ -1,0 +1,36 @@
+POTNAME 
+
+
+! PAIR  PD  PD
+START
+F_ON true
+F_TYPE PAIR
+FILE pair_pd_pd_1.pot
+LABEL PD  PD
+F_GROUP 1
+R_CUT 6.5
+END
+
+
+! DENS  PD  
+START
+F_ON true
+F_TYPE DENS
+FILE dens_pd_1.pot
+LABEL PD  
+F_GROUP 1
+R_CUT 6.5
+END
+
+
+! EMBE  PD  
+START
+F_ON true
+F_TYPE EMBE
+FILE embe_pd_1.pot
+LABEL PD  
+F_GROUP 1
+R_CUT 6.5
+END
+
+

@@ -5,11 +5,13 @@ mapkeys = 0
 map_pn = 0
 r_size = 1001
 r_width = 4
-pkey_temp = 0
+pkey_input = 0
+pot_input = 0
+pkey_combined = 0
+pot_combined = 0
 pkey = 0
-pot_rcut = 0
-pot_temp = 0
 pot = 0
+pot_rcut = 0
 pot_min_max = -1.0D0
 potmap = 0              ! TYPE,  A,  B/Group
 fgroups_dens = 0        ! LIST OF FGROUPS FOR EACH TYPE  COUNTER IN 51
@@ -45,196 +47,418 @@ pc_out = pc
 pkey_python(pc) = pykey
 
 IF(pc .EQ. 1)THEN
-  pkey_temp(pc, 1) = 1
+  pkey_input(pc, 1) = 1
 ELSE
-  pkey_temp(pc, 1) = pkey_temp(pc-1, 2) + 1
+  pkey_input(pc, 1) = pkey_input(pc-1, 2) + 1
 END IF
-pkey_temp(pc, 2) = pkey_temp(pc, 1) + SIZE(tab, 1) - 1
-pkey_temp(pc, 3) = ftype        ! 1 PAIR 2 DENS 3 EMBE
-pkey_temp(pc, 4) = option_a     ! Type a
-pkey_temp(pc, 5) = option_b     ! Type b or f group
-!print *, pkey_temp(pc, 3), pkey_temp(pc, 4), pkey_temp(pc, 5)
+pkey_input(pc, 2) = pkey_input(pc, 1) + SIZE(tab, 1) - 1
+pkey_input(pc, 3) = ftype        ! 1 PAIR 2 DENS 3 EMBE
+
+! IF PAIR, A = MIN(A,B)  B = MAX(A,B)
+IF(ftype .EQ. 1)THEN
+  IF(option_a .GT. option_b)THEN
+    pkey_input(pc, 4) = option_b     ! Type a 
+    pkey_input(pc, 5) = option_a     ! Type a 
+  ELSE
+    pkey_input(pc, 4) = option_a     ! Type a 
+    pkey_input(pc, 5) = option_b     ! Type b
+  END IF
+ELSE
+  pkey_input(pc, 4) = option_a     ! Type a 
+  pkey_input(pc, 5) = option_b     ! f group
+END IF
+
 ! STORE RCUT
 pot_rcut(pc) = rcut_in
 
 ! STORE POT
-pot_temp(pkey_temp(pc, 1):pkey_temp(pc, 2), 1:4) = tab(:,1:4)
+pot_input(pkey_input(pc, 1):pkey_input(pc, 2), 1:4) = tab(:,1:4)
 
 
 END SUBROUTINE add_potential
 
 
 
-
-
-
-SUBROUTINE add_zbl(id1, id2, on, z1, z2, ra, rb, spline_type)
-!###########################################################
-INTEGER(kind=StandardInteger) :: id1
-INTEGER(kind=StandardInteger) :: id2
-LOGICAL :: on
-REAL(kind=DoubleReal) :: z1
-REAL(kind=DoubleReal) :: z2
-REAL(kind=DoubleReal) :: ra
-REAL(kind=DoubleReal) :: rb
-INTEGER(kind=StandardInteger) :: spline_type
-!###########################################################
-!###########################################################
-
-zbl_counter = zbl_counter + 1
-
-zbl_l(zbl_counter) = on
-zbl_i(zbl_counter, 1) = id1
-zbl_i(zbl_counter, 2) = id2
-zbl_i(zbl_counter, 3) = spline_type
-zbl_r(zbl_counter, 1) = z1
-zbl_r(zbl_counter, 2) = z2
-zbl_r(zbl_counter, 3) = ra
-zbl_r(zbl_counter, 4) = rb
-
-
-END SUBROUTINE add_zbl
-
-
-
-
-
-
-
 SUBROUTINE set_potentials()
 !###########################################################
-INTEGER(kind=StandardInteger) :: pn, fn, n, zn
-INTEGER(kind=StandardInteger) :: mapkey, m
-INTEGER(kind=StandardInteger) :: map_pn
-INTEGER(kind=StandardInteger) :: a, b
-REAL(kind=DoubleReal) :: rmin, rmax
-LOGICAL :: loop
-REAL(kind=DoubleReal) :: zbl_ra(1:4)
-REAL(kind=DoubleReal) :: zbl_rb(1:4)
-REAL(kind=DoubleReal) :: za, zb, ra, rb
-REAL(kind=DoubleReal) :: test_fx
+INTEGER(kind=StandardInteger) :: pn, pkey, dkey, ekey, pa, pb, fn, fd_end, fe_end, n
+INTEGER(kind=StandardInteger) :: counter(1:max_potfunctions) = 0
+INTEGER(kind=StandardInteger) :: key_list(1:max_potfunctions, 1:10) = 0
+INTEGER(kind=StandardInteger) :: at, bt, ac, bc, ac_end
+REAL(kind=DoubleReal) :: f_min(1:max_potfunctions) = 0.0D0
+REAL(kind=DoubleReal) :: f_max(1:max_potfunctions) = 0.0D0
 !###########################################################
-INTEGER(kind=StandardInteger) :: fgroups(1:1000) = 0
-INTEGER(kind=StandardInteger) :: x_set(1:1000) = 0
-REAL(kind=DoubleReal) :: pot_arr(1:10000,1:10) = 0.0D0
-INTEGER(kind=StandardInteger) :: k = 0
-REAL(kind=DoubleReal) :: pot_t(1:1001,1:4) = 0.0D0
-REAL(kind=DoubleReal) :: coeffs(1:10) = 0.0D0
+REAL(kind=DoubleReal) :: pot_t(1:10000,1:4) = 0.0D0
 !###########################################################
 
 
-zbl_ra(1:4) = 0.0D0
-zbl_rb(1:4) = 0.0D0
-rmin = 0.0D0
-rmax = 0.0D0
-fgroups(1:1000) = 0
-x_set(1:1000) = 0
-pot_arr(1:10000,1:10) = 0.0D0
-k = 0
-pot_t(1:1001,1:4) = 0.0D0
-coeffs(1:10) = 0.0D0
+! ZERO ARRAYS
+pot_key(:,:) = 0
+pot_data(:,:) = 0.0D0
 
 
-! REARRANGE FGROUP (IF NEEDED)
-group_max = 0
+!##########
+! LOOP 1
+!##########
+
+! SET label_max AND fgroup_max
+! Calculate offsets dens_key_offset and embe_key_offset
+fd_end = SIZE(fgroups_dens, 2)
+fe_end = SIZE(fgroups_embe, 2)
 DO pn =1,pc  
-  IF(pkey_temp(pn, 3) .GT. 1)THEN
-    fn = 0
-    loop = .TRUE.
-    DO WHILE(loop)
-      fn = fn + 1
-      IF(fgroups(fn) .EQ. pkey_temp(pn, 5) .OR. fgroups(fn) .EQ. 0)THEN
-        loop = .FALSE.
+  ! Get label_max and fgroup_max
+  IF(pkey_input(pn, 3) .EQ. 1)THEN
+    label_max = MAX(label_max, pkey_input(pn, 4)) ! LABEL A
+    label_max = MAX(label_max, pkey_input(pn, 5)) ! LABEL B
+  ELSE
+    label_max = MAX(label_max, pkey_input(pn, 4))   ! LABEL A
+    fgroup_max = MAX(fgroup_max, pkey_input(pn, 5)) ! FGROUP
+  END IF
+
+  ! Store fgroups for each label type (Density)
+  IF(pkey_input(pn, 3) .EQ. 2)THEN
+    DO n = 1, fd_end
+      IF(fgroups_dens(pkey_input(pn, 4), n) .EQ. pkey_input(pn, 5))THEN 
+        EXIT 
+      ELSE IF(fgroups_dens(pkey_input(pn, 4), n) .EQ. 0)THEN
+        fgroups_dens(pkey_input(pn, 4), n) = pkey_input(pn, 5)
+        EXIT
       END IF
     END DO
-    fgroups(fn) = pkey_temp(pn, 5)
-    pkey_temp(pn, 5) = fn
-    group_max = fn
   END IF
-  !print *, pkey_temp(pn, 1), pkey_temp(pn, 2), pkey_temp(pn, 3), pkey_temp(pn, 4), pkey_temp(pn, 5)
-END DO
 
-
-! READ POTENTIALS INTO A TEMPORARY ARRAY pkey_temp
-! STORE THE MINIMUM AND MAXIMUM r FOR EACH FUNCTION
-! MAKE potmap(type, a, b or f) = key
-
-pot = 0.0D0
-map_pn = 0
-DO pn =1,pc
-  rmin = minval(pot_temp(pkey_temp(pn, 1):pkey_temp(pn, 2), 1))
-  rmax = maxval(pot_temp(pkey_temp(pn, 1):pkey_temp(pn, 2), 1))  
-  IF(potmap(pkey_temp(pn, 3), pkey_temp(pn, 4), pkey_temp(pn, 5)) .EQ. 0)THEN
-    map_pn = map_pn + 1
-    potmap(pkey_temp(pn, 3), pkey_temp(pn, 4), pkey_temp(pn, 5)) = map_pn    
-    pkey(map_pn, 1) = 1 + (map_pn - 1) * r_size
-    pkey(map_pn, 2) = map_pn * r_size
-    pkey(map_pn, 3) = pkey_temp(pn, 3)  ! Type
-    pkey(map_pn, 4) = pkey_temp(pn, 4)  ! A
-    pkey(map_pn, 5) = pkey_temp(pn, 5)  ! B or F
-  END IF
-  mapkey = potmap(pkey_temp(pn, 3), pkey_temp(pn, 4), pkey_temp(pn, 5))
-  IF(pot_min_max(mapkey, 1) .LT. 0.0D0 .OR. rmin .LT. pot_min_max(mapkey, 1))THEN
-    pot_min_max(mapkey, 1) = rmin
-  END IF
-  IF(pot_min_max(mapkey, 2) .LT. 0.0D0 .OR. rmax .GT. pot_min_max(mapkey, 2))THEN
-    pot_min_max(mapkey, 2) = rmax
-  END IF 
-END DO
-
-! ADD POTENTIAL FUNCTIONS TOGETHER WITH SAME KEY (i.e. same type, a, b or f)
-! INTERPOLATE SO MERGED FUNCTIONS RUN FOR SAME LENGTH rmin to rmax
-
-DO pn =1, pc 
-  mapkey = potmap(pkey_temp(pn, 3), pkey_temp(pn, 4), pkey_temp(pn, 5))
-  IF(x_set(mapkey) .EQ. 0)THEN
-    a = 1 + (mapkey - 1) * r_size
-    b = mapkey * r_size
-  END IF
-  CALL fill_zoor(&
-                 pot_temp(pkey_temp(pn, 1):pkey_temp(pn, 2),1), &
-                 pot_temp(pkey_temp(pn, 1):pkey_temp(pn, 2),2), &
-                 r_size, r_width, pot_min_max(mapkey, 1), pot_min_max(mapkey, 2), &
-                 4, pot_arr(1:r_size, 1:4))
-  IF(x_set(mapkey) .EQ. 0)THEN              
-    x_set(mapkey) = 1
-    pot(a:b, 1) = pot_arr(1:r_size, 1)
-  END IF
-  pot(a:b, 2:4) = pot(a:b, 2:4) +  pot_arr(1:r_size, 2:4) 
-END DO
-pc = MAXVAL(potmap)
-
-
-
-
-! STORE F GROUPS DENS FOR EACH TYPE
-DO pn =1, pc 
-  IF(pkey(pn, 3) .EQ. 2)THEN
-    k = 1
-    DO WHILE(fgroups_dens(pkey(pn, 4), k) .NE. 0)
-      k = k + 1
+  ! Store fgroups for each label type (Embedding)
+  IF(pkey_input(pn, 3) .EQ. 3)THEN
+    DO n = 1, fe_end
+      IF(fgroups_embe(pkey_input(pn, 4), n) .EQ. pkey_input(pn, 5))THEN 
+        EXIT 
+      ELSE IF(fgroups_embe(pkey_input(pn, 4), n) .EQ. 0)THEN
+        fgroups_embe(pkey_input(pn, 4), n) = pkey_input(pn, 5)
+        EXIT
+      END IF
     END DO
-    fgroups_dens(pkey(pn, 4), k) = pkey(pn, 5)    
-  ELSE IF(pkey(pn, 3) .EQ. 3)THEN
-    k = 1
-    DO WHILE(fgroups_embe(pkey(pn, 4), k) .NE. 0)
-      k = k + 1
-    END DO
-    fgroups_embe(pkey(pn, 4), k) = pkey(pn, 5)  
   END IF
+    
 END DO
 
 
 
+CALL pair_key(label_max, label_max, dens_key_offset)
+embe_key_offset = dens_key_offset + label_max * fgroup_max
 
 
+! Check for potentials that need to be combined, and store min/max values
+DO pn =1,pc  
+  at = pkey_input(pn, 1)
+  bt = pkey_input(pn, 2)
+  CALL get_pot_key(pkey_input(pn, 3), pkey_input(pn, 4), pkey_input(pn, 5), pkey)
+  counter(pkey) = counter(pkey) + 1
+  key_list(pkey, counter(pkey)) = pn
+
+  IF(counter(pkey) .EQ. 1)THEN
+    f_min(pkey) = pot_input(at, 1)     ! function min
+    f_max(pkey) = pot_input(bt, 1)     ! function max
+  ELSE
+    f_min(pkey) = MIN(f_min(pkey), pot_input(at, 1))
+    f_max(pkey) = MAX(f_max(pkey), pot_input(bt, 1))
+  END IF
+END DO
 
 
-
-
-
+ac_end = 1
+DO pn =1,pc   
+  CALL get_pot_key(pkey_input(pn, 3), pkey_input(pn, 4), pkey_input(pn, 5), pkey)
+  ! Get start/end from input data
+  at = pkey_input(pn, 1)
+  bt = pkey_input(pn, 2)
+  IF(pot_key(pkey, 1) .EQ. 0)THEN
+    ac = ac_end
+    bc = ac + r_size - 1
+    ac_end = ac_end + r_size
+    pot_key(pkey, 1) = ac
+    pot_key(pkey, 2) = bc
+  ELSE
+    ac = pot_key(pkey, 1)
+    bc = pot_key(pkey, 2)
+  END IF
+  IF(counter(pkey) .EQ. 1)THEN
+    ! FILL TEMPORARY ARRAY
+    pot_t(1:10000,1:4) = 0.0D0
+    CALL fill(pot_input(at:bt, 1), pot_input(at:bt, 2), r_size, r_width, &
+              r_interp, pot_t(1:r_size, :))      
+    ! STORE IN PAIR ARRAY
+    pot_data(ac:bc,1:r_width) = pot_t(1:r_size, 1:r_width)
+  ELSE
+    ! FILL TEMPORARY ARRAY
+    pot_t(1:10000,1:4) = 0.0D0
+    CALL fill_zoor(pot_input(at:bt, 1), pot_input(at:bt, 2), r_size, r_width, &
+              f_min(pkey), f_max(pkey), &
+              r_interp, pot_t(1:r_size, :))      
+    ! ADD TO PAIR ARRAY
+    pot_data(ac:bc,1:r_width) = pot_data(ac:bc,1:r_width) + pot_t(1:r_size, 1:r_width)      
+  END IF  
+END DO
 
 END SUBROUTINE set_potentials
+
+
+
+
+
+
+! KEYS
+SUBROUTINE get_pot_key(ftype, a, b, key)
+! Calculates unique key for two keys (order of keys NOT important)
+! (A,B) = (B,A)
+!###########################################################
+INTEGER(kind=StandardInteger), INTENT(IN) :: ftype, a, b
+INTEGER(kind=StandardInteger), INTENT(OUT) :: key
+!###########################################################
+IF(ftype .EQ. 1)THEN
+  CALL pair_key(a, b, key)
+ELSE IF(ftype .EQ. 2)THEN
+  CALL dens_key(a, b, key)
+ELSE IF(ftype .EQ. 3)THEN
+  CALL embe_key(a, b, key)
+END IF
+
+END SUBROUTINE get_pot_key
+
+
+
+
+
+! KEYS
+SUBROUTINE pair_key(a, b, key)
+! Calculates unique key for two keys (order of keys NOT important)
+! (A,B) = (B,A)
+!###########################################################
+INTEGER(kind=StandardInteger), INTENT(IN) :: a, b
+INTEGER(kind=StandardInteger), INTENT(OUT) :: key
+INTEGER(kind=StandardInteger) :: min_key, max_key
+!###########################################################
+! Min/Max
+IF(a .GT. label_max .OR. b .GT. label_max)THEN
+  key = 0
+ELSE
+  min_key = a
+  max_key = b
+  IF(a .GT. b)THEN
+    max_key = a
+    min_key = b
+  END IF
+  key = (max_key*(max_key-1))/2 + min_key
+END IF
+END SUBROUTINE pair_key
+
+! KEYS
+SUBROUTINE dens_key(a, fgroup, key)
+!###########################################################
+INTEGER(kind=StandardInteger), INTENT(IN) :: a, fgroup
+INTEGER(kind=StandardInteger), INTENT(OUT) :: key
+INTEGER(kind=StandardInteger) :: min_key, max_key
+!###########################################################
+IF(a .GT. label_max .OR. fgroup .GT. fgroup_max)THEN
+  key = 0
+ELSE
+  key = dens_key_offset + fgroup + (a - 1) * fgroup_max
+END IF
+END SUBROUTINE dens_key
+
+! KEYS
+SUBROUTINE embe_key(a, fgroup, key)
+!###########################################################
+INTEGER(kind=StandardInteger), INTENT(IN) :: a, fgroup
+INTEGER(kind=StandardInteger), INTENT(OUT) :: key
+INTEGER(kind=StandardInteger) :: min_key, max_key
+!###########################################################
+IF(a .GT. label_max .OR. fgroup .GT. fgroup_max)THEN
+  key = 0
+ELSE
+  key = dens_key_offset + label_max * fgroup_max + fgroup + (a - 1) * fgroup_max
+END IF
+END SUBROUTINE embe_key
+
+
+
+
+
+
+SUBROUTINE pot_search(f_type, option_a, option_b, x, fx)
+!###########################################################
+INTEGER(kind=StandardInteger), INTENT(IN) :: f_type, option_a, option_b
+REAL(kind=DoubleReal), INTENT(IN) :: x
+REAL(kind=DoubleReal), INTENT(OUT) :: fx
+!###########################################################
+INTEGER(kind=StandardInteger) :: pkey
+INTEGER(kind=StandardInteger) :: a, b
+!###########################################################
+! Default Out
+fx = 0.0D0
+! Get Key
+CALL get_pot_key(f_type, option_a, option_b, pkey)
+a = pot_key(pkey, 1)
+b = pot_key(pkey, 2)
+IF(a .GT. 0 .AND. b .GT. a)THEN
+  CALL pot_search_interpolate_a(x, pot_data(a:b, 1), pot_data(a:b, 2), fx)  
+END IF
+END SUBROUTINE pot_search
+
+SUBROUTINE pot_search_pair(option_a, option_b, x, fx)
+!###########################################################
+INTEGER(kind=StandardInteger), INTENT(IN) :: option_a, option_b
+REAL(kind=DoubleReal), INTENT(IN) :: x
+REAL(kind=DoubleReal), INTENT(OUT) :: fx
+!###########################################################
+INTEGER(kind=StandardInteger) :: pkey
+INTEGER(kind=StandardInteger) :: a, b
+!###########################################################
+! Default Out
+fx = 0.0D0
+! Get Key
+CALL get_pot_key(1, option_a, option_b, pkey)
+a = pot_key(pkey, 1)
+b = pot_key(pkey, 2)
+IF(a .GT. 0 .AND. b .GT. a)THEN
+  CALL pot_search_interpolate_a(x, pot_data(a:b, 1), pot_data(a:b, 2), fx)  
+END IF
+END SUBROUTINE pot_search_pair
+
+SUBROUTINE pot_search_dens(option_a, option_b, x, fx)
+!###########################################################
+INTEGER(kind=StandardInteger), INTENT(IN) :: option_a, option_b
+REAL(kind=DoubleReal), INTENT(IN) :: x
+REAL(kind=DoubleReal), INTENT(OUT) :: fx
+!###########################################################
+INTEGER(kind=StandardInteger) :: pkey
+INTEGER(kind=StandardInteger) :: a, b
+!###########################################################
+! Default Out
+fx = 0.0D0
+! Get Key
+CALL get_pot_key(2, option_a, option_b, pkey)
+a = pot_key(pkey, 1)
+b = pot_key(pkey, 2)
+IF(a .GT. 0 .AND. b .GT. a)THEN
+  CALL pot_search_interpolate_a(x, pot_data(a:b, 1), pot_data(a:b, 2), fx)  
+END IF
+END SUBROUTINE pot_search_dens
+
+SUBROUTINE pot_search_embe(option_a, option_b, x, fx)
+!###########################################################
+INTEGER(kind=StandardInteger), INTENT(IN) :: option_a, option_b
+REAL(kind=DoubleReal), INTENT(IN) :: x
+REAL(kind=DoubleReal), INTENT(OUT) :: fx
+!###########################################################
+INTEGER(kind=StandardInteger) :: pkey
+INTEGER(kind=StandardInteger) :: a, b
+!###########################################################
+! Default Out
+fx = 0.0D0
+! Get Key
+CALL get_pot_key(3, option_a, option_b, pkey)
+a = pot_key(pkey, 1)
+b = pot_key(pkey, 2)
+IF(a .GT. 0 .AND. b .GT. a)THEN
+  CALL pot_search_interpolate_a(x, pot_data(a:b, 1), pot_data(a:b, 2), fx)  
+END IF
+END SUBROUTINE pot_search_embe
+
+
+
+SUBROUTINE pot_search_arr(f_type, option_a, option_b, x, fx)
+!###########################################################
+INTEGER(kind=StandardInteger), INTENT(IN) :: f_type, option_a, option_b
+REAL(kind=DoubleReal), INTENT(IN) :: x
+REAL(kind=DoubleReal), INTENT(OUT) :: fx(1:2)
+!###########################################################
+INTEGER(kind=StandardInteger) :: pkey
+INTEGER(kind=StandardInteger) :: a, b
+!###########################################################
+! Default Out
+fx = 0.0D0
+! Get Key
+CALL get_pot_key(f_type, option_a, option_b, pkey)
+a = pot_key(pkey, 1)
+b = pot_key(pkey, 2)
+IF(a .GT. 0 .AND. b .GT. a)THEN
+  CALL pot_search_interpolate_b(x, pot_data(a:b, 1), pot_data(a:b, 2), pot_data(a:b, 3), fx)
+END IF
+END SUBROUTINE pot_search_arr
+
+SUBROUTINE pot_search_pair_arr(option_a, option_b, x, fx)
+!###########################################################
+INTEGER(kind=StandardInteger), INTENT(IN) :: option_a, option_b
+REAL(kind=DoubleReal), INTENT(IN) :: x
+REAL(kind=DoubleReal), INTENT(OUT) :: fx(1:2)
+!###########################################################
+INTEGER(kind=StandardInteger) :: pkey
+INTEGER(kind=StandardInteger) :: a, b
+!###########################################################
+! Default Out
+fx = 0.0D0
+! Get Key
+CALL get_pot_key(1, option_a, option_b, pkey)
+a = pot_key(pkey, 1)
+b = pot_key(pkey, 2)
+IF(a .GT. 0 .AND. b .GT. a)THEN
+  CALL pot_search_interpolate_b(x, pot_data(a:b, 1), pot_data(a:b, 2), pot_data(a:b, 3), fx)
+END IF
+END SUBROUTINE pot_search_pair_arr
+
+SUBROUTINE pot_search_dens_arr(option_a, option_b, x, fx)
+!###########################################################
+INTEGER(kind=StandardInteger), INTENT(IN) :: option_a, option_b
+REAL(kind=DoubleReal), INTENT(IN) :: x
+REAL(kind=DoubleReal), INTENT(OUT) :: fx(1:2)
+!###########################################################
+INTEGER(kind=StandardInteger) :: pkey
+INTEGER(kind=StandardInteger) :: a, b
+!###########################################################
+! Default Out
+fx = 0.0D0
+! Get Key
+CALL get_pot_key(2, option_a, option_b, pkey)
+a = pot_key(pkey, 1)
+b = pot_key(pkey, 2)
+IF(a .GT. 0 .AND. b .GT. a)THEN
+  CALL pot_search_interpolate_b(x, pot_data(a:b, 1), pot_data(a:b, 2), pot_data(a:b, 3), fx)
+END IF
+END SUBROUTINE pot_search_dens_arr
+
+SUBROUTINE pot_search_embe_arr(option_a, option_b, x, fx)
+!###########################################################
+INTEGER(kind=StandardInteger), INTENT(IN) :: option_a, option_b
+REAL(kind=DoubleReal), INTENT(IN) :: x
+REAL(kind=DoubleReal), INTENT(OUT) :: fx(1:2)
+!###########################################################
+INTEGER(kind=StandardInteger) :: pkey
+INTEGER(kind=StandardInteger) :: a, b
+!###########################################################
+! Default Out
+fx = 0.0D0
+! Get Key
+CALL get_pot_key(3, option_a, option_b, pkey)
+a = pot_key(pkey, 1)
+b = pot_key(pkey, 2)
+IF(a .GT. 0 .AND. b .GT. a)THEN
+  CALL pot_search_interpolate_b(x, pot_data(a:b, 1), pot_data(a:b, 2), pot_data(a:b, 3), fx)
+END IF
+END SUBROUTINE pot_search_embe_arr
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -246,13 +470,25 @@ REAL(kind=DoubleReal), INTENT(IN) :: x
 REAL(kind=DoubleReal), INTENT(OUT) :: fx
 !###########################################################
 INTEGER(kind=StandardInteger) :: mapkey
+INTEGER(kind=StandardInteger) :: a, b
 !###########################################################
-
-mapkey = potmap(f_type, option_a, option_b)
-CALL pot_search_interpolate_a(x, &
+a = option_a
+b = option_b
+IF(f_type .EQ. 1)THEN
+  IF(option_a .GT. option_b)THEN
+    b = option_a
+    a = option_b
+  END IF
+END IF
+mapkey = potmap(f_type, a, b)
+IF(mapkey .EQ. 0)THEN   ! RETURN ZERO IF NO DATA/POTENTIAL
+  fx = 0.0
+ELSE
+  CALL pot_search_interpolate_a(x, &
                        pot(pkey(mapkey, 1):pkey(mapkey, 2), 1), &
                        pot(pkey(mapkey, 1):pkey(mapkey, 2), 2), &
                        fx)  
+END IF
 END SUBROUTINE pot_search_a
 
 
@@ -263,16 +499,30 @@ REAL(kind=DoubleReal), INTENT(IN) :: x
 REAL(kind=DoubleReal), INTENT(OUT) :: fx(1:2)
 !###########################################################
 INTEGER(kind=StandardInteger) :: mapkey
+INTEGER(kind=StandardInteger) :: a, b
 !###########################################################
-
-mapkey = potmap(f_type, option_a, option_b)
-CALL pot_search_interpolate_b(x, &
+a = option_a
+b = option_b
+IF(f_type .EQ. 1)THEN
+  IF(option_a .GT. option_b)THEN
+    b = option_a
+    a = option_b
+  END IF
+END IF
+mapkey = potmap(f_type, a, b)
+IF(mapkey .EQ. 0)THEN   ! RETURN ZERO IF NO DATA/POTENTIAL
+  fx = 0.0
+ELSE
+  CALL pot_search_interpolate_b(x, &
                        pot(pkey(mapkey, 1):pkey(mapkey, 2), 1), &
                        pot(pkey(mapkey, 1):pkey(mapkey, 2), 2), &
                        pot(pkey(mapkey, 1):pkey(mapkey, 2), 3), &
                        fx)
-  
+END IF  
 END SUBROUTINE pot_search_b
+
+
+
 
 
 

@@ -454,7 +454,11 @@ class std:
     print(line,end='')  
     
     
-    
+  def pad(inp, width):
+    out = str(inp)
+    while(len(out)<width):
+      out = out + " "
+    return out
     
   def mem_value(strin):
     num = '0123456789.'

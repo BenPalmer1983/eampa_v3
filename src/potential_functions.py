@@ -59,6 +59,16 @@ class potential_functions:
 
 
 
+
+  @staticmethod
+  def ackland_mendelev_pair(r, p, pf):
+    return fnc.ackland_mendelev_pair_v(r, p, pf)
+
+  @staticmethod
+  def pair_spline(r, p, pf):
+    return fnc.pair_spline_v(r, p, pf)
+
+
   ##############################################
   # DENSITY FUNCTIONS
   ##############################################
@@ -95,6 +105,13 @@ class potential_functions:
   def triple_embedding(r, p, pf):
     return fnc.triple_embedding_v(r, p, pf)
 
+
+  # Triple Embedding
+  # f(x) = A + B * sqrt(r) + C * r**2 + D * r**4
+  @staticmethod
+  def quad_embedding(r, p, pf):
+    return fnc.quad_embedding_v(r, p, pf)
+    
   
   # Embedding Ackland (Olsson/Walenius)
   # f(x) = A sqrt(rho) + B rho**2 + C rho**4
@@ -134,3 +151,19 @@ class potential_functions:
     return fnc.spline_n_node_v(r, p)
     
     
+
+
+
+  @staticmethod
+  def cubic_knot_spline(r, p, pf):
+    return fnc.cubic_knot_spline_v(r, p, pf)
+    
+    
+
+  @staticmethod
+  def cubic_knot_spline_fixed_end(r, p, pf):
+    return fnc.cubic_knot_spline_fixed_end_v(r, p, pf)
+
+
+
+

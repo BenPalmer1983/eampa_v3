@@ -27,7 +27,7 @@ class display:
       display.output_2()
     if(output == 3):
       display.output_3()
-    
+      #print(g.rss)
     
   def output_1():
   
@@ -57,6 +57,8 @@ class display:
     print("# Timer:            " + display.pad_l(time.time() - g.times['start'], 16))
     print("# RSS: ", display.pad_r(g.pfdata['rss']['current'], 20), end="          ")
     print("Best: ", display.pad_r(g.pfdata['rss']['best'], 20), end=" ")
+    print()    
+    print("Max Density: ", display.pad_r(bp.max_density, 23), display.pad_r(efs.max_density, 23), end=" ")
     print()
     print("#        ID   a0       e0       B0       C11      C12      C44 ")
     try:
@@ -112,7 +114,8 @@ class display:
     display.header_3()
 
     # PRINT RSS
-    print("# RSS:                ", g.pfdata['rss']['current'], "  [",g.pfdata['rss']['best'],"]") 
+    print("# RSS:                ", g.pfdata['rss']['current'], "  [",g.pfdata['rss']['best'],"]   (Max density: ", g.rss['current_bp_max_density'],  g.rss['current_bp_max_density'], ")") 
+    print("# RSS (BEST):         ", g.pfdata['rss']['best'], "   (Max density: ", g.rss['best_bp_max_density'],  g.rss['best_bp_max_density'], ")") 
     display.print_line()
 
     # Best BP
@@ -361,6 +364,7 @@ class display:
     print("   # Configs:       ", end="")
     print(display.pad_l(g.benchmark['configs'], 14), end="")
     print()    
+    print(display.pad_r_always("# Next Extinction:    " + e_print, 60))    
     display.print_line()
     g.benchmark['configspersec']
     line = ['','','','','']
@@ -369,19 +373,22 @@ class display:
     line[1] = display.pad_r_always("# Stage:              " + g.pfdata['stage'], 60)
     line[2] = display.pad_r_always("# RSS Counter:        " + display.pad_l(g.pfdata['rss']['counter'], 16), 60)
     line[3] = display.pad_r_always("# Since Improvement:  " + display.pad_l(g.pfdata['rss']['since_improvement'], 16), 60)
-    line[4] = display.pad_r_always("# Next Extinction:    " + e_print, 60)
+    line[4] = display.pad_r_always("" + e_print, 60)
     
     # Col 2
     line[0] = line[0] + "# " + display.pad_r_always("TOP 10", 21)
     
     for n in range(10):
       ln = (n%4) + 1
-      if(g.pfdata['top']['filled']):
-        line[ln] = line[ln] + display.pad_r_always(g.pfdata['top']['rss'][n], 20)
-      else:
-        tn = n + (g.pfdata['top']['size'] - g.pfdata['top']['counter']) 
-        if(tn < g.pfdata['top']['size']):
-          line[ln] = line[ln] + display.pad_r_always(g.pfdata['top']['rss'][tn], 20)
+      if(len(g.top_parameters) > n):
+        line[ln] = line[ln] + display.pad_r_always(g.top_parameters[n][0], 20)
+      
+      #if(g.pfdata['top']['filled']):
+      #  line[ln] = line[ln] + display.pad_r_always(g.top_parameters[n][0], 20)
+      #else:
+      #  tn = n + (g.pfdata['top']['size'] - g.pfdata['top']['counter']) 
+      #  if(tn < g.pfdata['top']['size']):
+      #    line[ln] = line[ln] + display.pad_r_always(g.pfdata['top']['rss'][tn], 20)
     
     for n in range(5):
       print(line[n])

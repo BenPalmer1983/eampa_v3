@@ -4,8 +4,62 @@
 class pf_potential:
 
   def update(p, no_rescale=False):    
-    # Store
-    g.pfdata['params']['current'][:] = p[:]
+  
+    # Update potential
+    a = 0
+
+    for fn in range(len(g.pot_functions['functions'])): 
+      # Calc b
+      b = a + g.pot_functions['functions'][fn]['fit_size']  
+      if(g.pot_functions['functions'][fn]['fit_type'] == 1):     # NODE SPLINE           
+        g.pot_functions['functions'][fn]['s_nodes'][:,1] = p[a:b]
+        potential.make_spline_points_inner(fn)       
+      elif(g.pot_functions['functions'][fn]['fit_type'] == 2):   # ANALYTIC  
+        # Make Analytic Points
+        g.pot_functions['functions'][fn]['a_params'][:] = p[a:b]
+        potential.make_analytic_points_inner(fn)
+
+      # Update a
+      a = b     
+        
+
+    # Rescale embedding data points to cover density range
+    potential.rescale_embedding()
+
+    # Update efs and bp modules
+    potential.efs_add_potentials()     # Load potentials
+    potential.bp_add_potentials()      # Load potentials
+    
+    # Save parameters
+    potential.parameters = numpy.copy(potential.get_parameters())
+    g.pfdata['p']['current'] = numpy.copy(potential.get_parameters())
+ 
+
+
+  def take_density(p, p_dens): 
+    a = 0
+    for fn in range(len(g.pot_functions['functions'])): 
+      b = a + g.pot_functions['functions'][fn]['fit_size'] 
+      if(g.pot_functions['functions'][fn]['fit_type'] == 1):     # NODE SPLINE       
+        if(g.pot_functions['functions'][fn]['f_type_id'] == 2):
+          p[a:b] = copy.deepcopy(p_dens[a:b])
+      elif(g.pot_functions['functions'][fn]['fit_type'] == 2):   # ANALYTIC          
+        if(g.pot_functions['functions'][fn]['f_type_id'] == 2):
+          p[a:b] = copy.deepcopy(p_dens[a:b])
+      a = b
+    return p
+
+
+
+
+
+
+
+
+
+
+
+"""
   
     # Update potential
     a = 0
@@ -34,27 +88,4 @@ class pf_potential:
         g.pot_functions['functions'][fn]['a_params'][:] = p[a:b]
         potential.make_analytic_points_inner(fn)
         a = b    
-    
-
-    # Rescale density functions 
-    if(g.fit['rescale_density'] == 2 and no_rescale == False):
-      rescale_density.run()    
-    
-    # Update efs and bp modules
-    potential.efs_add_potentials()     # Load potentials
-    potential.bp_add_potentials()      # Load potentials
-    
-
-
-  def take_density(p, p_dens): 
-    a = 0
-    for fn in range(len(g.pot_functions['functions'])): 
-      b = a + g.pot_functions['functions'][fn]['fit_size'] 
-      if(g.pot_functions['functions'][fn]['fit_type'] == 1):     # NODE SPLINE       
-        if(g.pot_functions['functions'][fn]['f_type_id'] == 2):
-          p[a:b] = copy.deepcopy(p_dens[a:b])
-      elif(g.pot_functions['functions'][fn]['fit_type'] == 2):   # ANALYTIC          
-        if(g.pot_functions['functions'][fn]['f_type_id'] == 2):
-          p[a:b] = copy.deepcopy(p_dens[a:b])
-      a = b
-    return p
+"""

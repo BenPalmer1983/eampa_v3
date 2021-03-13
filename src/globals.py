@@ -34,10 +34,14 @@ class g:
                   'zbl': [],
                   'functions_original': [],
                   }
+  pot_labels = []
+
+  pot_fn = {}
                   
   configs = {
             'config_files': [],
             'configs': [],
+            'config_results': [],
             }  
             
   mask = {}
@@ -48,6 +52,7 @@ class g:
   bulk_properties = []
   bp_ids = {}  
   labels = {}
+  fgroups = {}
   grouplabels = {}
   groupelement = {}
   
@@ -55,8 +60,12 @@ class g:
   run_type = 'efs'
   wd_type = {}
   rss_weights = {}
+  rss_max_density = {}
   fit = {}
   fit_results = {}
+  
+  # Top 100 parameters/rss
+  top_parameters = []
 
 
   ######################################
@@ -76,7 +85,7 @@ class g:
   
 
   #RSS
-  rss = {'current': None, 'best': None, 'counter': None, 'since_improvement': None, 'log': [], 'efs': {'ok': False, 'cc': 0,}, 'bp': {'ok': False, 'cc': 0,}}
+  rss = {'current': None, 'best': None, 'counter': None, 'since_improvement': None, 'log': [], 'efs': {'ok': False, 'cc': 0,}, 'bp': {'ok': False, 'cc': 0,}, 'residual': []}
   
   ######################################
   # Potential Fitting

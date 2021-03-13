@@ -1,0 +1,48 @@
+POTNAME fe_pot
+
+/* comment block */
+""" comment block """
+
+
+!###########################
+!# IRON
+!###########################
+
+
+! Pair FE FE
+START
+FILE              fe_pair.pot
+LABEL             FE   FE
+F_ON true
+F_TYPE            PAIR            ! PAIR DENS EMBE
+F_GROUP
+R_CUT              6.5
+ZOOR     true  ! zero out of range
+END
+
+
+! FE Density
+START
+FILE              fe_dens.pot
+LABEL             FE
+F_ON true
+F_TYPE            DENS            ! PAIR DENS EMBE
+F_GROUP           1
+R_CUT             6.5
+END
+
+
+! FE Embedding
+START
+FILE              fe_embe.pot
+LABEL             FE
+F_ON true
+F_TYPE            EMBE            ! PAIR DENS EMBE
+F_GROUP           1
+R_CUT              6.5
+ZOOR     true  ! zero out of range
+END
+
+
+
+

@@ -64,10 +64,14 @@ class g:
                   'zbl': [],
                   'functions_original': [],
                   }
+  pot_labels = []
+
+  pot_fn = {}
                   
   configs = {
             'config_files': [],
             'configs': [],
+            'config_results': [],
             }  
             
   mask = {}
@@ -76,6 +80,7 @@ class g:
   bulk_properties = []
   bp_ids = {}  
   labels = {}
+  fgroups = {}
   grouplabels = {}
   groupelement = {}
   
@@ -83,8 +88,12 @@ class g:
   run_type = 'efs'
   wd_type = {}
   rss_weights = {}
+  rss_max_density = {}
   fit = {}
   fit_results = {}
+  
+# Top 100 parameters/rss
+  top_parameters = []
 
 ######################################
 # Calculated results
@@ -102,7 +111,7 @@ class g:
   benchmark = {'configs': 0, 'total_atoms': 0, 'total_interactions': 0, 'total_time': 0.0, 'configspersec': 0.0, 'atomspersec': 0.0, 'interationspersec': 0.0,}
   
 #RSS
-  rss = {'current': None, 'best': None, 'counter': None, 'since_improvement': None, 'log': [], 'efs': {'ok': False, 'cc': 0,}, 'bp': {'ok': False, 'cc': 0,}}
+  rss = {'current': None, 'best': None, 'counter': None, 'since_improvement': None, 'log': [], 'efs': {'ok': False, 'cc': 0,}, 'bp': {'ok': False, 'cc': 0,}, 'residual': []}
   
 ######################################
 # Potential Fitting
@@ -565,6 +574,12 @@ class std:
     line = line + '\n'
     print(line,end='')  
     
+  def pad(inp, width):
+    out = str(inp)
+    while(len(out)<width):
+      out = out + " "
+    return out
+    
   def mem_value(strin):
     num = '0123456789.'
     strin = strin.upper().strip()
@@ -844,6 +859,8 @@ class read_input:
     read_input.run_type()
     read_input.wd()
     read_input.rss_weights()
+    read_input.rss_max_density()
+    read_input.fitting()
     read_input.fit()
     read_input.fit_results()
     read_input.bp()
@@ -894,6 +911,7 @@ class read_input:
     'g': 1.0,
     'e': 1.0,
     'v': 1.0,
+    'negec': 1.0,
     }
     
 # TRY READING
@@ -907,24 +925,72 @@ class read_input:
 # SAVE
     main.log(std.dict_to_str(g.rss_weights))
       
+# READ
+  def rss_max_density():   
+      
+# DEFAULT
+    g.rss_max_density = {          
+    'min': 0.2,
+    'max': 0.8,
+    'scale_factor': 10.0,
+    'scale_exponent': 4.0,
+    'zero_density_factor': 1.0e8,
+    }
+    
+# TRY READING
+    for k in g.rss_max_density.keys():
+      try:
+        g.rss_max_density[k] = float(g.inp['rss_max_density'][k])
+      except:
+        pass
+# READ
+      
+# SAVE
+    main.log(std.dict_to_str(g.rss_max_density))
+    
+# READ
+  def fitting():   
+      
+# DEFAULT
+    g.fitting = {
+    'oversized_parameters': [10.0,0.05,0.05,0.05],   
+    'top_parameters': 100,
+    'load_top_parameters': 10,
+    }
+    if('fitting' in g.inp.keys()):
+      for k in g.fitting.keys():
+        try:
+          g.fitting[k] = g.inp['fitting'][k]
+        except:
+          pass
+
   def fit():
   
-# DEFAULT
-    g.fit = {
-    'cycles': 1,
-    'gens': 4,
+# List of fit types
+    g.fit = []
+    if('fit' in g.inp.keys()):
+      g.fit.append(read_input.read_fit('fit'))
+    for i in range(100):
+      if("fit" + str(i) in g.inp.keys()):
+        g.fit.append(read_input.read_fit("fit" + str(i)))
+
+  def read_fit(inp_key):  
+    
+    fit_data = {
+    'type': None,
+    'random_size': 100,
+    'cycles': 0,
+    'gens': 0,
     'spline_cycles': 0,
     'spline_gens': 0,
     'pop_size': 20,
     'fresh_size': 10,
+    'gen_variation_multiplier': 0.1,
     'exct_factor': 0.5,
     'exct_every': 5,
     'exct_var': 0.1,
     'exct_top_bias': 0.5,
     'rescale_density': 0,
-    'rescale_min': 0.3,
-    'rescale_max': 0.9,
-    'rescale_default': 0.6,
     'wide_start': 0.5,
     'wide_end': 10.0,
     'mutate_chance': 0.01,
@@ -939,31 +1005,39 @@ class read_input:
     'pool_size': 1000,
     'sane_seeds_a': 50,
     'sane_seeds_b': 200,
-    'sane_fraction': 0.5,
+    'sane_fraction': 0.5, 
+    'sa_loops_t': 10,
+    'sa_loops_i': 100,
+    'sa_temp_start': 10,
+    'sa_temp_end': 0.1,
+    'sa_step': 0.01,
+    'sa_step_factor': 0.3,
     }
 
 # TRY READING
-    for k in g.fit.keys():
+    for k in fit_data.keys():
       try:
-        g.fit[k] = g.inp['fit'][k]
+        fit_data[k] = g.inp[inp_key][k]
       except:
         pass
         
 # POP SIZE - must be even
-    if(g.fit['pop_size'] < 2):
-      g.fit['pop_size'] = 2
-    if(g.fit['pop_size'] % 2 != 0):
-      g.fit['pop_size'] = g.fit['pop_size'] + 1
+    if(fit_data['pop_size'] < 2):
+      fit_data['pop_size'] = 2
+    if(fit_data['pop_size'] % 2 != 0):
+      fit_data['pop_size'] = fit_data['pop_size'] + 1
       
 # FRESH SIZE - must be even
-    if(g.fit['fresh_size'] < 2):
-      g.fit['fresh_size'] = 2
-    if(g.fit['fresh_size'] % 2 != 0):
-      g.fit['fresh_size'] = g.fit['fresh_size'] + 1
-      
-# SAVE
-    main.log(std.dict_to_str(g.fit))
-      
+    if(fit_data['fresh_size'] < 2):
+      fit_data['fresh_size'] = 2
+    if(fit_data['fresh_size'] % 2 != 0):
+      fit_data['fresh_size'] = fit_data['fresh_size'] + 1
+
+    if(fit_data['type'] is None):
+      fit_data['type'] = 'RANDOM'
+
+    return fit_data
+
   def fit_results():
       
 # DEFAULT
@@ -1199,9 +1273,11 @@ class labels:
 ###########################################
 class potential:
 
-  def run():
+  rescale_density_on = False
+  rescale_embedding_on = False
+  parameters = None
 
-    print("Potential") 
+  def run():
   
     efs.init()                           # Initialise (allocate arrays)
     potential.efs_add_potentials()       # Load potentials
@@ -1220,9 +1296,16 @@ class potential:
       main.log("Potential load failed - no pot file")
       return False
     main.log("Potential file: " + str(pot_file))
-      
+
+    if('rescale_density' in g.inp['potential'].keys() and g.inp['potential']['rescale_density'].upper().strip() == "TRUE"):
+      potential.rescale_density_on = True
+
+    if('rescale_embedding' in g.inp['potential'].keys() and g.inp['potential']['rescale_embedding'].upper().strip() == "TRUE"):
+      potential.rescale_embedding_on = True
+
 # Read potential index
     potential.read_potential(pot_file)
+    potential.make_find_fn()
     potential.load_tabulated()
     potential.make_tabulated_points()
     potential.load_analytic()
@@ -1230,15 +1313,46 @@ class potential:
     potential.load_spline()
     potential.make_spline_points()
     potential.load_fit_data()
+    potential.rescale_embedding()
     potential.pf_output()
     potential.make_copies()
-       
+    potential.parameters = numpy.copy(potential.get_parameters())
+
     potential.plot_python_potentials(g.dirs['plots'] + "/starting_potential")   
-       
+    potential.pf_output_file(g.dirs['input'] + '/start.pot')
 #main.end()
        
     return True
   
+  @staticmethod
+  def make_find_fn():
+    for fn in range(len(g.pot_functions['functions'])): 
+      t_id = g.pot_functions['functions'][fn]['f_type_id']
+      if(g.pot_functions['functions'][fn]['f_type_id'] == 1):
+        a_id = g.pot_functions['functions'][fn]['a']
+        b_id = g.pot_functions['functions'][fn]['b']
+      elif(g.pot_functions['functions'][fn]['f_type_id'] == 2):
+        a_id = g.pot_functions['functions'][fn]['a']
+        b_id = g.pot_functions['functions'][fn]['f_group']
+      elif(g.pot_functions['functions'][fn]['f_type_id'] == 3):
+        a_id = g.pot_functions['functions'][fn]['a']
+        b_id = g.pot_functions['functions'][fn]['f_group']
+      if(t_id not in g.pot_fn.keys()):
+        g.pot_fn[t_id] = {}
+      if(a_id not in g.pot_fn[t_id].keys()):
+        g.pot_fn[t_id][a_id] = {}
+      g.pot_fn[t_id][a_id][b_id] = fn
+  
+  @staticmethod
+  def find_fn(t_id, a_id, b_id): 
+    if(t_id not in g.pot_fn.keys()):
+      return -1
+    if(a_id not in g.pot_fn[t_id].keys()):
+      return -1
+    if(b_id not in g.pot_fn[t_id][a_id].keys()):
+      return -1
+    return g.pot_fn[t_id][a_id][b_id]
+
   @staticmethod
   def pot_function():
     return {      
@@ -1270,9 +1384,86 @@ class potential:
     'fit_type': None,         # 1 spline, 2 analytic
     'fit_spline_type': None,  # 1 poly3, 2 poly5
     'fit_parameters': None,
+    'fit_parameters_start': None,
     'fit_size': None,
     'fit_mult': None,
+    'function_file_name': '',
     }
+
+  @staticmethod
+  def rescale_density():
+# NOT WORKING YET
+    if(potential.rescale_density_on):
+      print("Rescale")
+      m = {}
+      for fn in range(len(g.pot_functions['functions'])): 
+        if(g.pot_functions['functions'][fn]['f_type_id'] == 2):
+          a_id = g.pot_functions['functions'][fn]['a']
+          f_id = g.pot_functions['functions'][fn]['f_group']
+          m_rho = rescale_density.estimate_density(fn)
+          m[fn] = 1.0 / m_rho
+          fn_emb = potential.find_fn(3, a_id, f_id)
+          m[fn_emb] = 1.0 / m_rho
+          print(m_rho)
+# Get parameters
+      p = potential.get_parameters()
+
+# Update potential
+      a = 0
+      for fn in range(len(g.pot_functions['functions'])): 
+        multf = 1.0
+#if(fn in m.keys()):
+#  multf = m[fn]
+
+        b = a + g.pot_functions['functions'][fn]['fit_size'] 
+        if(g.pot_functions['functions'][fn]['fit_type'] == 1):     # NODE SPLINE   
+# Calc b
+          g.pot_functions['functions'][fn]['s_nodes'][:,1] = multf * p[a:b]
+          potential.make_spline_points_inner(fn)  
+        
+        elif(g.pot_functions['functions'][fn]['fit_type'] == 2):   # ANALYTIC  
+# Make Analytic Points
+          g.pot_functions['functions'][fn]['a_params'][:] = multf * p[a:b]
+          potential.make_analytic_points_inner(fn)
+
+# Update a
+        a = b    
+
+# Where the embedding function is analytic, rescale the tab points to range
+# from 0.0 up to predicted max density
+  @staticmethod
+  def rescale_embedding():
+    if(potential.rescale_embedding_on):
+      m = {}
+      for fn in range(len(g.pot_functions['functions'])):         
+        if(g.pot_functions['functions'][fn]['f_type_id'] == 2):  # Density function
+          a_id = g.pot_functions['functions'][fn]['a']
+          f_id = g.pot_functions['functions'][fn]['f_group']
+          fn_emb = potential.find_fn(3, a_id, f_id)
+          m_rho = rescale_density.estimate_density(fn)
+          if(fn_emb >= 0):
+            m[fn_emb] = m_rho
+
+      for fn in m.keys():
+        if(g.pot_functions['functions'][fn]['fit_type'] == 2):   # ANALYTIC  
+          g.pot_functions['functions'][fn]['a_u'] = m[fn_emb]
+          potential.make_analytic_points_inner(fn)
+
+  @staticmethod
+  def estimate_density(fn):
+# Symetric simple cubic used as test case
+    sc = {0.86602539999999995: 8, 0.80039053000000004: 24, 0.75: 24, 0.71807032999999998: 24, 0.70710678000000005: 12, 0.72886899000000005: 24, 0.67314560000000001: 48, 0.63737743999999996: 48, 0.625: 24, 0.61237244000000002: 24, 0.57282195999999996: 48, 0.55901699000000005: 24, 0.53033008999999998: 36, 0.51538819999999996: 48, 0.5: 6, 0.64951904999999999: 8, 0.58630196999999995: 24, 0.54486237000000004: 24, 0.46770717000000001: 48, 0.45069390999999998: 24, 0.4145781: 24, 0.39528470999999998: 24, 0.375: 30, 0.43301269999999997: 8, 0.35355339000000002: 12, 0.30618622000000001: 24, 0.27950849999999999: 24, 0.25: 6, 0.21650634999999999: 8, 0.17677670000000001: 12, 0.125: 7}
+    a_prim = 0.125
+    a = [2.0,3.0,4.0,5.0] 
+    m_rho = 0.0
+    for a0 in a:
+      a0 = (1 / a_prim) * a0
+      rho = 0.0    
+      for k in sc.keys():
+        y = interp.search_x(a0 * k, g.pot_functions['functions'][fn]['points'][:,0], g.pot_functions['functions'][fn]['points'][:,1])
+        rho = rho + sc[k] * y
+      m_rho = max(m_rho, rho)
+    return m_rho
 
 # LOAD FROM FILE
   @staticmethod
@@ -1284,10 +1475,11 @@ class potential:
         if(i > 0):
           g.pot_functions['pot_dir'] += '/'
         g.pot_functions['pot_dir'] += lst[i]
-    main.log("Loading: " + str(file_name))
-        
+    main.log("Loading: " + str(file_name))        
+
     index = std.config_file_to_list(file_name)  
     pot = potential.pot_function()
+    g.pot_functions['pot_file_name'] = file_name
     for row in index:    
       if(len(row) > 1 and row[0].upper() == "POTNAME"):
         g.pot_functions['pot_name'] = row[1]
@@ -1301,10 +1493,14 @@ class potential:
           pot['f_on'] = 0
       elif(len(row) > 1 and row[0].upper() == "LABEL"):
         label_str, label_id = labels.add(row[1])
+        if(label_str not in g.pot_labels):
+          g.pot_labels.append(label_str)  # Record potential labels
         pot['a_text'] = label_str
         pot['a'] = label_id
         if(len(row) > 2):
           label_str, label_id = labels.add(row[2])
+          if(label_str not in g.pot_labels):
+            g.pot_labels.append(label_str)  # Record potential labels
           pot['b_text'] = label_str
           pot['b'] = label_id
       elif(len(row) > 1 and row[0].upper() == "FILE"):
@@ -1326,16 +1522,28 @@ class potential:
           pot['f_type'] = 'NONE'
       elif(len(row) > 1 and row[0].upper() == "F_GROUP"):
         pot['f_group_label'] = row[1].strip() 
+      elif(len(row) == 1 and row[0].upper() == "F_GROUP"):
+        pot['f_group_label'] = "DEFAULT"
       elif(len(row) > 1 and row[0].upper() == "ZOOR"):
         val = row[1].upper() 
         pot['zoor'] = 0  
         if(val[0] == "T" or val[0] == "1" or val[0] == "Y"):
           pot['zoor'] = 1  
       elif(len(row) > 0 and row[0].upper() == "END"):
-        if(pot['a_text'] != None and pot['f_group_label'] != None):
-          label, id = labels.add_group(pot['a_text'], pot['f_group_label'], len(g.pot_functions['functions']))
-          pot['f_group'] = id
-      
+# END OF POTENTIAL READ
+        if(pot['f_type_id'] == 1):
+          pot['f_group'] = 0
+        else:
+          if(pot['a_text'] != None and pot['f_group_label'] != None):
+            if(pot['f_group_label'] == ""):
+              pot['f_group_label'] = "zzzemptyzzz"
+            if(pot['f_group_label'] in g.fgroups.keys()):
+              pot['f_group'] = g.fgroups[pot['f_group_label']]
+            else:
+              id = len(g.fgroups) + 1
+              g.fgroups[pot['f_group_label']] = id
+              pot['f_group'] = id
+
         g.pot_functions['functions'].append(pot)
         pot = potential.pot_function()
     
@@ -1565,6 +1773,7 @@ class potential:
         fit_file = g.pot_functions['pot_dir'] + '/' + g.pot_functions['functions'][fn]['fit_file']
         if(os.path.isfile(fit_file)):
 # Read File
+          params_start = None
           fh = open(fit_file, 'r')
           for line in fh:
             line = std.one_space(line.strip().upper())
@@ -1577,7 +1786,9 @@ class potential:
             if(line[0:3] == "#PL"):
               params_lower = f[1:]                     
             if(line[0:3] == "#PU"):
-              params_upper = f[1:]                      
+              params_upper = f[1:]                     
+            if(line[0:3] == "#PS"):
+              params_start = f[1:]                      
             if(line[0:2] == "#N"):
               spline_nodes = f[1:]                      
             if(line[0:3] == "#ST"):
@@ -1606,11 +1817,18 @@ class potential:
             elif(g.pot_functions['functions'][fn]['fit_type'] == 2 and
                g.pot_functions['functions'][fn]['function_type'] == 2):
               g.pot_functions['functions'][fn]['fit_size'] = len(g.pot_functions['functions'][fn]['a_params'])
-              g.pot_functions['functions'][fn]['fit_parameters'] = numpy.zeros((3,len(g.pot_functions['functions'][fn]['a_params']),),)     
+              g.pot_functions['functions'][fn]['fit_parameters'] = numpy.zeros((3,len(g.pot_functions['functions'][fn]['a_params']),),) 
+              g.pot_functions['functions'][fn]['fit_parameters_start'] = numpy.zeros((len(g.pot_functions['functions'][fn]['a_params']),),)    
             
               for i in range(g.pot_functions['functions'][fn]['fit_size']):
                 g.pot_functions['functions'][fn]['fit_parameters'][0,i] = float(params_lower[i])
                 g.pot_functions['functions'][fn]['fit_parameters'][1,i] = float(params_upper[i])
+#g.pot_functions['functions'][fn]['fit_parameters_start'][i] = float(params_start[i])
+                
+                if(params_start is None):
+                  g.pot_functions['functions'][fn]['fit_parameters_start'][i] = 0.5 * (float(params_lower[i]) + float(params_upper[i]))
+                else:
+                  g.pot_functions['functions'][fn]['fit_parameters_start'][i] = float(params_start[i])
               
 # Spline fitting
             elif(g.pot_functions['functions'][fn]['fit_type'] == 1):
@@ -1650,7 +1868,12 @@ class potential:
   @staticmethod
   def pf_output(): 
     if(g.outputs):     
-      fh = open(g.dirs['output'] + '/' + 'pot.dat', 'w')
+      potential.pf_output_file(g.dirs['output'] + '/' + 'pot.dat')
+    
+  @staticmethod
+  def pf_output_file(file_path): 
+
+      fh = open(file_path, 'w')
       
       n = 0
       for pf in g.pot_functions['functions']:
@@ -1702,6 +1925,48 @@ class potential:
           fh.write(str('None\n'))         
       fh.close()
       
+  @staticmethod
+  def get_parameters():  
+    w = 0
+    for fn in range(len(g.pot_functions['functions'])): 
+      if(g.pot_functions['functions'][fn]['fit_size'] != None):
+        w = w + g.pot_functions['functions'][fn]['fit_size']
+    p = numpy.zeros((w,),)  
+      
+# Update potential
+    a = 0
+    for fn in range(len(g.pot_functions['functions'])): 
+      if(g.pot_functions['functions'][fn]['fit_size'] != None):
+        b = a + g.pot_functions['functions'][fn]['fit_size']  
+        if(g.pot_functions['functions'][fn]['fit_type'] == 1):     # NODE SPLINE   
+          p[a:b] = g.pot_functions['functions'][fn]['s_nodes'][:,1]
+        elif(g.pot_functions['functions'][fn]['fit_type'] == 2):   # ANALYTIC  
+          p[a:b] = g.pot_functions['functions'][fn]['a_params'][:]
+# Update a
+        a = b    
+    
+    return p
+    
+  @staticmethod
+  def get_start_parameters():   
+    w = 0
+    for fn in range(len(g.pot_functions['functions'])): 
+      w = w + g.pot_functions['functions'][fn]['fit_size']
+    p = numpy.zeros((w,),)  
+      
+# Update potential
+    a = 0
+    for fn in range(len(g.pot_functions['functions'])): 
+      b = a + g.pot_functions['functions'][fn]['fit_size']  
+      if(g.pot_functions['functions'][fn]['fit_type'] == 1):     # NODE SPLINE   
+        p[a:b] = g.pot_functions['functions'][fn]['fit_parameters_start'][:,1]
+      elif(g.pot_functions['functions'][fn]['fit_type'] == 2):   # ANALYTIC  
+        p[a:b] = g.pot_functions['functions'][fn]['fit_parameters_start'][:]
+# Update a
+      a = b    
+      
+    return p
+    
   @staticmethod
   def save_potential(dir_out=None, name_out=None):
     potential_output.eampa(dir_out, name_out)
@@ -1960,6 +2225,7 @@ class potential:
 # ADD POTENTIALS
     for pn in range(len(g.pot_functions['functions'])):
       pf = g.pot_functions['functions'][pn]
+#print(pf['f_type_id'], pf['a'], pf['f_group'])
       if(pf['f_on']):
         if(pf['f_type_id'] == 1):
           fortran_id = efs.add_potential(
@@ -1981,22 +2247,10 @@ class potential:
                             pn
                            )   
           g.pot_functions['functions'][pn]['fortran_id'] = fortran_id
-        
-# ADD ZBL
-    for zbl in g.pot_functions['zbl']:
-      efs.add_zbl(
-                  zbl['id_1'],
-                  zbl['id_2'], 
-                  zbl['on'],  
-                  zbl['z1'], 
-                  zbl['z2'] , 
-                  zbl['ra'] , 
-                  zbl['rb'] , 
-                  zbl['spline_type'] 
-                 )    
-
+    
 # SET POTENTIALS
-    efs.set_potentials()   
+    efs.set_potentials() 
+#exit()
     
   def es_add_potentials():
   
@@ -2166,6 +2420,14 @@ class potential_functions:
   def buckingham(r, p, pf):
     return fnc.buckingham_v(r, p, pf)
 
+  @staticmethod
+  def ackland_mendelev_pair(r, p, pf):
+    return fnc.ackland_mendelev_pair_v(r, p, pf)
+
+  @staticmethod
+  def pair_spline(r, p, pf):
+    return fnc.pair_spline_v(r, p, pf)
+
 ##############################################
 # DENSITY FUNCTIONS
 ##############################################
@@ -2197,6 +2459,12 @@ class potential_functions:
   def triple_embedding(r, p, pf):
     return fnc.triple_embedding_v(r, p, pf)
 
+# Triple Embedding
+# f(x) = A + B * sqrt(r) + C * r**2 + D * r**4
+  @staticmethod
+  def quad_embedding(r, p, pf):
+    return fnc.quad_embedding_v(r, p, pf)
+    
 # Embedding Ackland (Olsson/Walenius)
 # f(x) = A sqrt(rho) + B rho**2 + C rho**4
   @staticmethod
@@ -2223,6 +2491,14 @@ class potential_functions:
   def spline_n_node(r, p, pf):
     return fnc.spline_n_node_v(r, p)
     
+  @staticmethod
+  def cubic_knot_spline(r, p, pf):
+    return fnc.cubic_knot_spline_v(r, p, pf)
+    
+  @staticmethod
+  def cubic_knot_spline_fixed_end(r, p, pf):
+    return fnc.cubic_knot_spline_fixed_end_v(r, p, pf)
+
 ###########################################
 #  CLASS potential_outpu
 ###########################################
@@ -2282,17 +2558,15 @@ class potential_output:
     
     for fn in range(len(g.pot_functions['functions'])): 
       f = g.pot_functions['functions'][fn]
-#print("F ", fn)
-#print(f)
-#print()
-#print()
+
 # File Name
-      pf_name = f['f_type'] + '_' + f['a_text'].strip()
-      if(f['b_text'].strip() != ''):
-        pf_name += '_' + f['b_text'].strip()
-      if(str(f['f_group']).strip() != ''):
-        pf_name += '_' + str(f['f_group'])
-      pf_name = pf_name.lower() + '.pot'
+#pf_name = f['f_type'] + '_' + f['a_text'].strip()
+#if(f['b_text'].strip() != ''):
+#  pf_name += '_' + f['b_text'].strip()
+#if(str(f['f_group']).strip() != ''):
+#  pf_name += '_' + str(f['f_group'])
+#pf_name = pf_name.lower() + '.pot'
+      pf_name = f['file']
       
       a = labels.get(f['a'])
       b = labels.get(f['b'])
@@ -2311,6 +2585,7 @@ class potential_output:
       fh.write('\n')  
       fh.write('\n')  
       
+# Write Function File
       fh_pf = open(dir_out + '/' + pf_name, 'w')
       if(f['function_type'] == 1):
         pass
@@ -2329,7 +2604,26 @@ class potential_output:
           fh_pf.write('\n')
         fh_pf.write('#L ' + str(f['a_l']) + '\n')
         fh_pf.write('#U ' + str(f['a_u']) + '\n')
-        fh_pf.close()
+      fh_pf.close()
+
+# Write Function File
+      if(f['function_type'] == 2):
+        fh_pfit = open(dir_out + '/' + f['fit_file'], 'w')
+        fh_pfit.write('#FIT A' + '\n')
+        fh_pfit.write('#PS ')
+        for p in f['a_params']:        
+          fh_pfit.write(' ' + str(p))
+        fh_pfit.write('\n')
+        fh_pfit.write('#PL ')
+        for i in range(len(f['a_params'])):    
+          fh_pfit.write(' ' + str(str(f['a_params'][i] - 0.5 * (f['fit_parameters'][1,i] - f['fit_parameters'][0,i]))))
+        fh_pfit.write('\n')
+        fh_pfit.write('#PU ')
+        for i in range(len(f['a_params'])):    
+          fh_pfit.write(' ' + str(str(f['a_params'][i] + 0.5 * (f['fit_parameters'][1,i] - f['fit_parameters'][0,i]))))
+        fh_pfit.write('\n')
+        fh_pfit.close()
+        
     fh.close()
   
   @staticmethod
@@ -2433,37 +2727,67 @@ class potential_output:
 class rescale_density:
   
   def run():
+    m = {}
     for fn in range(len(g.pot_functions['functions'])): 
       if(g.pot_functions['functions'][fn]['f_type_id'] == 2):
-        min_rho = min(g.pot_functions['functions'][fn]['points'][:,1])
-        g.pot_functions['functions'][fn]['points'][:,1] = g.pot_functions['functions'][fn]['points'][:,1] - min_rho 
-        rho = rescale_density.estimate_density(fn) 
-        if(rho < g.fit['rescale_min'] or rho > g.fit['rescale_max']):
-          g.pot_functions['functions'][fn]['points'][:,1:3] = (g.fit['rescale_default'] / rho) * g.pot_functions['functions'][fn]['points'][:,1:3]
-          rho = rescale_density.estimate_density(fn)
+        a_id = g.pot_functions['functions'][fn]['a']
+        f_id = g.pot_functions['functions'][fn]['f_group']
+        m_rho = rescale_density.estimate_density(fn)
+        m[fn] = 1.0 / m_rho
+        fn_emb = potential.find_fn(3, a_id, f_id)
+        m[fn_emb] = 1.0 / m_rho
+
+    """
+# Update potential
+    a = 0
+    for fn in range(len(g.pot_functions['functions'])): 
+      if(g.pot_functions['functions'][fn]['fit_type'] == 1):     # NODE SPLINE   
+# Calc b
+        b = a + g.pot_functions['functions'][fn]['fit_size']  
+        
+        g.pot_functions['functions'][fn]['s_nodes'][:,1] = p[a:b]
+        potential.make_spline_points_inner(fn)
+        
+# Make Analytic Points
+#g.pot_functions['functions'][fn]['s_params'][:] = p[a:b]
+# LOAD ORIGINAL
+#g.pot_functions['functions'][fn]['points'] = numpy.copy(g.pot_functions['functions'][fn]['points_original'])
+# VARY SPLINE
+#potential.vary_tabulated_points(fn, p[a:b])
+        
+# Update a
+        a = b   
+        
+      elif(g.pot_functions['functions'][fn]['fit_type'] == 2):   # ANALYTIC  
+# Calc b
+        b = a + g.pot_functions['functions'][fn]['fit_size'] 
+# Make Analytic Points
+        g.pot_functions['functions'][fn]['a_params'][:] = p[a:b]
+        potential.make_analytic_points_inner(fn)
+        a = b    
+    """
+
+  def estimate_densities():
+    out = []
+    for fn in range(len(g.pot_functions['functions'])): 
+      if(g.pot_functions['functions'][fn]['f_type_id'] == 2):
+        out.append([fn, rescale_density.estimate_density(fn)])
+    return out
 
   def estimate_density(fn):
-    r = numpy.zeros((7,),)
-    rn = numpy.zeros((7,),)
-    r[0] = 7.48332e0
-    r[1] = 6.32456e0
-    r[2] = 6.92821e0
-    r[3] = 4.89898e0
-    r[4] = 5.65686e0
-    r[5] = 2.82843e0
-    r[6] = 4.0e0
-    rn[0] = 48
-    rn[1] = 24
-    rn[2] = 8
-    rn[3] = 24
-    rn[4] = 12
-    rn[5] = 12
-    rn[6] = 6    
-    rho = 0.0    
-    for i in range(7):
-      y = interp.search_x(r[i], g.pot_functions['functions'][fn]['points'][:,0], g.pot_functions['functions'][fn]['points'][:,1])
-      rho = rho + rn[i] * y
-    return rho
+# Symetric simple cubic used as test case
+    sc = {0.86602539999999995: 8, 0.80039053000000004: 24, 0.75: 24, 0.71807032999999998: 24, 0.70710678000000005: 12, 0.72886899000000005: 24, 0.67314560000000001: 48, 0.63737743999999996: 48, 0.625: 24, 0.61237244000000002: 24, 0.57282195999999996: 48, 0.55901699000000005: 24, 0.53033008999999998: 36, 0.51538819999999996: 48, 0.5: 6, 0.64951904999999999: 8, 0.58630196999999995: 24, 0.54486237000000004: 24, 0.46770717000000001: 48, 0.45069390999999998: 24, 0.4145781: 24, 0.39528470999999998: 24, 0.375: 30, 0.43301269999999997: 8, 0.35355339000000002: 12, 0.30618622000000001: 24, 0.27950849999999999: 24, 0.25: 6, 0.21650634999999999: 8, 0.17677670000000001: 12, 0.125: 7}
+    a_prim = 0.125
+    a = [2.0,3.0,4.0,5.0] 
+    m_rho = 0.0
+    for a0 in a:
+      a0 = (1 / a_prim) * a0
+      rho = 0.0    
+      for k in sc.keys():
+        y = interp.search_x(a0 * k, g.pot_functions['functions'][fn]['points'][:,0], g.pot_functions['functions'][fn]['points'][:,1])
+        rho = rho + sc[k] * y
+      m_rho = max(m_rho, rho)
+    return m_rho
     
   def max_densities():    
     density_list = None
@@ -2565,10 +2889,11 @@ class configs:
 # Read each config
     for i in range(len(config_list)):
       configs.add_config(config_list[i], file_path, i)
-  
+
   @staticmethod
   def make_config():
     return {
+    'f_id': None, 
     'file_type': '',  
     'file_path': '',  
     'file_part': 0,  
@@ -2610,6 +2935,10 @@ class configs:
     fd['file_type'] = config_type
     fd['file_path'] = file_path
     fd['file_part'] = i
+
+    fd['c'][0] = 1
+    fd['c'][1] = 1
+    fd['c'][2] = 1
     
 # FIRST READ
     for line in content:
@@ -2674,13 +3003,14 @@ class configs:
         fd['s_units'] = f[1]
       if(len(f) >= 4 and f[0][0] != "#"):    
         count_coord = False
+#print(f)
         if(len(f) >= 4):
           count_coord = True
         if(len(f) >= 7):
           fd['f'] = 1
         if(count_coord):
           fd['coord_count_prim'] = fd['coord_count_prim'] + 1
-          
+
 # COORD SIZE
     c = numpy.identity(3)
     
@@ -2712,9 +3042,8 @@ class configs:
     for line in content:
       line = line.strip() 
       f = std.to_fields(line, ' ')
-      if(len(f) >= 4 and f[0][0] != "#"):    
-        if(len(f) >= 4):   
-          
+      if(len(f) >= 4 and f[0][0] != "#"):   
+        if(len(f) >= 4):             
           label_str, label_id = labels.add(f[0])            
 #print(f[0], label_str, label_id)
           fd['coords_label_prim'][n] = label_str
@@ -2728,7 +3057,7 @@ class configs:
           fd['forces_prim'][n,1] = float(f[5])
           fd['forces_prim'][n,2] = float(f[6])
         n = n + 1
-        
+    
 # EXPAND COORDS
     m = 0
     for i in range(fd['c'][0]):
@@ -2745,7 +3074,7 @@ class configs:
               fd['forces'][m,1] = fd['forces_prim'][n,1]
               fd['forces'][m,2] = fd['forces_prim'][n,2]
             m = m + 1
-            
+
 # SORT ENERGY
     if(fd['e'] == 1 and fd['energy_per_atom'] != None and fd['energy'] == None):
       try:
@@ -3142,7 +3471,14 @@ class configs:
   
   @staticmethod
   def efs_add_config():  
-    for c in g.configs['configs']:
+
+    while(len(g.configs['config_results'])<len(g.configs['configs'])):
+      g.configs['config_results'].append({'f_id': None, 'energy': None, 'stress': None, 'force': None,})
+
+    for n in range(len(g.configs['configs'])):
+      c = g.configs['configs'][n]
+
+#print(c)
       efs.add_config( 
                      6.5,
                      c['alat'], 
@@ -3154,9 +3490,17 @@ class configs:
                      c['stress'], 
                      c['f'], 
                      c['s']
-                    )                 
+                    )    
+      g.configs['configs'][n]['f_id'] = efs.cc
+      g.configs['config_results'][n]['f_id'] = efs.cc
     efs.make_nl()
-  
+
+  @staticmethod
+  def efs_results(): 
+    while(len(g.configs['config_results'])<len(g.configs['configs'])):
+      cc = g.configs['config_results'][n]['f_id']
+      print(efs.energies[cc])
+
 #@staticmethod
 #def efs_add_config():
     
@@ -4510,6 +4854,9 @@ class b_props:
     except:
       dir = ""
       bp_file = g.inp['bp']['bp_file']
+
+    if(not(os.path.isfile(bp_file))):
+      return None
     
 # Read BP data file
     bp_inp = read_config.read_file(bp_file)
@@ -4536,20 +4883,26 @@ class b_props:
         label_str, label_id = labels.add(potlabel)     
         
         newbp = b_props.make(label_id, label_str)
+        newbp['bp_key_str'] = k
 
 # There must be an alat value set
         newbp['alat'] = float(bp_inp[k]['alat'])
         newbp['alat'] = units.convert(bp_length, 'ang', newbp['alat'])
+#newbp['label_str'] = label_str
                 
         try:
           if(bp_inp[k]['type'].lower() == 'sc'):
             newbp['type'] = 1
+            newbp['type_text'] = 'Simple Cubic'
           elif(bp_inp[k]['type'].lower() == 'bcc'):
             newbp['type'] = 2
+            newbp['type_text'] = 'Body Centered Cubic'
           elif(bp_inp[k]['type'].lower() == 'fcc'):
             newbp['type'] = 3
+            newbp['type_text'] = 'Face Centered Cubic'
           elif(bp_inp[k]['type'].lower() == 'zb'):
             newbp['type'] = 4
+            newbp['type_text'] = 'Zinc Blende'
         except:
           pass 
           
@@ -4650,7 +5003,7 @@ class b_props:
               
         except:
           pass
-          
+#print(newbp)
 # Save to list
         g.bulk_properties.append(newbp)
 
@@ -4661,6 +5014,7 @@ class b_props:
 #
    
     bp_d ={
+           'bp_key_str': '',
            'label_id': label_id,
            'label_str': label_str,
            'alat': None,
@@ -4675,6 +5029,8 @@ class b_props:
            'e': None,
            'poisson': None,
            'amu_per_crystal': None,
+           'type': -1,
+           'type_text': '',
           }
     bp_d['uv'][:,:] = 0.0
     bp_d['uv'][0,0] = 1.0
@@ -4689,46 +5045,47 @@ class b_props:
   @staticmethod
   def bp_add():  
   
-    for bp_n in g.bulk_properties:
-#bp_id = bp.add_fcc(6.5, g.bulk_properties[bp_n]['alat'], 1)
-#add_bp_config(rcut_in, alat_in, uv_in, label_in, crystal_type_in, expansion_in, bp_id)
-      """
-      rcut = g.bulk_properties[bp_n]['rcut']
-      alat = g.bulk_properties[bp_n]['alat']
-      uv = g.bulk_properties[bp_n]['uv']
-      label = g.bulk_properties[bp_n]['label_id']
-      type = g.bulk_properties[bp_n]['type']
-      expansion = g.bulk_properties[bp_n]['expansion']
-      """
-      rcut = bp_n['rcut']
-      alat = bp_n['alat']
-      uv = bp_n['uv']
-      label = bp_n['label_id']
-      type = bp_n['type']
-      expansion = bp_n['expansion']
+#print(g.pot_labels)
+  
+    for bp_i in range(len(g.bulk_properties)):
+      bp_n = g.bulk_properties[bp_i]
+      label_str = bp_n['label_str'].upper()
+      if(label_str in g.pot_labels):
+
+        rcut = bp_n['rcut']
+        alat = bp_n['alat']
+        uv = bp_n['uv']
+        label = bp_n['label_id']
+        type = bp_n['type']
+        expansion = bp_n['expansion']
       
 # Add Config
-      bp_id = int(bp.add_bp_config(rcut, alat, uv, label, type, expansion))
-    
+        bp_id = int(bp.add_bp_config(rcut, alat, uv, label, type, expansion))
+        g.bulk_properties[bp_i]['fortran_id'] = bp_id
+
 # Add known data
-      bp.add_alat(bp_id, bp_n['alat'])
-      bp.add_e0(bp_id, bp_n['e0'])
-      bp.add_b0(bp_id, bp_n['b0'])
-      bp.add_ec(bp_id, bp_n['ec'])
-      bp.add_amu_per_crystal(bp_id, bp_n['amu_per_crystal'])
+        bp.add_alat(bp_id, bp_n['alat'])
+        bp.add_e0(bp_id, bp_n['e0'])
+        bp.add_b0(bp_id, bp_n['b0'])
+        bp.add_ec(bp_id, bp_n['ec'])
+        bp.add_amu_per_crystal(bp_id, bp_n['amu_per_crystal'])
       
-      g.bp_ids[bp_id] = {}
-      g.bp_ids[bp_id]['rcut'] = rcut
-      g.bp_ids[bp_id]['alat'] = alat
-      g.bp_ids[bp_id]['uv'] = uv
-      g.bp_ids[bp_id]['label'] = label
-      g.bp_ids[bp_id]['type'] = type
-      g.bp_ids[bp_id]['expansion'] = expansion
-      g.bp_ids[bp_id]['e0'] = bp_n['e0']
-      g.bp_ids[bp_id]['b0'] = bp_n['b0']
-      g.bp_ids[bp_id]['ec'] = bp_n['ec']
-      g.bp_ids[bp_id]['amu_per_crystal'] = bp_n['amu_per_crystal']
-      
+        g.bp_ids[bp_id] = {}
+        g.bp_ids[bp_id]['label_str'] = label_str
+        g.bp_ids[bp_id]['rcut'] = rcut
+        g.bp_ids[bp_id]['alat'] = alat
+        g.bp_ids[bp_id]['uv'] = uv
+        g.bp_ids[bp_id]['label'] = label
+        g.bp_ids[bp_id]['type'] = type
+        g.bp_ids[bp_id]['expansion'] = expansion
+        g.bp_ids[bp_id]['e0'] = bp_n['e0']
+        g.bp_ids[bp_id]['b0'] = bp_n['b0']
+        g.bp_ids[bp_id]['ec'] = bp_n['ec']
+        g.bp_ids[bp_id]['amu_per_crystal'] = bp_n['amu_per_crystal']
+        g.bp_ids[bp_id]['type'] = bp_n['type']
+        g.bp_ids[bp_id]['type_text'] = bp_n['type_text']
+        g.bp_ids[bp_id]['bp_key_str'] = bp_n['bp_key_str']
+ 
 # Add rss multiplication values
     try:
       bp.set_rss_alat(g.inp['rss']['alat'])
@@ -4767,6 +5124,15 @@ class b_props:
 
       t_pad = 30
       f_pad = 18
+
+      std.write_file_line(fh, '', 1, '', 1)
+      std.write_file_line(fh, '', 1, '', 1)
+      std.write_file_line(fh, '', 1, '', 1)      
+      std.write_file_line(fh, '######################################################', 1, '', 1)
+      std.write_file_line(fh, 'LABEL  ' + str(g.bp_ids[bp_id]['label_str'] ), 1, '', 1)
+      std.write_file_line(fh, '######################################################', 1, '', 1)
+      std.write_file_line(fh, '', 1, '', 1)
+      std.write_file_line(fh, '', 1, '', 1)
       
       std.write_file_line(fh, '######################################################', 1, '', 1)
       std.write_file_line(fh, 'Known Properties', 1, '', 1)
@@ -4969,7 +5335,16 @@ class b_props:
       bp_b0 = g.bp_ids[bp_id+1]['b0']
       bp_ec = g.bp_ids[bp_id+1]['ec']
       bp_amu_per_crystal = g.bp_ids[bp_id+1]['amu_per_crystal']
-      
+
+      std.print_file_line('', 1, '', 1)
+      std.print_file_line('', 1, '', 1)
+      std.print_file_line('', 1, '', 1)   
+      std.print_file_line('############################################################################################################', 1, '', 1)
+      std.print_file_line('BP KEY          ' + str(g.bp_ids[bp_id+1]['bp_key_str'].upper()), 1, '', 1)
+      std.print_file_line('LABEL           ' + str(g.bp_ids[bp_id+1]['label_str']), 1, '', 1)
+      std.print_file_line('TYPE            ' + str(g.bp_ids[bp_id+1]['type_text']), 1, '', 1)
+      std.print_file_line('############################################################################################################', 1, '', 1)
+
       std.print_file_line('', 1, '', 1)
       std.print_file_line('######################################################', 1, '', 1)
       std.print_file_line('Known Properties', 1, '', 1)
@@ -5021,6 +5396,17 @@ class b_props:
       std.print_file_line('b0:', t_pad, bp.calc_b0[bp_id], f_pad)
       std.print_file_line('b0/GPA:', t_pad, 160.230732254e0 * bp.calc_b0[bp_id], f_pad)
       std.print_file_line('', 1, '', 1)  
+      std.print_file_line('Stiffness Matrix', 1, '', 1)
+      std.print_file_line('#################', 1, '', 1)
+      std.print_file_line('Stiffness:', t_pad, bp.calc_ec[bp_id,0,:], f_pad)
+      for i in range(1,6):   
+        std.print_file_line('', t_pad, bp.calc_ec[bp_id,i,:], f_pad)
+      std.print_file_line('', 1, '', 1)
+      std.print_file_line('Stiffness (GPA):', t_pad, 160.230732254e0 * bp.calc_ec[bp_id,0,:], f_pad)
+      for i in range(1,6):   
+        std.print_file_line('', t_pad, 160.230732254e0 * bp.calc_ec[bp_id,i,:], f_pad)
+      std.print_file_line('', 1, '', 1)
+      std.print_file_line('', 1, '', 1)
     
     """ 
     for bp_id in range(bp.bp_configs_count):
@@ -5108,8 +5494,8 @@ class b_props:
       plt.plot(bp.calc_volumes[bp_id, 0, 0:s], bp.calc_energies[bp_id, 0, 0:s], color='k',  marker="x", ls='')
       plt.plot(bp.calc_volumes[bp_id, 0, 0:s], bp.calc_energies_fit[bp_id, 0, 0:s], color='k', ls='solid')
 
-      plt.savefig(dir + '/' + 'eos.svg')
-      plt.savefig(dir + '/' + 'eos.eps')
+      plt.savefig(dir + '/' + 'eos_' + str(bp_id) + '.svg')
+      plt.savefig(dir + '/' + 'eos_' + str(bp_id) + '.eps')
       
 # ELASTIC CONSTANTS
       
@@ -5136,8 +5522,8 @@ class b_props:
         axs[int(numpy.floor(dn/3)), dn % 3].set_xlabel('Strain (Expanded Alat)')
         axs[int(numpy.floor(dn/3)), dn % 3].set_ylabel('Energy (eV)')
                
-      plt.savefig(dir + '/' + 'ec.svg')
-      plt.savefig(dir + '/' + 'ec.eps')
+      plt.savefig(dir + '/' + 'ec_' + str(bp_id) + '.svg')
+      plt.savefig(dir + '/' + 'ec_' + str(bp_id) + '.eps')
       
     """
     n = globals.d['eos_data_size']
@@ -5175,6 +5561,26 @@ class units:
     'NM': 1E9,
     'ANG': 1E10,
     'BOHR': 1.89E10,
+    }
+    
+# AREA METERS SQUARED
+    area = {
+    'M2': 1.0,
+    'CM2': 1E4,
+    'MM2': 1E6,
+    'UM2': 1E12,
+    'NM2': 1E18,
+    'ANG2': 1E20,
+    }
+    
+# VOLUME METERS CUBED
+    volume = {
+    'M2': 1.0,
+    'CM2': 1E6,
+    'MM2': 1E9,
+    'UM2': 1E18,
+    'NM2': 1E27,
+    'ANG2': 1E30,
     }
 
 # ENERGY J
@@ -5217,7 +5623,7 @@ class units:
     
 # TEMPERATURE
     
-    unit_list = [length, energy, force, velocity, pressure, charge_density]
+    unit_list = [length, area, volume, energy, force, velocity, pressure, charge_density]
     
     for l in unit_list:
       if(conv_from in l.keys() and conv_to in l.keys()):
@@ -5263,61 +5669,223 @@ class efs_calc:
   def run_energy():
   
     print("Calc Energy") 
+    efs_calc.output_dir()
   
 # Setup EFS
     efs.init()                         # Initialise (allocate arrays)
     potential.efs_add_potentials()     # Load potentials
     configs.efs_add_config()           # Add configs
     efs.energy()
-    efs_calc.output_energy()
+    efs_calc.output()
+    efs_calc.save_to_file()
     potential.plot_fortran_potentials()
     potential.plot_python_potentials()
     
   def run_energy_force():
   
     print("Calc Energy and Forces") 
+    efs_calc.output_dir()
     
 # Setup EFS
     efs.init()                         # Initialise (allocate arrays)
     potential.efs_add_potentials()     # Load potentials
     configs.efs_add_config()           # Add configs
     efs.energy_force() 
-    efs_calc.output_energy()
-    efs_calc.output_forces()
+    efs_calc.output()
+    efs_calc.save_to_file()
     potential.plot_fortran_potentials()
     potential.plot_python_potentials()
   
   def run_energy_force_stress():
   
     print("Calc Energy, Forces and Stress") 
+    efs_calc.output_dir()
     
 # Setup EFS
     efs.init()                         # Initialise (allocate arrays)
     potential.efs_add_potentials()     # Load potentials
     configs.efs_add_config()           # Add configs
     efs.energy_force_stress() 
-    efs_calc.output_energy()
-    efs_calc.output_forces()
-    efs_calc.output_stress()
+    configs.efs_results()              # Load Results
+    efs_calc.output()
+    efs_calc.save_to_file()
+#efs_calc.output_rss()
     potential.plot_fortran_potentials()
     potential.plot_python_potentials()
-  
+
 #efs.max_density_calc()
+
+  def output_dir():
+    std.make_dir(g.dirs['wd'] + '/efs')
+
+  def output():
+  
+    t_pad = 12
+    f_pad = 18
+    margin = 30
+    halfwidth = 30
+
+    print()
+
+    for n in range(efs.cc):    
+
+# Config calcs
+      nat = efs.key[n,1] - efs.key[n,0] + 1
+      a = efs.key[n, 0]
+      b = efs.key[n, 1]
+
+      e_on = efs.key[n, 10]
+      f_on = efs.key[n, 11]
+      s_on = efs.key[n, 12]
+#print(efs.key[n,:])
+
+      print("Config " + str(n+1) + '    ' + g.configs['configs'][n]['file_path'])
+      print('###############################################################')
+      print(std.pad("Atom Count:", margin) + str(nat))
+
+      print(std.pad("Energy (known/calculated):", margin) + 
+            std.pad(efs.energies[n], halfwidth) + 
+            std.pad(efs.config_energy[n,2] , halfwidth))
+
+      print(std.pad("Pair:", margin) + 
+            std.pad("", halfwidth) + 
+            std.pad(efs.config_energy[n,0] , halfwidth))
+
+      print(std.pad("Embedding:", margin) + 
+            std.pad("", halfwidth) + 
+            std.pad(efs.config_energy[n,1] , halfwidth))
+
+      print()
+
+  def save_to_file(out_dir=None):
+
+    if(out_dir == None):
+      out_dir = g.dirs['wd'] + '/efs'
+  
+    t_pad = 12
+    f_pad = 18
+    margin = 20
+    halfwidth = 50
+  
+    fh = open(out_dir + '/efs_results.txt', 'w')
+    fh.write('###############################################################')
+    fh.write('###############################################################\n')
+    fh.write('FULL RESULTS\n')
+    fh.write('Config Count: ' + str(efs.cc) + '\n')
+    fh.write('###############################################################')
+    fh.write('###############################################################\n')
+    fh.write('\n')    
+    for n in range(efs.cc):    
+
+# Config calcs
+      nat = efs.key[n,1] - efs.key[n,0] + 1
+      a = efs.key[n, 0]
+      b = efs.key[n, 1]
+
+      e_on = efs.key[n, 10]
+      f_on = efs.key[n, 11]
+      s_on = efs.key[n, 12]
+#print(efs.key[n,:])
+
+      fh.write("Config " + str(n+1) + '    ')
+      fh.write(g.configs['configs'][n]['file_path'] + '\n')
+      fh.write('###############################################################\n')
+      fh.write('\n')
+
+      fh.write(std.pad("Atom Count:", margin))
+      fh.write(str(nat))
+      fh.write('\n')
+
+      fh.write(std.pad("", margin))
+      fh.write(std.pad("KNOWN", halfwidth))
+      fh.write(std.pad("CALCULATED", halfwidth))
+      fh.write('\n')
+      
+# Energy
+      fh.write(std.pad("ENERGY:", margin))
+      fh.write('\n')
+
+      fh.write(std.pad("(total)", margin))
+      fh.write(std.pad(efs.energies[n], halfwidth))
+      fh.write(std.pad(efs.config_energy[n,2] , halfwidth))
+      fh.write('\n')
+
+      fh.write(std.pad("(pair)", margin))
+      fh.write(std.pad("", halfwidth))
+      fh.write(std.pad(efs.config_energy[n,0], halfwidth))
+      fh.write('\n')
+
+      fh.write(std.pad("(embedding)", margin))
+      fh.write(std.pad("", halfwidth))
+      fh.write(std.pad(efs.config_energy[n,1], halfwidth))
+      fh.write('\n')
+
+      fh.write(std.pad("EPA:", margin))
+      fh.write('\n')
+
+      fh.write(std.pad("(total)", margin))
+      fh.write(std.pad(efs.energies[n] / nat, halfwidth))
+      fh.write(std.pad(efs.config_energy[n,5], halfwidth))
+      fh.write('\n')
+
+      fh.write(std.pad("(pair)", margin))
+      fh.write(std.pad("", halfwidth))
+      fh.write(std.pad(efs.config_energy[n,3], halfwidth))
+      fh.write('\n')
+
+      fh.write(std.pad("(embedding)", margin))
+      fh.write(std.pad("", halfwidth))
+      fh.write(std.pad(efs.config_energy[n,4], halfwidth))
+      fh.write('\n')
+      fh.write('\n')
+
+      fh.write(std.pad("Atom Coords:", margin))
+      fh.write('\n')
+      nn = 0
+      for cn in range(a, b, 1):
+        fh.write(std.pad(str(nn) + ":", 8))
+        fh.write(std.pad(labels.get(efs.labels[cn]) + " [" + str(efs.labels[cn]) + "]", 20))
+        fh.write(std.pad('{:6.3f}'.format(efs.coords[cn,0]), 14))
+        fh.write(std.pad('{:6.3f}'.format(efs.coords[cn,1]), 14))
+        fh.write(std.pad('{:6.3f}'.format(efs.coords[cn,2]), 14))
+
+        if(f_on == 1):
+          fh.write("  #  ")
+          fh.write(std.pad('{:12.3e}'.format(float(efs.forces[n,nn,0])), 14))
+          fh.write(std.pad('{:12.3e}'.format(float(efs.forces[n,nn,1])), 14))
+          fh.write(std.pad('{:12.3e}'.format(float(efs.forces[n,nn,2])), 14))
+          fh.write("  #  ")
+          fh.write(std.pad('{:12.3f}'.format(float(efs.config_forces[n,nn,0])), 14))
+          fh.write(std.pad('{:12.3f}'.format(float(efs.config_forces[n,nn,1])), 14))
+          fh.write(std.pad('{:12.3f}'.format(float(efs.config_forces[n,nn,2])), 14))
+          
+        fh.write('\n')
+        nn = nn + 1
+      fh.write('\n')
+
+      fh.write('\n')     
+    fh.write('###############################################################')
+    fh.write('###############################################################\n')
+    fh.close()
 
   def output_energy():
   
     t_pad = 12
     f_pad = 18
   
-    fh = open(g.dirs['results'] + '/' + 'config_energies.txt', 'w')
+    fh = open(g.dirs['wd'] + '/efs/' + 'config_energies.txt', 'w')
     fh.write('###############################################################')
     fh.write('###############################################################\n')
     fh.write('ENERGY RESULTS\n')
     fh.write('Config Count: ' + str(efs.cc) + '\n')
     fh.write('###############################################################')
     fh.write('###############################################################\n')
+    fh.write('\n')    
     for n in range(efs.cc):    
-      std.write_file_line(fh, 'Config ' + str(n+1) + ':', t_pad, efs.config_energy[n,:], f_pad)
+      fh.write("Config " + str(n+1) + '    ')
+      fh.write(g.configs['configs'][n]['file_path'] + '\n')
+      std.write_file_line(fh, "", t_pad, efs.config_energy[n,:], f_pad)
+      fh.write('\n')     
     fh.write('###############################################################')
     fh.write('###############################################################\n')
     fh.close()
@@ -5327,7 +5895,7 @@ class efs_calc:
     t_pad = 12
     f_pad = 18
   
-    fh = open(g.dirs['results'] + '/' + 'config_forces.txt', 'w')
+    fh = open(g.dirs['wd'] + '/efs/' + 'config_forces.txt', 'w')
     fh.write('###############################################################')
     fh.write('###############################################################\n')
     fh.write('FORCE RESULTS\n')
@@ -5339,10 +5907,8 @@ class efs_calc:
       fh.write('##################\n')
       fh.write('Config ' + str(n) + '\n')
       fh.write('##################\n')
-      a = efs.key[n, 0] - 1
-      b = efs.key[n, 1]
-      for l in range(a, b):
-        std.write_file_line(fh, str(efs.labels[l]) + ':', t_pad, efs.config_forces[l,:], f_pad)
+      for l in range(0, efs.key[n, 19]):
+        std.write_file_line(fh, str(efs.labels[l]) + ':', t_pad, efs.config_forces[n, l,:], f_pad)
       fh.write('\n')
      
     fh.write('\n')
@@ -5355,7 +5921,7 @@ class efs_calc:
     t_pad = 12
     f_pad = 18
   
-    fh = open(g.dirs['results'] + '/' + 'config_stresses.txt', 'w')
+    fh = open(g.dirs['wd'] + '/efs/' + 'config_stresses.txt', 'w')
     fh.write('###############################################################')
     fh.write('###############################################################\n')
     fh.write('STRESS RESULTS\n')
@@ -5373,7 +5939,7 @@ class efs_calc:
     fh.close()
   
   def output_rss():
-    fh = open(g.dirs['results'] + '/' + 'rss_configs.txt', 'w')
+    fh = open(g.dirs['wd'] + '/efs/' + 'rss_configs.txt', 'w')
     fh.write('###############################################################\n')
     fh.write('ENERGY RESULTS\n')
     fh.write('Config Count: ' + str(efs.cc) + '\n')
@@ -5423,6 +5989,21 @@ class efs_calc:
       g.efs_known['cc'] = 0       
        
   def get_rss():
+
+# Bias so worse RSS if the density is out of range
+    """
+    f = 1.0  
+    if(bp.max_density < g.rss_max_density['min']):
+      f = 1.0 + (100.0 * (g.rss_max_density['min'] - bp.max_density))**4
+    if(bp.max_density > g.rss_max_density['max']):
+      f = 1.0 + (g.rss_max_density['scale_factor'] * (bp.max_density - 0.8))**g.rss_max_density['scale_exponent']
+    """
+    f = 1.0  
+    if(bp.max_density == 0.0):
+      f = g.rss_max_density['zero_density_factor']  
+    
+    g.rss['residual'] = []
+
     try:
 # Make Dictionary
       g.rss['efs'] = {}
@@ -5432,37 +6013,19 @@ class efs_calc:
       g.rss['efs']['force_rss'] = float(efs.force_rss)
       g.rss['efs']['stress_rss'] = float(efs.stress_rss)
       g.rss['efs']['total_rss'] = float(efs.total_rss)
-      g.rss['efs']['energy_rss_weighted'] = float(efs.energy_rss_weighted)
-      g.rss['efs']['force_rss_weighted'] = float(efs.force_rss_weighted)
-      g.rss['efs']['stress_rss_weighted'] = float(efs.stress_rss_weighted)
-      g.rss['efs']['total_rss_weighted'] = float(efs.total_rss_weighted)
+      g.rss['efs']['energy_rss_weighted'] = f * float(efs.energy_rss_weighted)
+      g.rss['efs']['force_rss_weighted'] = f * float(efs.force_rss_weighted)
+      g.rss['efs']['stress_rss_weighted'] = f * float(efs.stress_rss_weighted)
+      g.rss['efs']['total_rss_weighted'] = f * float(efs.total_rss_weighted)
     except:
 # Make Dictionary
       g.rss['efs'] = {}
       g.rss['efs']['ok'] = False
       g.rss['efs']['cc'] = 0
   
-    """
-    try:
-# Make Dictionary
-      g.rss_efs = {}
-      g.rss_efs['ok'] = True
-      g.rss_efs['cc'] = int(efs.cc)
-      g.rss_efs['energy_rss'] = float(efs.energy_rss)
-      g.rss_efs['force_rss'] = float(efs.force_rss)
-      g.rss_efs['stress_rss'] = float(efs.stress_rss)
-      g.rss_efs['total_rss'] = float(efs.total_rss)
-      g.rss_efs['energy_rss_weighted'] = float(efs.energy_rss_weighted)
-      g.rss_efs['force_rss_weighted'] = float(efs.force_rss_weighted)
-      g.rss_efs['stress_rss_weighted'] = float(efs.stress_rss_weighted)
-      g.rss_efs['total_rss_weighted'] = float(efs.total_rss_weighted)
-    except:
-# Make Dictionary
-      g.rss_efs = {}
-      g.rss_efs['ok'] = False
-      g.rss_efs['cc'] = 0
-    """ 
-  
+    for i in range(efs.residuals_size):
+      g.rss['residual'].append(f * float(efs.residuals[i]))
+
 ###########################################
 #  CLASS bp_cal
 ###########################################
@@ -5471,6 +6034,8 @@ class bp_calc:
   def run():  
   
     print("Calc Bulk Properties") 
+
+    bp_calc.output_dir()
     
 # Setup BP
     bp_calc.init()
@@ -5484,6 +6049,10 @@ class bp_calc:
 # Calculate energies of configurations for all structures
     bp.energy() 
    
+#print(bp.cc)
+#print(bp.calc_count)
+#print(bp.cc_log[0,1)
+
 # Calculate BP
     bp.calculate_bp()   
     
@@ -5494,11 +6063,16 @@ class bp_calc:
     
 # Output to File
 #b_props.bp_output()
+
+    b_props.bp_eos_plot(g.dirs['wd'] + '/bp')
     
 # Plots
 #b_props.bp_eos_plot()
 #potential.plot_fortran_potentials()
 #potential.plot_python_potentials()
+    
+  def output_dir():
+    std.make_dir(g.dirs['wd'] + '/bp')
     
   def init():
 # Log
@@ -5540,9 +6114,12 @@ class bp_calc:
     bp.set_rss_g(g.rss_weights['g'])
     bp.set_rss_e(g.rss_weights['e'])
     bp.set_rss_v(g.rss_weights['v'])
+    bp.set_rss_neg_ec(g.rss_weights['negec'])
     
   def get_results(): 
+
     bp_calc.get_known()  
+
 # Make Dictionary
     g.bp_results = {}    
     try:             
@@ -5551,6 +6128,7 @@ class bp_calc:
       g.bp_results['bp_calculations'] = []
       g.bp_results['input'] = {}
       bp_id = 0
+
       while(bp.bp_keys_i[bp_id,0] > -1):
         g.bp_results['input'][bp_id] = g.bp_ids[bp_id+1]
         g.bp_results['bp_calculations'].append({'a0': None, 'e0': None, 'b0': None, 'ec': None, 'g': None, 'e': None, 'v': None,'b0_gpa': None,'ec_gpa': None,})
@@ -5568,6 +6146,7 @@ class bp_calc:
             for j in range(6):
               g.bp_results['bp_calculations'][bp_id]['ec'][i,j] = float(bp.calc_ec[bp_id, i, j])
               g.bp_results['bp_calculations'][bp_id]['ec_gpa'][i,j] = 160.230732254 * float(bp.calc_ec[bp_id, i, j])
+        
         if(bp.known_set[bp_id, 4] == 1):
           g.bp_results['bp_calculations'][bp_id]['g'] = float(bp.calc_g[bp_id])
         if(bp.known_set[bp_id, 5] == 1):
@@ -5617,8 +6196,20 @@ class bp_calc:
       g.bp_known['ok'] = False
       g.bp_known['cc'] = 0 
     
-  def get_rss():  
-     
+  def get_rss():      
+
+    """
+# Bias so worse RSS if the density is out of range
+    f = 1.0  
+    if(bp.max_density < g.rss_max_density['min']):
+      f = 1.0 + (100.0 * (g.rss_max_density['min'] - bp.max_density))**4
+    if(bp.max_density > g.rss_max_density['max']):
+      f = 1.0 + (g.rss_max_density['scale_factor'] * (bp.max_density - 0.8))**g.rss_max_density['scale_exponent']
+    """
+    f = 1.0  
+    if(bp.max_density == 0.0):
+      f = g.rss_max_density['zero_density_factor']  
+
     try:
 # Make Dictionary
       g.rss['bp'] = {}
@@ -5626,7 +6217,7 @@ class bp_calc:
       g.rss['bp']['cc'] = int(bp.cc)
 # Totals
       g.rss['bp']['total_rss'] = float(bp.rss_total_rss)
-      g.rss['bp']['total_rss_weighted'] = float(bp.rss_total_rss_w)
+      g.rss['bp']['total_rss_weighted'] = f * float(bp.rss_total_rss_w)
 # Individual RSS
       g.rss['bp']['a0'] = float(bp.rss_by_type[0])
       g.rss['bp']['e0'] = float(bp.rss_by_type[1])
@@ -5636,51 +6227,22 @@ class bp_calc:
       g.rss['bp']['e'] = float(bp.rss_by_type[5])    
       g.rss['bp']['v'] = float(bp.rss_by_type[6])
 # Weighted RSS
-      g.rss['bp']['a0_weighted'] = float(bp.rss_by_type_w[0])
-      g.rss['bp']['e0_weighted'] = float(bp.rss_by_type_w[1])
-      g.rss['bp']['b0_weighted'] = float(bp.rss_by_type_w[2])
-      g.rss['bp']['ec_weighted'] = float(bp.rss_by_type_w[3])
-      g.rss['bp']['g_weighted'] = float(bp.rss_by_type_w[4])
-      g.rss['bp']['e_weighted'] = float(bp.rss_by_type_w[5])    
-      g.rss['bp']['v_weighted'] = float(bp.rss_by_type_w[6])
+      g.rss['bp']['a0_weighted'] = f * float(bp.rss_by_type_w[0])
+      g.rss['bp']['e0_weighted'] = f * float(bp.rss_by_type_w[1])
+      g.rss['bp']['b0_weighted'] = f * float(bp.rss_by_type_w[2])
+      g.rss['bp']['ec_weighted'] = f * float(bp.rss_by_type_w[3])
+      g.rss['bp']['g_weighted'] = f * float(bp.rss_by_type_w[4])
+      g.rss['bp']['e_weighted'] = f * float(bp.rss_by_type_w[5])    
+      g.rss['bp']['v_weighted'] = f * float(bp.rss_by_type_w[6])
     except:
 # Make Dictionary
       g.rss['bp'] = {}
       g.rss['bp']['ok'] = False
       g.rss['bp']['cc'] = 0 
            
-    """   
-    try:
-# Make Dictionary
-      g.rss_bp = {}
-      g.rss_bp['ok'] = True  
-      g.rss_bp['cc'] = int(bp.cc)
-# Totals
-      g.rss_bp['total_rss'] = float(bp.rss_total_rss)
-      g.rss_bp['total_rss_weighted'] = float(bp.rss_total_rss_w)
-# Individual RSS
-      g.rss_bp['a0'] = float(bp.rss_by_type[0])
-      g.rss_bp['e0'] = float(bp.rss_by_type[1])
-      g.rss_bp['b0'] = float(bp.rss_by_type[2])
-      g.rss_bp['ec'] = float(bp.rss_by_type[3])
-      g.rss_bp['g'] = float(bp.rss_by_type[4])
-      g.rss_bp['e'] = float(bp.rss_by_type[5])    
-      g.rss_bp['v'] = float(bp.rss_by_type[6])
-# Weighted RSS
-      g.rss_bp['a0_weighted'] = float(bp.rss_by_type_w[0])
-      g.rss_bp['e0_weighted'] = float(bp.rss_by_type_w[1])
-      g.rss_bp['b0_weighted'] = float(bp.rss_by_type_w[2])
-      g.rss_bp['ec_weighted'] = float(bp.rss_by_type_w[3])
-      g.rss_bp['g_weighted'] = float(bp.rss_by_type_w[4])
-      g.rss_bp['e_weighted'] = float(bp.rss_by_type_w[5])    
-      g.rss_bp['v_weighted'] = float(bp.rss_by_type_w[6])
-    except:
-# Make Dictionary
-      g.rss_bp = {}
-      g.rss_bp['ok'] = False
-      g.rss_bp['cc'] = 0 
-    """  
-    
+    for i in range(bp.residuals_n):
+      g.rss['residual'].append(f * float(bp.residuals[i]))
+      
 ###########################################
 #  CLASS es_cal
 ###########################################
@@ -5856,17 +6418,16 @@ class rss_calc:
 
   def run():
     print("Calc RSS") 
-    
-# Create Plot Dirs
-    std.make_dir(g.dirs['wd'] + '/rss')
-    std.make_dir(g.dirs['wd'] + '/rss/plots')
-    
+
+# Make dir
+    rss_calc.output_dir()   
+
 # Setup EFS
     efs.init()                         # Initialise (allocate arrays)
     efs_calc.set_weights()
     potential.efs_add_potentials()     # Load potentials
     configs.efs_add_config()           # Add configs
-    
+
 # Setup BP
     bp_calc.init()
     bp_calc.set_weights()
@@ -5876,11 +6437,93 @@ class rss_calc:
 # Run EFS and BP
     rss = rss_calc.run_calc()
     
-# Output to File
-    efs_calc.output_energy()
-    efs_calc.output_forces()
-    efs_calc.output_stress()
+    efs_calc.output()
+    efs_calc.save_to_file(g.dirs['wd'] + '/rss')
+
+    b_props.bp_output_terminal()
+
+    print('')     
+    print('CONFIGS')   
+    print('             e known         e calc         e_rss         e_rss_w       f_rss       f_rss_w       s_rss       s_rss_w')      
+    for n in range(efs.cc):    
+      print('Config ' + str(n+1) + ':', end="")
+      print('{:14.6f}'.format(efs.energies[n]), end="")
+      print('{:14.6f}'.format(efs.config_energy[n,2]), end="")
+      print('{:14.6f}'.format(float(efs.config_rss[n,0])), end="")
+      print('{:14.6f}'.format(float(efs.config_rss[n,4])), end="")
+      print('{:14.6f}'.format(float(efs.config_rss[n,1])), end="")
+      print('{:14.6f}'.format(float(efs.config_rss[n,5])), end="")
+      print('{:14.6f}'.format(float(efs.config_rss[n,2])), end="")
+      print('{:14.6f}'.format(float(efs.config_rss[n,6])), end="")
+      print('')     
+
+    e_rss = sum(efs.config_rss[:,0])
+    f_rss = sum(efs.config_rss[:,1])
+    s_rss = sum(efs.config_rss[:,2])
+    t_rss = e_rss + f_rss + s_rss
+
+    e_rss_w = sum(efs.config_rss[:,4])
+    f_rss_w = sum(efs.config_rss[:,5])
+    s_rss_w = sum(efs.config_rss[:,6])
+    t_rss_w = e_rss_w + f_rss_w + s_rss_w
+
+    print('All configs:                   ' + str(t_rss))
+    print('All configs (energy):          ' + str(e_rss))
+    print('All configs (force):           ' + str(f_rss))
+    print('All configs (stress):          ' + str(s_rss))
+    print('All configs weighted:          ' + str(t_rss_w))
+    print('All configs weighted (energy): ' + str(e_rss_w))
+    print('All configs weighted (force):  ' + str(f_rss_w))
+    print('All configs weighted (stress): ' + str(s_rss_w))
+
+    print('')   
+    for bp_id in range(bp.bp_configs_count):  
+      print('')   
+ 
+      print('BP  ' + str(bp_id)) 
+      print('================') 
+
+      rss_calc.print_line('a0', bp.known_alat[bp_id], bp.calc_alat[bp_id])
+      rss_calc.print_line('v0', None, bp.calc_v0[bp_id])
+      rss_calc.print_line('e0', bp.known_e0[bp_id], bp.calc_e0[bp_id])
+      rss_calc.print_line('b0', bp.known_b0[bp_id], bp.calc_b0[bp_id])
+      print('')   
+
+      print("Calculated Stiffness Matrix (GPA)")
+      for i in range(6):
+        for j in range(6):
+          print(str('{:14.6f}'.format(float(160.230732254e0 * bp.calc_ec[bp_id,i,j]))), end="")
+        print()
+      print("Known Stiffness Matrix (GPA)")
+      for i in range(6):
+        for j in range(6):
+          print(str('{:14.6f}'.format(float(160.230732254e0 * bp.known_ec[bp_id,i,j]))), end="")
+        print()
+#print(160.230732254e0 * bp.known_ec[bp_id,i,:])
+      
+      print('')   
+  
+    print('RSS:')    
+    print('a0:', g.rss['bp']['a0'], "   w: ",g.rss['bp']['a0_weighted'])
+    print('e0:', g.rss['bp']['e0'], "   w: ",g.rss['bp']['e0_weighted'])
+    print('b0:', g.rss['bp']['b0'], "   w: ",g.rss['bp']['b0_weighted'])
+    print('ec:', g.rss['bp']['ec'], "   w: ",g.rss['bp']['ec_weighted'])
+    print('g:', g.rss['bp']['g'], "   w: ",g.rss['bp']['g_weighted'])
+    print('e:', g.rss['bp']['e'], "   w: ",g.rss['bp']['e_weighted'])
+    print('v:', g.rss['bp']['v'], "   w: ",g.rss['bp']['v_weighted'])
+    print('')
+    print('')
+    print('RSS: ' + str(rss))
+    print('')
+    print('')
+    print('Max Density:', bp.max_density, efs.max_density)
+    print('')
+    print('')
+#print(g.rss)
+    print('')
     
+    exit()
+
 # Plots
 #potential.plot_fortran_potentials()
 #potential.plot_python_potentials()
@@ -5889,43 +6532,13 @@ class rss_calc:
     
     b_props.bp_output()
     b_props.bp_eos_plot(g.dirs['wd'] + '/rss/plots')
-    
-    print('')     
-    print('CONFIGS')    
-    for n in range(efs.cc):    
-      print('Config ' + str(n+1) + ':', efs.config_energy[n,2], efs.energies[n], (efs.config_energy[n,2]-efs.energies[n])**2)
-    print('All configs:                   ' + str(efs.total_rss))
-    print('All configs (energy):          ' + str(efs.energy_rss))
-    print('All configs (force):           ' + str(efs.force_rss))
-    print('All configs (stress):          ' + str(efs.stress_rss))
-    print('All configs weighted:          ' + str(efs.total_rss_weighted))
-    print('All configs weighted (energy): ' + str(efs.energy_rss_weighted))
-    print('All configs weighted (force):  ' + str(efs.force_rss_weighted))
-    print('All configs weighted (stress): ' + str(efs.stress_rss_weighted))
-    
-    print('')   
-    for bp_id in range(bp.bp_configs_count):  
-      print('BP') 
-      print('alat:', bp.calc_alat[bp_id], bp.known_alat[bp_id], (bp.calc_alat[bp_id] - bp.known_alat[bp_id])**2)
-      print('v0:', bp.calc_v0[bp_id])
-      print('e0:', bp.calc_e0[bp_id], bp.known_e0[bp_id], (bp.calc_e0[bp_id] - bp.known_e0[bp_id])**2)
-      print('b0:', bp.calc_b0[bp_id], bp.known_b0[bp_id], (bp.calc_b0[bp_id] - bp.known_b0[bp_id])**2)
-      print("Calculated Stiffness Matrix (GPA)")
-      for i in range(6):
-        print(160.230732254e0 * bp.calc_ec[bp_id,i,:])
-      print("Known Stiffness Matrix (GPA)")
-      for i in range(6):
-        print(160.230732254e0 * bp.known_ec[bp_id,i,:])
-  
-    print('')
-    print('RSS: ' + str(rss))
-    
-    print('')
-    print(g.rss)
-    print('')
+
+  def output_dir():
+    std.make_dir(g.dirs['wd'] + '/rss')  
+    std.make_dir(g.dirs['wd'] + '/rss/plots')
     
 # ASSUMES EFS AND BP ALREADY SET UP
-  def run_calc(): 
+  def run_calc(save_in_top=True): 
 # START TIME
     s = time.time()  
   
@@ -5940,30 +6553,32 @@ class rss_calc:
       bp_cc = int(bp.cc)
     except:  
       bp_cc = 0
-  
-# RUN CALCULATIONS
-    if(g.rss_weights['config'] != 0.0 and efs_cc > 0):
-      efs.rss_calc()
-      efs_calc.get_rss()
-    if(g.rss_weights['bp'] != 0.0 and bp_cc > 0):
-      bp.energy()
-      bp.calculate_bp()  
-  
-# LOAD CALCULATED RESULTS
-    efs_calc.get_results()
-    bp_calc.get_results()
-  
-# LOAD RSS RESULTS
-    efs_calc.get_rss()
-    bp_calc.get_rss()
 
+# RUN CALCULATIONS
+    efs.rss_calc()
+    bp.energy()
+    bp.calculate_bp()  
+
+# GET RESULTS
+    efs_calc.get_results()
+    efs_calc.get_rss()   
+    bp_calc.get_results()
+    bp_calc.get_rss()
+ 
+    g.rss['residual'] = numpy.asarray(g.rss['residual'])
+    
 # SUM WEIGHTED RSS
     rss = 0.0
     if(g.rss['efs']['ok']):
       rss = rss + g.rss['efs']['total_rss_weighted']
     if(g.rss['bp']['ok']):
       rss = rss + g.rss['bp']['total_rss_weighted'] 
-    
+
+#print("Python EFS total_rss_weighted", g.rss['efs']['total_rss_weighted'])
+#print("Python BP total_rss_weighted", g.rss['bp']['total_rss_weighted'])
+#print( g.rss['efs']['total_rss_weighted'] + g.rss['bp']['total_rss_weighted'])
+#print(sum(g.rss['residual']))
+
 # Increment counter
     if(g.rss['counter'] == None):
       g.rss['counter'] = 1
@@ -5978,28 +6593,54 @@ class rss_calc:
       g.rss['counter'] = g.rss['counter'] + 1
       return None
       
-# LOG
-#rss = {'current': None, 'best': None, 'counter': None, 'since_improvement': None, 'log': []}
-    g.rss['current'] = rss
-    g.rss['log'].append(rss)
-    
 # KEEP LOG OF BEST RSS
     if(g.rss['since_improvement'] == None):
       g.rss['since_improvement'] = 0
     g.rss['since_improvement'] = g.rss['since_improvement'] + 1
+    g.rss['current_bp_max_density'] = copy.deepcopy(bp.max_density)
+    g.rss['current_efs_max_density'] = copy.deepcopy(efs.max_density)
     if(g.rss['best'] == None or g.rss['current'] < g.rss['best']):
       main.log('Best rss: ' + str(g.rss['best']) + ' (since last: ' + str(g.rss['since_improvement']) + ')')
+      g.rss['best_bp_max_density'] = copy.deepcopy(bp.max_density)
+      g.rss['best_efs_max_density'] = copy.deepcopy(efs.max_density)
       g.rss['best'] = g.rss['current']
       g.rss['since_improvement'] = 0
       
       g.efs_results_best = copy.deepcopy(g.efs_results)
       g.bp_results_best = copy.deepcopy(g.bp_results)
+    
+    """
+# TOP 100 List
+    if(save_in_top):
+      list_len = g.fitting['top_parameters']
+
+# COPY ARRAYS
+      p_now = numpy.copy(potential.get_parameters())
+      efs_results = copy.deepcopy(g.efs_results)
+      bp_results = copy.deepcopy(g.bp_results)
+
+      if(len(g.top_parameters) == 0):
+        g.top_parameters.append([rss, p_now, efs_results, bp_results, bp.max_density, efs.max_density])
+      else:    
+        i = 0
+        while(i<len(g.top_parameters)):
+          if(rss < g.top_parameters[i][0]):
+            break
+          elif(rss == g.top_parameters[i][0] and g.top_parameters[i][1].all() == p_now.all()):
+            i = list_len
+            break
+          else:
+            i = i + 1
+        if(i < list_len):
+          g.top_parameters.insert(i, [rss, p_now, efs_results,bp_results, bp.max_density, efs.max_density])
+        if(len(g.top_parameters) > list_len):
+          g.top_parameters.pop()
+    """ 
       
 # END TIME
-    e = time.time()  
-    
+    e = time.time()      
     dt = e - s
-    
+
 #efs_cc bp_cc
     g.benchmark['total_atoms'] = g.benchmark['total_atoms'] + (bp.total_atoms + efs.total_atoms)
     g.benchmark['total_interactions'] = g.benchmark['total_interactions'] + (bp.l_nl_size + efs.l_nl_size)
@@ -6013,205 +6654,644 @@ class rss_calc:
     return rss
     
   def reset_rss(): 
-    g.rss = {'current': None, 'best': None, 'counter': None, 'since_improvement': None, 'log': [], 'efs': {'ok': False, 'cc': 0,}, 'bp': {'ok': False, 'cc': 0,}}
-    
+    g.rss = {'current': None, 
+             'best': None, 
+             'counter': None, 
+             'since_improvement': None, 
+             'top': [], 
+             'efs': {'ok': False, 'cc': 0,}, 
+             'bp': {'ok': False, 'cc': 0,}
+            }
+
+  def print_line(label, known, calc):
+    while(len(label)<14):
+      label = label + " "
+
+    if(known == None):
+      print(label, end="")
+      print("              ", end="")
+      print(str('{:14.6f}'.format(calc)), end="")
+      print()
+    elif(calc == None):
+      print(label, end="")
+      print(str('{:14.6f}'.format(known)), end="")
+      print("              ", end="")
+      print()
+    elif(not(known == None and calc == None)):
+      print(label, end="")
+      print(str('{:14.6f}'.format(known)), end="")
+      print(str('{:14.6f}'.format(calc)), end="")
+      print(str('{:14.6f}'.format((calc - known)**2)), end="")
+      print()
+
 ###########################################
 #  CLASS p
 ###########################################
 class pf:
 
-  start_time = 0
-
-  def run():    
+  start_time = 0.0
+  end_time = 0.0  
   
+  def run():   
+  
+# Start Time
     pf.start_time = time.time()
   
+# Log
     main.log_title("Potential Fit")
-    
+      
+# Set up EFS and BP modules and g.pfdata
+    pf_init.run()
+
 # Create Plot Dirs
     std.make_dir(g.dirs['wd'] + '/fitting')
-    
-# Set up EFS and BP modules
-    pf.set_up()
-    
-# Make data structure
-    g.pfdata = pf_data.make()
-    
-# Print start screen
-    pf.startup()
-    
-# Output
-    potential.plot_python_potentials(g.dirs['wd'] + '/plots/pots/start_potential')
+    pf.fh = open(g.dirs['wd'] + '/fitting/fitting_summary.txt', 'w')
 
-# Make Pool
-    pf_parameters.setup_pool()
-    pf_parameters.make_pool()
-   
-# Run
-    pf.run_fit()
+# Run once with initial parameters
+    g.pfdata['stage'] = 'START - INITIAL PARAMETERS'
+    g.pfdata['stage_brief'] = 'START'
+    p = potential.get_start_parameters()
+    pf_potential.update(p)
+    rss = pf.get_rss()
+    pf.set_current(p)
+
+# Load saved
+    pf_saved.run()
+
+#pf_saa.run()
+
+    for fit in g.fit:
+      pf.fit = fit
+      if(pf.fit['type'].lower() == "random"):        
+        pf_random.run()
+      elif(pf.fit['type'].lower() == "sa"): 
+        pf_sa.run()
+      elif(pf.fit['type'].lower() == "ga"): 
+        pf_genetic.run()
+      elif(pf.fit['type'].lower() == "ng"): 
+        pf_ng.run()
+
+    pf_top.save(g.dirs['wd'] + '/save', 'top_parameters.txt')
+
+# Output
+    potential_output.full()
+          
+# End Time
+    pf.end_time = time.time()
+  
+# Log fit time
+    main.log("Fit time: ", str(pf.end_time - pf.start_time))
+
+    print(g.top_parameters[0][0])
+    print(g.top_parameters[0][1])
+    print(g.top_parameters[0][2])
+    print(g.top_parameters[0][3])
+    print(g.top_parameters[0][4])
+    print(g.top_parameters[0][5])
+
+# Final
+    pf_final.run()
+
+#pf_ng.run()
+
+# Enhance top
+#pf_setop.run()
+
+# Run Genetic
+#pf_genetic.run()
     
-# Save Results
-    pf.save()
-    
+# Run Sim Annealing on Best Result
+#pf_sa.run()
+
+#pf_gd.run()
+#pf_steps.run()
+  
+#pf_ng.run()
+
+# Display
+#g.pfdata['stage'] = 'Finished'
+#display.finish()
+      
 ######################################################
 # SET UP - initialise EFS, BP and any other modules
 #          and run first calc
 ######################################################
-  def set_up():  
-# If a spline fit, convert into a spline with the set number of nodes
-    for fn in range(len(g.pot_functions['functions'])):       
-      if(g.pot_functions['functions'][fn]['fit_type'] == 1):     
-        potential.vary_tabulated_points(fn)
 
-# Setup EFS
-    efs.init()                         # Initialise (allocate arrays)
-    potential.efs_add_potentials()     # Load potentials
-    configs.efs_add_config()           # Add configs
+  def set_current(p):
+    g.pfdata['p']['current'] = numpy.copy(p)
     
-# Setup BP
-    bp_calc.init()
-    potential.bp_add_potentials()
-    b_props.bp_add()
-    bp_calc.get_known()
-    
-# Rescale density function
-    if(g.fit['rescale_density'] == 2):
-      rescale_density.run()      
-    
-  def startup():
-    display.clear() 
-    
-    print("###################################################")      
-    print("Starting RSS: ", g.pfdata['rss']['start'])   
-    print("###################################################") 
-    print("Potential Parameters")
-    print("###################################################")   
-    potential.print_parameters() 
-    
-    time.sleep(2.5)
-
-  def run_fit():
-  
-    for c in range(g.fit['cycles']):
-      pf_cycle.run()
-  
-  def get_rss(top=True):  
-    rss = rss_calc.run_calc()  
-    
+  def get_rss(save_in_top=True):  
+    rss = rss_calc.run_calc(save_in_top)  
+        
     g.pfdata['rss']['current'] = rss
     g.pfdata['rss']['counter'] += 1
+    g.pfdata['max_density']['bp_current'] = bp.max_density
+    g.pfdata['max_density']['efs_current'] = efs.max_density
     
-    if(rss is not None):    
-# Hash of Parameters
-      h = pf.param_hash(g.pfdata['params']['current'])    
-      
+# If successful
+    if(rss is not None):   
+    
 # Store Details
       g.pfdata['rss']['counter_successful'] += 1
       g.pfdata['rss']['since_improvement'] += 1    
       if(g.pfdata['rss']['start'] == None):
         g.pfdata['rss']['start'] = rss
       if(g.pfdata['rss']['best'] == None or rss < g.pfdata['rss']['best']):
-        g.pfdata['params']['best'][:] = copy.deepcopy(g.pfdata['params']['current'])
-        g.pfdata['best_hash'] = h
+        g.pfdata['p']['best'] = numpy.copy(g.pfdata['p']['current'])
         g.pfdata['rss']['best'] = rss
-        g.pfdata['bp_best'] = copy.deepcopy(g.bp_results)        
+        g.pfdata['bp']['best'] = copy.deepcopy(g.bp_results)        
         g.pfdata['rss']['since_improvement'] = 0
+        g.pfdata['max_density']['bp_best'] = bp.max_density
+        g.pfdata['max_density']['efs_best'] = efs.max_density
         
-# Fill in top
-      if(top):
-        pf.top(g.pfdata['params']['current'], rss)
+# Save in top
+      if(save_in_top):
+        list_len = g.fitting['top_parameters']
+
+# COPY ARRAYS
+        p_now = numpy.copy(potential.get_parameters())
+        efs_results = copy.deepcopy(g.efs_results)
+        bp_results = copy.deepcopy(g.bp_results)
+        rss_details = copy.deepcopy(g.rss)
+
+        if(len(g.top_parameters) == 0):
+          g.top_parameters.append([rss, p_now, efs_results, bp_results, bp.max_density, efs.max_density, rss_details])
+        else:    
+          i = 0
+          while(i<len(g.top_parameters)):
+            if(rss < g.top_parameters[i][0]):
+              break
+            elif(rss == g.top_parameters[i][0] and g.top_parameters[i][1].all() == p_now.all()):
+              i = list_len
+              break
+            else:
+              i = i + 1
+          if(i < list_len):
+            g.top_parameters.insert(i, [rss, p_now, efs_results,bp_results, bp.max_density, efs.max_density, rss_details])
+          if(len(g.top_parameters) > list_len):
+            g.top_parameters.pop()    
 
 # DISPLAY
-    display.output()    
+    pf_display.output()    
     return rss
     
-  def top(p, rss):  
-    g.pfdata['top']['counter'] += 1
-    if(g.pfdata['top']['filled']):
-      if(rss < g.pfdata['top']['rss'][-1]):
-        g.pfdata['top']['rss'][-1] = copy.deepcopy(rss)
-        g.pfdata['top']['p'][-1,:] = copy.deepcopy(p)
-    else:
-      for n in range(g.pfdata['top']['size']):
-        breakout = False
-        if(g.pfdata['top']['rss'][n] == -1.0):
-          g.pfdata['top']['rss'][n] = copy.deepcopy(rss)
-          g.pfdata['top']['p'][n,:] = copy.deepcopy(p)
-          breakout = True
-        if(breakout):
-          break
-      if(breakout == False):
-        g.pfdata['top']['filled'] = True
+  def summary_line(opt_type, t_start, t_end, rss_start, rss_end):
     
-    sort.sort_1d_dp_asc(g.pfdata['top']['rss'][:])
-    g.pfdata['top']['rss'] = sort.apply_keytable_1d_dp(g.pfdata['top']['rss'])
-    g.pfdata['top']['p'] = sort.apply_keytable_2d_dp(g.pfdata['top']['p'])
+    t_taken = str('{:6.3f}'.format(t_end - t_start))
+    while(len(t_taken)<16):
+      t_taken = t_taken + " "
+    
+    rss_start = str('{:12.4e}'.format(rss_start))
+    while(len(rss_start)<16):
+      rss_start = rss_start + " "
+    
+    rss_end = str('{:12.4e}'.format(rss_end))
+    while(len(rss_end)<16):
+      rss_end = rss_end + " "
 
-#top = {'size': top_size, 'rss': numpy.zeros((top_size,),), 'p': numpy.zeros((top_size, width,),),}
-#pass
-  
-    """
-    p = g.pfdata['params']['current']
-    for i in range(10):
-      if(rss == g.pfdata['top_ten'][i][0]):
-        return 0
-      if(g.pfdata['top_ten'][i][0] == None):
-        g.pfdata['top_ten'][i][0] = rss
-        g.pfdata['top_ten'][i][1] = p
-        return 0
-      if(rss < g.pfdata['top_ten'][i][0]):
-        if(i < 9):
-          g.pfdata['top_ten'][i+1:9] = copy.deepcopy(g.pfdata['top_ten'][i:8])
-        g.pfdata['top_ten'][i][0] = rss
-        g.pfdata['top_ten'][i][1] = p
-        return 0
-    """
+    opt_type = str(opt_type)
+    while(len(opt_type)<30):
+      opt_type = opt_type + " "
+
+    pf.fh.write(opt_type + rss_start + "-->  " + rss_end + "  " + t_taken + "\n")
     
-  def print_top_ten():  
-    print()  
-    print("=====================")  
-    for i in range(10):
-      print(i, g.pfdata['top_ten'][i][0])
-    print("=====================")  
-    print()  
-    print()  
-    
-  def param_hash(p):
-    hstr = ''
+###########################################
+#  CLASS g
+###########################################
+class gd:
+
+  precision = 1.0e-6
+  max_iterations = 10
+  h = 1.0e-8
+  momentum = 0.1
+  p_in = None
+  rss_in = None
+  p_out = None
+  rss_out = None
+  fix = None
+
+# Central Difference
+  def df(p):
+    d = numpy.zeros((len(p),),)
     for i in range(len(p)):
-      hstr = hstr + str(p[i])
-    return hashlib.md5(hstr.encode()).hexdigest()
+      if(gd.fix[i] == 0.0):
+        d[i] = 0.0
+      else:
+        p_f = numpy.copy(p)
+        p_f[i] = p_f[i] + gd.h
+        p_b = numpy.copy(p)
+        p_b[i] = p_b[i] - gd.h
+        d[i] = (gd.rss(p_f) - gd.rss(p_b)) / (2 * gd.h)
+    return d
+
+  def line_search(p, dp):
+# Back track
+    best_rss = gd.rss_in
+    best_gamma = 0.0
+    gamma = 20.0 * gd.last_gamma 
+    if(gamma <1.0e-8):
+      gamma <1.0e-6
+    loop = True
+    n = 0
+    while(gamma > 1.0e-12):
+      n = n + 1
+      p_test = p - gamma * dp
+      rss = gd.rss(p_test)
+      gamma = 0.5 * gamma
+      if(best_rss is None or rss < best_rss):
+        p_best = p_test
+        best_rss = rss
+        best_gamma = gamma
+    gd.last_gamma = best_gamma
+    return best_rss, best_gamma * dp
     
-  def save():  
+# Gradient Descent
+  def opt(f_rss, p0, fix=None):
+    gd.rss = f_rss   
+    gd.last_gamma = 1.0
+    p = p0
+    
+    if(type(fix) == numpy.ndarray):
+      if(len(p) == len(fix)):
+        for i in range(len(fix)):
+          if(fix[i] != 0.0):
+            fix[i] = 1.0
+      else:
+        fix = numpy.zeros((len(p0),),)
+        fix[:] = 1.0
+    else:
+      fix = numpy.zeros((len(p0),),)
+      fix[:] = 1.0
+    gd.fix = fix  
+    gd.p_in = numpy.copy(p)
+    gd.rss_in = gd.rss(p)
+    
+    best_p = numpy.copy(gd.p_in)
+    best_rss = gd.rss_in
+
+    n = 0
+    last_dp = 0.0
+    while(n < gd.max_iterations):
+      df = gd.df(p)
+      rss, dp = gd.line_search(p, df)
+      if(rss > best_rss):
+        n = gd.max_iterations
+      else:
+        p = p - (gd.momentum * last_dp + dp)
+        last_dp = dp
+        rss = gd.rss(p)
+        best_p = numpy.copy(p)
+        best_rss = rss
+        n = n + 1
+        
+    gd.p_out = numpy.copy(best_p)
+    gd.rss_out = best_rss
+    
+    return p, rss
+
+###########################################
+#  CLASS pf_star
+###########################################
+class pf_start:
+
+  def run():
+  
+    pf_display.stage = 'START - LOAD SAVED'
+    
+    p = potential.get_start_parameters()
+    pf_potential.update(p)
+    rss = pf.get_rss()
+
+#pf_pgradient.run()
+
+# Load saved parameters
+    params = pf_top.load(g.dirs['wd'] + '/save', 'top_parameters.txt')    
+    for p in params:
+      pf_potential.update(p)
+      rss = pf.get_rss()
+
+###########################################
+#  CLASS pf_step
+###########################################
+class pf_steps:
+
+  def run():
+
+    p = numpy.copy(g.pfdata['params']['start'])
+    rss = pf.get_rss()
+    
+    for n in range(5):
+      p_new = numpy.copy(p)
+      p_new = p_new + pf_steps.random_step()
+
+      pf_potential.update(p_new)
+      rss_new = pf.get_rss()
+  
+      if(rss_new < rss):
+        p = numpy.copy(p_new)
+        rss_new = rss
+
+  def random_step(m = 0.01):
+# Get random parameters 0 to 1
+    return m * (0.5 - numpy.random.rand(g.pfdata['params']['count']))
+    
+  def process_list(p_list, steps = 100):
+
+    p_new_list = []
+
+    for n in range(len(p_list)):
+
+      g.pfdata['stage'] = 'STEP_' + str(n+1)
+
+      p_current = numpy.copy(p_list[n])
+      rss_current = pf.get_rss()
+      rss_start = rss_current
+
+      for n in range(steps):
+        p_new = numpy.copy(p_current)
+        p_new = p_new + pf_steps.random_step(0.0001)
+
+        pf_potential.update(p_new)
+        rss = pf.get_rss(False)
+
+        if(rss < rss_current):
+          p_current = p_new
+          rss_current = rss
+      
+      p_new_list.append(p_current)
+
+    return p_new_list
+
+###########################################
+#  CLASS pf_geneti
+###########################################
+class pf_genetic:
+
+  count = 0
+  start_time = 0
+  variation_factor = 1.0
+
+  def run():    
+    if(pf.fit['gens'] == 0):
+      return 0
+    
+    g.pfdata['stage'] = 'Genetic Algorithm ' + str(pf_genetic.count)
+    g.pfdata['stage_brief'] = 'GA' + str(pf_genetic.count)
+
+#
+    t_start = time.time()
+    start_best_rss = g.pfdata['rss']['best'] 
+    pf_genetic.start_time = time.time()
+    pf_genetic.count = pf_genetic.count + 1
+  
+    main.log_title("Genetic Fit")   
+    
+# Load from input
+    pf_genetic.width = g.pfdata['psize']
+    pf_genetic.pop_size = pf.fit['pop_size']
+    pf_genetic.fresh_size = pf.fit['fresh_size']
+    pf_genetic.generations = pf.fit['gens']
+    pf_genetic.no_clone_var = pf.fit['no_clone_var']
+    pf_genetic.gen_variation_multiplier = pf.fit['gen_variation_multiplier']
+
+# Force to be even
+    if(pf_genetic.pop_size % 2 != 0):
+      pf_genetic.pop_size = pf_genetic.pop_size + 1
+    if(pf_genetic.fresh_size % 2 != 0):
+      pf_genetic.fresh_size = pf_genetic.fresh_size + 1
+
+# Calculate other sizes
+    pf_genetic.children_size = pf_genetic.pop_size + 2 * pf_genetic.fresh_size
+    pf_genetic.merge_size = 2 * pf_genetic.pop_size + 3 * pf_genetic.fresh_size
+    
+# Set Up Pop + Fresh arrays
+    pf_genetic.pop = numpy.zeros((pf_genetic.pop_size, pf_genetic.width,),)
+    pf_genetic.pop_rss = numpy.zeros((pf_genetic.pop_size,),)
+    pf_genetic.fresh = numpy.zeros((pf_genetic.fresh_size, pf_genetic.width,),)
+    pf_genetic.fresh_rss = numpy.zeros((pf_genetic.fresh_size,),)
+    pf_genetic.children = numpy.zeros((pf_genetic.children_size, pf_genetic.width,),)
+    pf_genetic.children_rss = numpy.zeros((pf_genetic.children_size,),)
+    pf_genetic.pop_merged = numpy.zeros((pf_genetic.merge_size, pf_genetic.width,),)
+    pf_genetic.pop_merged_rss = numpy.zeros((pf_genetic.merge_size,),)
+  
+# Parents array
+    pf_genetic.parents = numpy.arange(pf_genetic.pop_size)
+
+# Initialise population
+    g.pfdata['stage'] = 'Genetic Fit ' + str(pf_genetic.count) + ' Initialising'
+  
+# Copy out parameters from "top_parameters"
+    start_parameters = []
+    if(len(g.top_parameters) > 0):
+      for i in range(len(g.top_parameters)):
+        new_p = numpy.copy(g.top_parameters[i][1][:])
+        start_parameters.append(new_p)
+    else:
+      p = potential.get_start_parameters()
+      new_p = numpy.copy(p)
+      start_parameters.append(new_p)
+
+# Load start parameters into pop, and fill remaining with random parameters
+    n = 0
+    for pn in range(pf_genetic.pop_size):
+      loop = True
+      while(loop): 
+        n = n + 1
+        if(n <= len(start_parameters)):
+          pf_genetic.pop[pn, :] = start_parameters[n-1][:]
+        else:
+          pf_genetic.pop[pn, :] = pf_parameters.random_p()
+        
+# Try - if it fails or rss == None, try next
+        pf_potential.update(pf_genetic.pop[pn, :])
+        try:
+# Update
+          rss = pf.get_rss()
+          if(rss is not None):
+            loop = False
+            pf_genetic.pop_rss[pn] = rss
+        except:
+          pass
+
+###################################
+# LOOP THROUGH GENERATIONS
+###################################
+
+    pf_genetic.generation = 0
+    for gen in range(pf_genetic.generations):
+      pf_genetic.generation = pf_genetic.generation + 1
+      pf_genetic.run_gen()
+
+# End
+    pf.summary_line("GENETIC ALGORITHM " + str(pf_genetic.count), t_start, time.time(), start_best_rss,  g.pfdata['rss']['best'])
+    pf_save.top("GENETIC_ALGORITHM_" + str(pf_sa.count))
+  
+  def run_gen():
+
+    ss = 'Genetic Fit ' + str(pf_genetic.count) + ' Gen ' + str(pf_genetic.generation) + ' '  
+
+# Shuffle parents array
+    numpy.random.shuffle(pf_genetic.parents) 
+
+    c = 0
+# Breed Population
+    g.pfdata['stage'] = ss + 'Breed Population'
+    for p in range(pf_genetic.pop_size // 2):  
+      loop = True
+      while(loop):
+        loop = pf_genetic.breed_event(p, c, 'p+p')      
+      c = c + 2
+
+# Make Fresh
+    g.pfdata['stage'] = ss + 'Initialising Fresh Population'   
+    pf_genetic.make_fresh()
+
+# Shuffle parents array
+    numpy.random.shuffle(pf_genetic.parents) 
+
+# Breed Population-Fresh
+    g.pfdata['stage'] = ss + 'Breed With Fresh Population'  
+    for p in range(pf_genetic.fresh_size):  
+      loop = True
+      while(loop):
+        loop = pf_genetic.breed_event(p, c, 'p+f')      
+      c = c + 2
+
+# Merge populations and select top to form next generation
+    g.pfdata['stage'] = ss + 'Merge Populations'   
+    pf_genetic.merge()
+
+# Load best back into population
+    pf_genetic.pop[:, :] = pf_genetic.pop_merged[0:pf_genetic.pop_size, :]
+    pf_genetic.pop_rss[:] = pf_genetic.pop_merged_rss[0:pf_genetic.pop_size]
    
-    main.log_hr()
-    main.log("End of fit")
-    main.log("Time spent in potfit:   " + str(time.time() - pf.start_time))
-    main.log("RSS Counter:            " + str(g.rss['counter']))
-    main.log("Configs:                " + str(g.benchmark['configs']))
-    main.log("Total atoms:            " + str(g.benchmark['total_atoms']))
-    main.log("Total Interactions:     " + str(g.benchmark['total_interactions']))
-    main.log("Time:                   " + str(g.benchmark['total_time']))
-    main.log("Configs/Sec:            " + str(g.benchmark['configspersec']))
-    main.log("Atoms/Sec:              " + str(g.benchmark['atomspersec']))
-    main.log("Interactions/Sec:       " + str(g.benchmark['interationspersec']))
+# Change variation for next generation
+    pf_genetic.variation_factor = pf_genetic.variation_factor * pf_genetic.gen_variation_multiplier
+
+  def breed_event(p, c, opt):
+    pc = pf_genetic.width
     
-    main.log_hr()
-    main.log("Parameters")    
-    for i in range(len(g.pfdata['params']['best'])):
-      main.log("P" + str(i) + " " + str(g.pfdata['params']['best'][i]))
-    main.log_hr()
-   
-# Load best
-    pf_potential.update(g.pfdata['params']['best'][:])
+    pa = pf_genetic.parents[p]
+    if(opt == 'p+p'):  
+      pb = pf_genetic.parents[p + pf_genetic.pop_size // 2]
+      pb_array = 'pop'
+    if(opt == 'p+f'): 
+      pb = p
+      pb_array = 'fresh'
     
-# Display
-    g.pfdata['stage'] = 'Finished'
-    display.finish()
+    ca = c
+    cb = c + 1
     
-# Output
-    potential_output.full()
+# Breed
+    state = pf_genetic.get_state()
+    for i in range(pc):
+      state = pf_genetic.get_state(state)
+      if(state):
+        pf_genetic.children[ca, i] = pf_genetic.pop[pa, i]
+        if(pb_array == 'pop'):
+          pf_genetic.children[cb, i] = pf_genetic.pop[pb, i]
+        elif(pb_array == 'fresh'):
+          pf_genetic.children[cb, i] = pf_genetic.fresh[pb, i]
+      else:     
+        if(pb_array == 'pop'):
+          pf_genetic.children[ca, i] = pf_genetic.pop[pb, i]
+        elif(pb_array == 'fresh'):
+          pf_genetic.children[ca, i] = pf_genetic.fresh[pb, i]
+        pf_genetic.children[cb, i] = pf_genetic.pop[pa, i]
+      
+# Mutate
+#g.pfdata['params']['children'][ca, :] = pf_genetic.mutate(g.pfdata['params']['children'][ca, :], g.fit['mutate_chance'])
+#g.pfdata['params']['children'][cb, :] = pf_genetic.mutate(g.pfdata['params']['children'][cb, :], g.fit['mutate_chance'])
     
+# No clones - Child A
+    for pn in range(pf_genetic.pop_size):
+      if((pf_genetic.children[ca, :].all() == pf_genetic.pop[pn,:]).all()):
+        r = numpy.random.rand(pc)   
+        pf_genetic.children[ca, :] = pf_parameters(pf_genetic.children[ca, :],  pf_genetic.no_clone_var)
+        break
+        
+# No clones - Child B
+    for pn in range(pf_genetic.pop_size):
+      if((pf_genetic.children[cb, :].all() == pf_genetic.pop[pn,:]).all()):
+        r = numpy.random.rand(pc)   
+        pf_genetic.children[cb, :] = pf_parameters(pf_genetic.children[cb, :],  pf_genetic.no_clone_var)
+        break
+
+# Check the children actually give valid parameters
+    loop = False     
+    pf_potential.update(pf_genetic.children[ca, :])
+    rss = pf.get_rss()
+    if(rss is None):
+      loop = True
+      
+    pf_potential.update(pf_genetic.children[cb, :])
+    rss = pf.get_rss()
+    if(rss is None):
+      loop = True
+      
+    if(loop == False):
+      pf_genetic.children_rss[ca] = rss
+      pf_genetic.children_rss[cb] = rss
+      
+# Loop again or not
+    return loop
+    
+  def get_state(state = None):
+    if(state == None):
+      if(random.uniform(0.0, 100.0) > 50.0):
+        return True
+      return False
+    else:
+      if(random.uniform(0.0, 100.0) > 50.0):
+        if(state):
+          return False
+        return True
+      return state
+
+  def make_fresh():    
+
+    for p in range(pf_genetic.fresh_size):
+      loop = True
+      while(loop):
+        try:
+          rn = min(len(g.top_parameters) - 1, numpy.floor((len(g.top_parameters) + 1) * random.uniform(0.0, 1.0)**3))
+          pbest = numpy.copy(g.top_parameters[0][1])
+          pf_genetic.fresh[p, :] = pf_parameters.random_p(pbest, pf_genetic.variation_factor)
+
+#pf_genetic.fresh[p, :] = numpy.copy(g.top_parameters[0][1])
+
+          pf_potential.update(pf_genetic.fresh[p, :])
+          rss = pf.get_rss()
+          if(rss is not None):
+            loop = False
+            pf_genetic.fresh_rss[p] = rss
+        except:
+          pass 
+
+# Used to merge parents, fresh and all children into ordered array
+  def merge():
+    ps = pf_genetic.pop_size
+    fs = pf_genetic.fresh_size
+    cs = pf_genetic.pop_size + 2 * pf_genetic.fresh_size
+      
+# Reset array
+    pf_genetic.pop_merged[:,:] = 0.0
+    pf_genetic.pop_merged[0:ps,:] = pf_genetic.pop[:,:]   
+    pf_genetic.pop_merged[ps:ps+fs,:] = pf_genetic.fresh[:,:]   
+    pf_genetic.pop_merged[ps+fs:ps+fs+cs,:] = pf_genetic.children[:,:]  
+    pf_genetic.pop_merged_rss[:] = 0.0
+    pf_genetic.pop_merged_rss[0:ps] = pf_genetic.pop_rss[:] 
+    pf_genetic.pop_merged_rss[ps:ps+fs] = pf_genetic.fresh_rss[:] 
+    pf_genetic.pop_merged_rss[ps+fs:ps+fs+cs] = pf_genetic.children_rss[:] 
+        
+# Sort
+    pf_genetic.sort_merged()
+    
+  def sort_merged():
+    sort.sort_1d_dp_asc(pf_genetic.pop_merged_rss[:])
+    pf_genetic.pop_merged_rss = sort.apply_keytable_1d_dp(pf_genetic.pop_merged_rss)
+    pf_genetic.pop_merged = sort.apply_keytable_2d_dp(pf_genetic.pop_merged)
+
 ###########################################
 #  CLASS displa
 ###########################################
@@ -6239,6 +7319,7 @@ class display:
       display.output_2()
     if(output == 3):
       display.output_3()
+#print(g.rss)
     
   def output_1():
   
@@ -6268,6 +7349,8 @@ class display:
     print("# Timer:            " + display.pad_l(time.time() - g.times['start'], 16))
     print("# RSS: ", display.pad_r(g.pfdata['rss']['current'], 20), end="          ")
     print("Best: ", display.pad_r(g.pfdata['rss']['best'], 20), end=" ")
+    print()    
+    print("Max Density: ", display.pad_r(bp.max_density, 23), display.pad_r(efs.max_density, 23), end=" ")
     print()
     print("#        ID   a0       e0       B0       C11      C12      C44 ")
     try:
@@ -6320,7 +7403,8 @@ class display:
     display.header_3()
 
 # PRINT RSS
-    print("# RSS:                ", g.pfdata['rss']['current'], "  [",g.pfdata['rss']['best'],"]") 
+    print("# RSS:                ", g.pfdata['rss']['current'], "  [",g.pfdata['rss']['best'],"]   (Max density: ", g.rss['current_bp_max_density'],  g.rss['current_bp_max_density'], ")") 
+    print("# RSS (BEST):         ", g.pfdata['rss']['best'], "   (Max density: ", g.rss['best_bp_max_density'],  g.rss['best_bp_max_density'], ")") 
     display.print_line()
 
 # Best BP
@@ -6549,6 +7633,7 @@ class display:
     print("   # Configs:       ", end="")
     print(display.pad_l(g.benchmark['configs'], 14), end="")
     print()    
+    print(display.pad_r_always("# Next Extinction:    " + e_print, 60))    
     display.print_line()
     g.benchmark['configspersec']
     line = ['','','','','']
@@ -6557,19 +7642,22 @@ class display:
     line[1] = display.pad_r_always("# Stage:              " + g.pfdata['stage'], 60)
     line[2] = display.pad_r_always("# RSS Counter:        " + display.pad_l(g.pfdata['rss']['counter'], 16), 60)
     line[3] = display.pad_r_always("# Since Improvement:  " + display.pad_l(g.pfdata['rss']['since_improvement'], 16), 60)
-    line[4] = display.pad_r_always("# Next Extinction:    " + e_print, 60)
+    line[4] = display.pad_r_always("" + e_print, 60)
     
 # Col 2
     line[0] = line[0] + "# " + display.pad_r_always("TOP 10", 21)
     
     for n in range(10):
       ln = (n%4) + 1
-      if(g.pfdata['top']['filled']):
-        line[ln] = line[ln] + display.pad_r_always(g.pfdata['top']['rss'][n], 20)
-      else:
-        tn = n + (g.pfdata['top']['size'] - g.pfdata['top']['counter']) 
-        if(tn < g.pfdata['top']['size']):
-          line[ln] = line[ln] + display.pad_r_always(g.pfdata['top']['rss'][tn], 20)
+      if(len(g.top_parameters) > n):
+        line[ln] = line[ln] + display.pad_r_always(g.top_parameters[n][0], 20)
+      
+#if(g.pfdata['top']['filled']):
+#  line[ln] = line[ln] + display.pad_r_always(g.top_parameters[n][0], 20)
+#else:
+#  tn = n + (g.pfdata['top']['size'] - g.pfdata['top']['counter'])
+#  if(tn < g.pfdata['top']['size']):
+#    line[ln] = line[ln] + display.pad_r_always(g.pfdata['top']['rss'][tn], 20)
     
     for n in range(5):
       print(line[n])
@@ -6625,100 +7713,6 @@ class display:
   last_rss = 0.0
   best_rss = 0.0
   """
-
-###########################################
-#  CLASS g
-###########################################
-class gd:
-
-  precision = 1.0e-6
-  max_iterations = 10
-  h = 1.0e-8
-  momentum = 0.1
-  p_in = None
-  rss_in = None
-  p_out = None
-  rss_out = None
-  fix = None
-
-# Central Difference
-  def df(p):
-    d = numpy.zeros((len(p),),)
-    for i in range(len(p)):
-      if(gd.fix[i] == 0.0):
-        d[i] = 0.0
-      else:
-        p_f = numpy.copy(p)
-        p_f[i] = p_f[i] + gd.h
-        p_b = numpy.copy(p)
-        p_b[i] = p_b[i] - gd.h
-        d[i] = (gd.rss(p_f) - gd.rss(p_b)) / (2 * gd.h)
-    return d
-
-  def line_search(p, dp):
-# Back track
-    best_rss = gd.rss_in
-    best_gamma = 0.0
-    gamma = 20.0 * gd.last_gamma 
-    if(gamma <1.0e-8):
-      gamma <1.0e-6
-    loop = True
-    n = 0
-    while(gamma > 1.0e-12):
-      n = n + 1
-      p_test = p - gamma * dp
-      rss = gd.rss(p_test)
-      gamma = 0.5 * gamma
-      if(best_rss is None or rss < best_rss):
-        p_best = p_test
-        best_rss = rss
-        best_gamma = gamma
-    gd.last_gamma = best_gamma
-    return best_rss, best_gamma * dp
-    
-# Gradient Descent
-  def opt(f_rss, p0, fix=None):
-    gd.rss = f_rss   
-    gd.last_gamma = 1.0
-    p = p0
-    
-    if(type(fix) == numpy.ndarray):
-      if(len(p) == len(fix)):
-        for i in range(len(fix)):
-          if(fix[i] != 0.0):
-            fix[i] = 1.0
-      else:
-        fix = numpy.zeros((len(p0),),)
-        fix[:] = 1.0
-    else:
-      fix = numpy.zeros((len(p0),),)
-      fix[:] = 1.0
-    gd.fix = fix  
-    gd.p_in = numpy.copy(p)
-    gd.rss_in = gd.rss(p)
-    
-    best_p = numpy.copy(gd.p_in)
-    best_rss = gd.rss_in
-
-    n = 0
-    last_dp = 0.0
-    while(n < gd.max_iterations):
-      df = gd.df(p)
-      rss, dp = gd.line_search(p, df)
-      if(rss > best_rss):
-        n = gd.max_iterations
-      else:
-        p = p - (gd.momentum * last_dp + dp)
-        last_dp = dp
-        rss = gd.rss(p)
-        best_p = numpy.copy(p)
-        best_rss = rss
-        n = n + 1
-        
-    gd.p_out = numpy.copy(best_p)
-    gd.rss_out = best_rss
-    
-    return p
 
 ###########################################
 #  CLASS pf_dat
@@ -6780,6 +7774,9 @@ class pf_data:
                 'counter': 0,
                 'counter_successful': 0,
                 'since_improvement': 0,
+        },
+        'max_density': {'current': None,
+                        'best': None,
         },
         'cycle': {'counter': 0, 'total_cycles': g.fit['cycles'], 'spline_counter': 0,},
         'generation': {'counter': 0, 'total_generations': g.fit['gens'], 'spline_counter': 0,},
@@ -6846,16 +7843,25 @@ class pf_cycle:
     
     g.pfdata['stage'] = 'Initialising Population'
     
-    parameters = copy.deepcopy(g.pfdata['params']['start'][:])
+# Add top parameters (if there are any)
+    
+    cycle_start_parameters = []
+    new_p = copy.deepcopy(g.pfdata['params']['start'][:])
+    cycle_start_parameters.append(new_p)
+    
+    for i in range(len(g.top_parameters)):
+      new_p = copy.deepcopy(g.top_parameters[i][1][:])
+      cycle_start_parameters.append(new_p)
+
     n = 0
     for pn in range(pop_size):
       loop = True
       while(loop): 
         n = n + 1
-        if(n == 1):
-          g.pfdata['params']['pop'][pn, :] = g.pfdata['params']['start'][:]
+        if(n <= len(cycle_start_parameters)):
+          g.pfdata['params']['pop'][pn, :] = cycle_start_parameters[n-1][:]
         else:
-          g.pfdata['params']['pop'][pn, :] = pf_parameters.get_p()
+          g.pfdata['params']['pop'][pn, :] = pf_parameters.random_p()
         
 # Try - if it fails or rss == None, try next
         pf_potential.update(g.pfdata['params']['pop'][pn, :])
@@ -6868,7 +7874,7 @@ class pf_cycle:
             g.pfdata['params']['pop_rss'][pn] = rss
         except:
           pass
-      
+
 ###################################
 # LOOP THROUGH GENERATIONS
 ###################################
@@ -6982,8 +7988,49 @@ class pf_cycle:
 class pf_potential:
 
   def update(p, no_rescale=False):    
-# Store
-    g.pfdata['params']['current'][:] = p[:]
+  
+# Update potential
+    a = 0
+
+    for fn in range(len(g.pot_functions['functions'])): 
+# Calc b
+      b = a + g.pot_functions['functions'][fn]['fit_size']  
+      if(g.pot_functions['functions'][fn]['fit_type'] == 1):     # NODE SPLINE           
+        g.pot_functions['functions'][fn]['s_nodes'][:,1] = p[a:b]
+        potential.make_spline_points_inner(fn)       
+      elif(g.pot_functions['functions'][fn]['fit_type'] == 2):   # ANALYTIC  
+# Make Analytic Points
+        g.pot_functions['functions'][fn]['a_params'][:] = p[a:b]
+        potential.make_analytic_points_inner(fn)
+
+# Update a
+      a = b     
+        
+# Rescale embedding data points to cover density range
+    potential.rescale_embedding()
+
+# Update efs and bp modules
+    potential.efs_add_potentials()     # Load potentials
+    potential.bp_add_potentials()      # Load potentials
+    
+# Save parameters
+    potential.parameters = numpy.copy(potential.get_parameters())
+    g.pfdata['p']['current'] = numpy.copy(potential.get_parameters())
+ 
+  def take_density(p, p_dens): 
+    a = 0
+    for fn in range(len(g.pot_functions['functions'])): 
+      b = a + g.pot_functions['functions'][fn]['fit_size'] 
+      if(g.pot_functions['functions'][fn]['fit_type'] == 1):     # NODE SPLINE       
+        if(g.pot_functions['functions'][fn]['f_type_id'] == 2):
+          p[a:b] = copy.deepcopy(p_dens[a:b])
+      elif(g.pot_functions['functions'][fn]['fit_type'] == 2):   # ANALYTIC          
+        if(g.pot_functions['functions'][fn]['f_type_id'] == 2):
+          p[a:b] = copy.deepcopy(p_dens[a:b])
+      a = b
+    return p
+
+"""
   
 # Update potential
     a = 0
@@ -7012,27 +8059,7 @@ class pf_potential:
         g.pot_functions['functions'][fn]['a_params'][:] = p[a:b]
         potential.make_analytic_points_inner(fn)
         a = b    
-    
-# Rescale density functions
-    if(g.fit['rescale_density'] == 2 and no_rescale == False):
-      rescale_density.run()    
-    
-# Update efs and bp modules
-    potential.efs_add_potentials()     # Load potentials
-    potential.bp_add_potentials()      # Load potentials
-    
-  def take_density(p, p_dens): 
-    a = 0
-    for fn in range(len(g.pot_functions['functions'])): 
-      b = a + g.pot_functions['functions'][fn]['fit_size'] 
-      if(g.pot_functions['functions'][fn]['fit_type'] == 1):     # NODE SPLINE       
-        if(g.pot_functions['functions'][fn]['f_type_id'] == 2):
-          p[a:b] = copy.deepcopy(p_dens[a:b])
-      elif(g.pot_functions['functions'][fn]['fit_type'] == 2):   # ANALYTIC          
-        if(g.pot_functions['functions'][fn]['f_type_id'] == 2):
-          p[a:b] = copy.deepcopy(p_dens[a:b])
-      a = b
-    return p
+"""
 
 ###########################################
 #  CLASS pf_generatio
@@ -7048,10 +8075,7 @@ class pf_generation:
     main.log_hr()
     main.log("Generation " + str(g.pfdata['generation']['counter']))
     main.log_hr()
-    
-    if(g.pfdata['generation']['counter']>1):
-      pf_parameters.make_pool()
-  
+
     pf_generation.pop_size = g.fit['pop_size']
     pf_generation.pop_size_half = g.fit['pop_size'] // 2
     pf_generation.fresh_size = g.fit['fresh_size']
@@ -7099,6 +8123,9 @@ class pf_generation:
 # Enhance
     g.pfdata['stage'] = 'Enhance'   
     pf_enhance.run()
+
+#g.pfdata['generation']['counter']
+#pf_setop
     
     cstr = str(g.pfdata['generation']['counter'])
     while(len(cstr)<5):
@@ -7196,7 +8223,10 @@ class pf_generation:
       loop = True
       while(loop):
         try:
-          g.pfdata['params']['fresh'][p, :] = pf_parameters.get_p()
+          rn = min(len(g.top_parameters) - 1, numpy.floor((len(g.top_parameters) + 1) * random.uniform(0.0, 1.0)**3))
+          pbest = numpy.copy(g.top_parameters[rn][1])
+
+          g.pfdata['params']['fresh'][p, :] = pf_parameters.random_p(pbest)
           pf_potential.update(g.pfdata['params']['fresh'][p, :])
           rss = pf.get_rss()
           if(g.pfdata['rss']['current'] is not None):
@@ -7204,30 +8234,7 @@ class pf_generation:
             g.pfdata['params']['fresh_rss'][p] = rss
         except:
           pass 
-      
-  def make_fresh_old():    
-    w = g.fit['fresh_ws']
-    w_inc = (g.fit['fresh_we'] - g.fit['fresh_ws']) / (g.fit['fresh_size'] // 2 - 1)
-    for p in range(g.fit['fresh_size']):
-      loop = True
-      while(loop):   
-        if(p % 2 == 0):
-          g.pfdata['params']['fresh'][p, :] = pf_cycle.random_p(g.pfdata['top']['p'][0,:], w)       
-        else:  
-          r = random.randint(0, 9)
-          g.pfdata['params']['fresh'][p, :] = pf_cycle.random_p(g.pfdata['top']['p'][r,:], w)              
-        loop = False
-        try:
-          pf_potential.update(g.pfdata['params']['fresh'][p, :])
-          rss = pf.get_rss()
-          if(g.pfdata['rss']['current'] is not None):
-            loop = False
-            g.pfdata['params']['fresh_rss'][p] = rss
-        except:
-          pass 
-      if(p % 2 == 1):
-        w = w + w_inc
-          
+
 # Used to merge parents, fresh and all children into ordered array
   def merge():
     ps = g.fit['pop_size']
@@ -7252,6 +8259,35 @@ class pf_generation:
     g.pfdata['params']['pop_merged_rss'] = sort.apply_keytable_1d_dp(g.pfdata['params']['pop_merged_rss'])
     g.pfdata['params']['pop_merged'] = sort.apply_keytable_2d_dp(g.pfdata['params']['pop_merged'])
 
+###############################################################################################
+#
+# Delete some day
+#
+###############################################################################################
+
+  def make_fresh_old():    
+    w = g.fit['fresh_ws']
+    w_inc = (g.fit['fresh_we'] - g.fit['fresh_ws']) / (g.fit['fresh_size'] // 2 - 1)
+    for p in range(g.fit['fresh_size']):
+      loop = True
+      while(loop):   
+        if(p % 2 == 0):
+          g.pfdata['params']['fresh'][p, :] = pf_cycle.random_p(g.pfdata['top']['p'][0,:], w)       
+        else:  
+          r = random.randint(0, 9)
+          g.pfdata['params']['fresh'][p, :] = pf_cycle.random_p(g.pfdata['top']['p'][r,:], w)              
+        loop = False
+        try:
+          pf_potential.update(g.pfdata['params']['fresh'][p, :])
+          rss = pf.get_rss()
+          if(g.pfdata['rss']['current'] is not None):
+            loop = False
+            g.pfdata['params']['fresh_rss'][p] = rss
+        except:
+          pass 
+      if(p % 2 == 1):
+        w = w + w_inc
+  
 ###########################################
 #  CLASS pf_extinctio
 ###########################################
@@ -7325,6 +8361,10 @@ class pf_enhance:
     else:
       return 0
   
+    pf_setop.run()
+
+    return 1
+
     pop_count = g.pfdata['enhance']['top']
     if(pop_count > g.fit['pop_size']):
       pop_count = g.fit['pop_size']
@@ -7337,7 +8377,7 @@ class pf_enhance:
       p_diff = pf_parameters.p_diff()
 #print(p_diff)
 #exit()
-      params = gd.opt(pf_enhance.gd_rss, g.pfdata['params']['pop'][p,:], p_diff)
+      params, rss = gd.opt(pf_enhance.gd_rss, g.pfdata['params']['pop'][p,:], p_diff)
       if(gd.rss_out < g.pfdata['params']['pop_rss'][p]):
         g.pfdata['params']['pop_rss'][p] = gd.rss_out
         g.pfdata['params']['pop'][p,:] = numpy.copy(params)
@@ -7346,6 +8386,28 @@ class pf_enhance:
         rss = pf.get_rss(True)
   
 #enhance_freq     #enhance_freq
+    
+  def process(p_list):
+    rss_list = []
+    p_list_out = []
+    rss_list_out = []
+    for n in range(len(p_list)):
+      p_before = numpy.copy(p_list[n])
+      rss_before = pf.get_rss()
+      rss_list.append(rss_before)
+      
+      p_diff = pf_parameters.p_diff()
+      p_after, rss_after = gd.opt(pf_enhance.gd_rss, p_before, p_diff)
+      
+      if(rss_after < rss_before):
+        p_list_out.append(p_after)
+        rss_list_out.append(rss_after)
+      else:
+        p_list_out.append(p_before)
+        rss_list_out.append(rss_before)
+        
+    print(rss_list)
+    print(rss_list_out)
     
   def gd_rss(params):
     pf_potential.update(params)
@@ -7357,7 +8419,80 @@ class pf_enhance:
 ###########################################
 class pf_parameters:
 
-  def get_p():
+  def random_p(c=0.0, m=None):
+  
+# Multiply the range
+    if(m == None):
+      m = 1.0
+
+# Randomly pick over sized parameters (defined in input file)
+    rn = numpy.random.uniform()    
+    b = g.fitting['oversized_parameters'][0]
+    prb = 1.0
+    for i in range(1, len(g.fitting['oversized_parameters']),1):
+      prb = prb * g.fitting['oversized_parameters'][i]
+      if(rn<prb):
+        m = m * b
+      else:
+        break
+
+# Get the upper and lower range
+    p_count = g.pfdata['psize']
+    lower = g.pfdata['params_var'][0,:]
+    upper = g.pfdata['params_var'][1,:]
+    p_range = upper - lower
+    
+# If there's no center, take midpoint of upper/lower - else center it on the parameters c
+    if(type(c) != numpy.ndarray and c == 0.0):
+      center = lower + 0.5 * p_range 
+    else:
+      center = numpy.copy(c)
+    
+# Multiply range
+    m_range = m * p_range
+    
+# Get random parameters 0 to 1
+    r = numpy.random.rand(p_count)
+    
+# New parameters
+    p_new = center + (r - 0.5) * m_range
+    
+# Return
+    return p_new
+    
+  def random_variation(p_in, variation):
+    p_count = g.pfdata['psize']
+    lower = g.pfdata['params_var'][0,:]
+    upper = g.pfdata['params_var'][1,:]
+    p_range = upper - lower
+
+# p_out
+    p_out = numpy.copy(p_in)
+    p_out = p_out +  variation * p_range * (numpy.random.rand(p_count) - 0.5)
+
+    return p_out
+
+  def mutate(p_in, variation):
+    p_count = g.pfdata['psize']
+    lower = g.pfdata['params_var'][0,:]
+    upper = g.pfdata['params_var'][1,:]
+    p_range = upper - lower
+
+# p_out
+    p_out = numpy.copy(p_in)
+
+###############################################################################################
+#
+# Delete some day
+#
+###############################################################################################
+
+#e = 0
+#if(g.pfdata['generation']['counter']>0):
+#  e = g.pfdata['generation']['counter'] - 1
+#p_new = c + (r - 0.5) * m_range * (g.fit['gen_var_factor'])**(e)
+    
+  def get_p_from_pool():
     pmax = g.pfdata['pool']['pmax']
     pn = g.pfdata['pool']['pn'] % pmax
     p = copy.deepcopy(g.pfdata['pool']['params'][pn, :])                     # Copy parameters
@@ -7486,33 +8621,6 @@ class pf_parameters:
     main.log("shuffle pool")
     numpy.random.shuffle(g.pfdata['pool']['params'])
 
-  def random_p(c=0.0, m=1.0):
-#
-    p_count = g.pfdata['params']['count']
-    lower = g.pfdata['params']['var'][0,:]
-    upper = g.pfdata['params']['var'][1,:]
-    range = upper - lower
-    
-# If there's no center, take midpoint of upper/lower - else center it on the parameters c
-    if(type(c) != numpy.ndarray and c == 0.0):
-      c = lower + 0.5 * range 
-    
-# Multiply range
-    m_range = m * range
-    
-# Get random parameters 0 to 1
-    r = numpy.random.rand(p_count)
-    
-# New parameters
-    e = 0
-    if(g.pfdata['generation']['counter']>0):
-      e = g.pfdata['generation']['counter'] - 1
-    
-    p_new = c + (r - 0.5) * m_range * (g.fit['gen_var_factor'])**(e)
-    
-# Return
-    return p_new
-    
   def estimate_density(fn):  
 #print(g.pot_functions['functions'][fn]['points'][:,1])
     r = numpy.zeros((7,),)
@@ -7541,6 +8649,846 @@ class pf_parameters:
   def p_diff():
     return (g.pfdata['params']['var'][1,:] - g.pfdata['params']['var'][0,:])
 
+###########################################
+#  CLASS pf_seto
+###########################################
+class pf_setop:
+
+  def run():
+
+    for n in range(g.fit['start_random']):
+      p = pf_parameters.random_p()
+      pf_potential.update(p)
+      rss = pf.get_rss()
+
+    step_enhance_steps = 10
+    
+# Loop through entire top list
+    p_enhance = []
+    for i in range(len(g.top_100)):
+      p_enhance.append(g.top_100[i][1])
+
+# Make new list of top parameters
+    new_list = pf_setop.process_list(p_enhance, step_enhance_steps)
+
+# Empty and re-populate top
+    g.top_100 = []
+    for i in range(len(new_list)):
+      pf_potential.update(new_list[i])
+      rss = pf.get_rss()
+
+  def process_list(p_list, steps = 100):
+
+    p_new_list = []
+
+    for n in range(len(p_list)):
+
+      g.pfdata['stage'] = 'STEP_' + str(n+1)
+
+      p_current = numpy.copy(p_list[n])
+      rss_current = pf.get_rss()
+      rss_start = rss_current
+
+      for n in range(steps):
+        p_new = numpy.copy(p_current)
+        p_new = p_new + pf_setop.random_step(0.0001)
+
+        pf_potential.update(p_new)
+        rss = pf.get_rss(False)
+
+        if(rss < rss_current):
+          p_current = p_new
+          rss_current = rss
+      
+      p_new_list.append(p_current)
+
+    return p_new_list
+
+  def random_step(m = 0.01):
+# Get random parameters 0 to 1
+    return m * (0.5 - numpy.random.rand(g.pfdata['params']['count']))
+
+###########################################
+#  CLASS pf_g
+###########################################
+class pf_gd:
+
+  h = 1.0e-5
+
+  def run():
+    
+# Start
+    p = g.top_parameters[0][1]
+    rss = pf_gd.rss(p)
+    dp = pf_gd.df(p)
+    dp = dp / max(dp)
+
+    gamma = 1.0
+    pf_gd.line_search(p, dp, gamma, rss)
+
+    exit()
+
+  def rss(p, top_parameters=False):
+    pf_potential.update(p)
+    return pf.get_rss(top_parameters)
+
+# Central Difference
+  def df(p):
+    dp = numpy.zeros((len(p),),)
+    for i in range(len(p)):
+      p_f = numpy.copy(p)
+      p_b = numpy.copy(p)
+
+      p_f[i] = p_f[i] + pf_gd.h
+      p_b[i] = p_b[i] - pf_gd.h
+
+      rss_f = pf_gd.rss(p_f)
+      rss_b = pf_gd.rss(p_b)
+      print(i, rss_b, rss_f)
+
+      dp[i] = (pf_gd.rss(p_f) - pf_gd.rss(p_b)) / (2 * pf_gd.h)
+    return dp
+
+  def line_search(p, dp, gamma, best_rss):    
+    gamma = 1.0
+    while(gamma > 1.0e-24):
+      p_test = numpy.copy(p)
+      p_test = p_test - gamma * dp
+      rss = pf_gd.rss(p_test)
+      gamma = 0.25 * gamma
+      print(gamma, rss, best_rss)
+      if(rss < best_rss):
+        p_best = p_test
+        best_rss = rss
+        best_gamma = gamma
+        
+###########################################
+#  CLASS pf_n
+###########################################
+class pf_ng:
+
+  R = None
+  rss = None
+
+  def run():
+    g.pfdata['stage'] = 'NEWTON GAUSS'
+    g.pfdata['stage_brief'] = 'NG'
+
+    p = g.top_parameters[0][1]
+    pf_ng.set(p)
+    pf_ng.residual()
+
+    Jw = len(p)
+    Jh = len(pf_ng.R)
+    R = numpy.copy(g.rss['residual'])
+    h = 1.0e-10
+    l = 0.1
+
+    J = numpy.zeros((Jh,Jw),)
+    for i in range(len(p)):
+      p_b = numpy.copy(p)
+      p_b[i] = p_b[i] - h
+      pf_potential.update(p_b)      
+      rss_b = pf.get_rss(False)
+      R_b = numpy.copy(g.rss['residual'])
+
+      p_f = numpy.copy(p)
+      p_f[i] = p_f[i] + h
+      pf_potential.update(p_f)      
+      rss_f = pf.get_rss(False)
+      R_f = numpy.copy(g.rss['residual'])
+
+      J[:,i] = (R_f - R_b) / (2.0 * h)
+
+    JT = numpy.transpose(J)
+    JTJ = numpy.matmul(JT, J)
+    JTJ_diag = numpy.diag(JTJ)
+    JTR = numpy.matmul(JT, R) 
+
+    try:
+      dp = numpy.linalg.solve(JTJ + l * JTJ_diag, -JTR)
+      p = p - dp
+    except:
+      pass
+ 
+    pf_potential.update(p)
+    pf.get_rss(False)
+
+  def residual():
+    rss = pf.get_rss(False)
+    pf_ng.R = g.rss['residual']
+    pf_ng.rss = rss
+    
+  def jacobian():
+    print("J")
+
+  def set(p):
+    pf_potential.update(p)
+
+###########################################
+#  CLASS pf_s
+###########################################
+class pf_sa:
+
+  t = None
+  count = 0
+
+  def run():
+    pf_sa.count = pf_sa.count + 1
+    t_start = time.time()
+    start_best_rss = g.pfdata['rss']['best'] 
+
+    if(pf.fit['sa_loops_t'] == 0 or pf.fit['sa_loops_i'] == 0):
+      return 0
+
+    g.pfdata['stage'] = 'Simulated Annealing ' + str(pf_sa.count)
+    g.pfdata['stage_brief'] = 'SA' + str(pf_sa.count)
+
+# Start - use best
+    p = g.pfdata['p']['best']
+    pf_potential.update(p)
+    rss = pf.get_rss(False)
+    p_count = len(p)
+
+# Store Best Parameters
+    p_best = numpy.copy(p)
+    rss_best = rss
+
+    step = pf.fit['sa_step']  
+    for tn in range(pf.fit['sa_loops_t']):
+      if(pf.fit['sa_loops_t'] == 1):
+        pf_sa.t = pf.fit['sa_temp_start']
+        f = 1.0
+      else:
+        pf_sa.t = pf.fit['sa_temp_start'] - tn *  (pf.fit['sa_temp_start'] - pf.fit['sa_temp_end']) / (pf.fit['sa_loops_t'] - 1)
+        f = pf.fit['sa_step_factor']**tn
+        g.pfdata['stage'] = 'Simulated Annealing ' +str(pf_sa.count) + ' Loop ' + str(tn + 1)
+        rss_start_loop = rss_best
+      for n in range(pf.fit['sa_loops_i']):
+        loop = True
+        while(loop):
+          p_new = numpy.copy(p)
+          p_new = p_new + f * step * (0.5 - numpy.random.rand(p_count))
+          pf_potential.update(p_new)
+          rss_new = pf.get_rss(False)
+          if(rss_new is not None):
+            loop = False
+        if(rss_new is not None):
+          if(rss_new < rss or numpy.random.uniform() < numpy.exp((rss-rss_new) / pf_sa.t)):
+            p = numpy.copy(p_new)
+            rss = rss_new
+            if(rss_new < rss_best):
+              p_best = numpy.copy(p_new)
+              rss_best = rss_new
+      if(rss_best < rss_start_loop):
+        pf_potential.update(p_best)
+        rss_new = pf.get_rss(True)
+
+    pf.summary_line("SIMULATED ANNEALING " + str(pf_sa.count), t_start, time.time(), start_best_rss,  g.pfdata['rss']['best'])
+    pf_save.top("SIMULATED_ANNEALING_" + str(pf_sa.count))
+
+###########################################
+#  CLASS pf_sa
+###########################################
+class pf_saa:
+
+  t = None
+  count = 0
+
+  def run():
+    pf_saa.count = pf_saa.count + 1
+    t_start = time.time()
+    start_best_rss = g.pfdata['rss']['best'] 
+
+#if(pf.fit['sa_loops_t'] == 0 or pf.fit['sa_loops_i'] == 0):
+#  return 0
+
+# Start - use best
+    p = g.pfdata['p']['best']
+    pf_potential.update(p)
+    rss = pf.get_rss(False)
+    p_count = len(p)
+
+# Store Best Parameters
+    p_best = numpy.copy(p)
+    rss_best = rss
+    g.pfdata['stage'] = 'Simulated Annealing Advanced ' + str(pf_saa.count) + ' Line Search'
+
+    f = 100.0
+    f_best = f
+    p_grad = pf_pgradient.run(p_best)
+    for n in range(100):
+      p_new = numpy.copy(p_best)
+      p_new = p_new - f * p_grad
+      pf_potential.update(p_new)
+      rss_new = pf.get_rss(False)
+      if(rss_new < rss_best):
+        rss_best = rss_new 
+        f_best = f
+      f = 0.5 * f
+ 
+    g.pfdata['stage'] = 'Simulated Annealing Advanced ' + str(pf_saa.count) + ' Anneal'
+
+    for i in range(10):
+      for n in range(50):
+        p_new = numpy.copy(p_best)
+        p_new = p_new - 0.1 * f_best * p_grad * numpy.random.rand(p_count)   
+
+        pf_potential.update(p_new)
+        rss_new = pf.get_rss(False)
+
+        if(rss_new < rss_best):
+          p_best = numpy.copy(p_new)
+          rss_best = rss_new
+      p_grad = pf_pgradient.run(p_best)
+   
+    exit()
+
+    """
+    step = pf.fit['sa_step']  
+    for tn in range(pf.fit['sa_loops_t']):
+      if(pf.fit['sa_loops_t'] == 1):
+        pf_sa.t = pf.fit['sa_temp_start']
+        f = 1.0
+      else:
+        pf_sa.t = pf.fit['sa_temp_start'] - tn *  (pf.fit['sa_temp_start'] - pf.fit['sa_temp_end']) / (pf.fit['sa_loops_t'] - 1)
+        f = pf.fit['sa_step_factor']**tn
+        g.pfdata['stage'] = 'Simulated Annealing Loop ' + str(tn + 1)
+        rss_start_loop = rss_best
+      for n in range(pf.fit['sa_loops_i']):
+        p_new = numpy.copy(p)
+        p_new = p_new + f * step * (0.5 - numpy.random.rand(p_count))
+        pf_potential.update(p_new)
+        rss_new = pf.get_rss(False)
+
+        if(rss_new < rss or numpy.random.uniform() < numpy.exp((rss-rss_new) / pf_sa.t)):
+          p = numpy.copy(p_new)
+          rss = rss_new
+          if(rss_new < rss_best):
+            p_best = numpy.copy(p_new)
+            rss_best = rss_new
+      if(rss_best < rss_start_loop):
+        pf_potential.update(p_best)
+        rss_new = pf.get_rss(True)
+    """
+
+    pf.summary_line("SIMULATED ANNEALING " + str(pf_random.count), t_start, time.time(), start_best_rss,  g.pfdata['rss']['best'])
+
+###########################################
+#  CLASS pf_save
+###########################################
+class pf_saved:
+
+  def run():
+  
+#pf_pgradient.run()
+    g.pfdata['stage'] = 'START - LOAD SAVED'
+
+# Load saved parameters
+    try:
+      params = pf_top.load(g.dirs['wd'] + '/save', 'top_parameters.txt')    
+      for p in params:
+        pf_potential.update(p)
+        rss = pf.get_rss()
+    except:
+      pass
+
+###########################################
+#  CLASS pf_rando
+###########################################
+class pf_random:
+
+  count = 0
+  time_spent = 0.0
+
+  def run():
+    t_start = time.time()
+    start_best_rss = g.pfdata['rss']['best'] 
+    pf_random.count = pf_random.count + 1
+    g.pfdata['stage'] = 'RANDOM ' + str(pf_random.count)
+    g.pfdata['stage_brief'] = 'R' + str(pf_random.count)
+
+# START PARAMETER
+# Try randomly generated parameters
+    for n in range(pf.fit['random_size']):
+      p = pf_parameters.random_p(0.0)
+      pf_potential.update(p)
+      rss = pf.get_rss()
+
+    pf_random.time_spent = pf_random.time_spent + (time.time() - t_start)
+
+    pf.summary_line("RANDOM SEARCH " + str(pf_random.count), t_start, time.time(), start_best_rss,  g.pfdata['rss']['best'])
+   
+    pf_save.top("RANDOM_SEARCH_" + str(pf_random.count))
+
+###########################################
+#  CLASS pf_to
+###########################################
+class pf_top:
+
+  def save(dir, filename):
+
+    print("Saving Top Parameters")
+    print(dir + "/" + filename)
+    std.make_dir(dir)
+    fh = open(dir + "/" + filename, 'w')
+    for i in range(len(g.top_parameters)):
+      i_str = str(i+1)
+      while(len(i_str)<8):
+        i_str = "0" + i_str
+      fh.write("---START---" + "\n")
+      fh.write(i_str + "\n")
+      fh.write("PARAMETERS \n")
+      fh.write(str(len(g.top_parameters[i][1])) + "\n")
+      for j in range(len(g.top_parameters[i][1])):
+        fh.write(str(g.top_parameters[i][1][j]) + "\n")
+      fh.write("RSS " + str(g.top_parameters[i][0]) + '\n')
+      fh.write("BP MaxDensity " + str(g.top_parameters[i][4]) + '\n')
+      fh.write("EFS MaxDensity " + str(g.top_parameters[i][5]) + '\n')
+      try:
+        bp_calculations = g.top_parameters[i][3]['bp_calculations']
+        for bi in range(len(bp_calculations)):
+          fh.write("a0 " + str(bp_calculations[bi]['a0']) + "\n")
+          fh.write("e0 " + str(bp_calculations[bi]['e0']) + "\n")
+          fh.write("b0 " + str(bp_calculations[bi]['b0']) + "\n")
+      except:
+        pass
+      fh.write("---END---" + "\n")
+
+    fh.close()
+
+  def load(dir, filename):
+    if(int(g.fitting['load_top_parameters']) == 0):
+      return []
+    print(g.fitting['load_top_parameters'])
+    top_p = []
+    fh = open(dir + "/" + filename, 'r')
+    
+    f = []
+    for line in fh:
+      f.append(line.strip())
+    fh.close()
+
+    i = 0
+    while(i<len(f)):
+      if(f[i] == "---START---"):
+        i = i + 3
+        pn = int(f[i])
+        p = numpy.zeros((pn,),)
+        for n in range(pn):
+          i = i + 1
+          p[n] = float(f[i])
+      elif(f[i] == "---END---"):
+        top_p.append(p)
+      i = i + 1
+      if(len(top_p) == g.fitting['load_top_parameters']):
+        break
+
+    return top_p 
+
+###########################################
+#  CLASS pf_pgradien
+###########################################
+class pf_pgradient:
+
+  def run(p):
+    pf_potential.update(p)
+    rss = pf.get_rss(False)
+    grad = numpy.zeros((len(p),), dtype=numpy.float64,)
+
+    for i in range(len(p)):
+# Forward
+      p_f = numpy.copy(p)
+      h = 1.0e-10 * p_f[i]
+      if(p_f[i] == 0.0):
+        h = 1.0e-10
+      p_f[i] = p_f[i] + h
+      pf_potential.update(p_f)
+      rss_f = pf.get_rss(False)
+# Backward
+      p_b = numpy.copy(p)
+      h = 1.0e-10 * p_b[i]
+      if(p_b[i] == 0.0):
+        h = 1.0e-10
+      p_b[i] = p_b[i] - h
+      pf_potential.update(p_b)
+      rss_b = pf.get_rss(False)
+      
+      grad[i] = (rss_f - rss_b) / (2.0 * h)
+
+    return grad
+
+###########################################
+#  CLASS pf_displa
+###########################################
+class pf_display:
+
+  display_header_set = False
+  last_stage = None
+
+  def clear():    
+    os.system('cls' if os.name == 'nt' else 'clear') 
+  
+  def print_line(w=140):
+    for i in range(w):
+      print("#", end="")
+    print()
+
+  def output():
+    try:
+      output = int(g.inp['display']['output'])
+    except:
+      output = 1    
+    if(output == 1):
+      pf_display_simple.output()
+#if(output == 2):
+#  display.output_2()
+#if(output == 3):
+#  display.output_3()
+#  #print(g.rss)
+
+  @staticmethod
+  def pad_r(inp, p=12, r=None):
+    if(inp == None):
+      return ""  
+    if(r is not None):  
+      try:
+        inp = numpy.round(inp, r)
+      except:
+        pass
+    out = str(inp).strip()  
+    while(len(out)<p):
+      out = out + " "      
+    return out[0:p]
+
+  @staticmethod
+  def pad_l(inp, p=12, r=None):
+    if(inp == None):
+      return ""  
+    if(r is not None):  
+      try:
+        inp = numpy.round(inp, r)
+      except:
+        pass  
+    out = str(inp).strip()  
+    while(len(out)<p):
+      out = " " + out     
+    return out[0:p]
+    
+  @staticmethod
+  def bar(p, w=25):
+    out = ''
+    p_num = p
+    p = p * (25 / 100)
+    for i in range(w):
+      if(i <= p):
+        out = out + '#'
+      else:
+        out = out + '_'
+    out = out + '   ' + str(p_num) + '%'
+    return out
+    
+###########################################
+#  CLASS pf_display_simpl
+###########################################
+class pf_display_simple:
+
+  def output():
+    if(g.pfdata['last_stage'] == None or g.pfdata['last_stage'] != g.pfdata['stage']):
+      g.pfdata['last_stage'] = g.pfdata['stage']
+      print("#####################################")
+      print(g.pfdata['stage'])
+      print("#####################################")
+    
+    if(g.pfdata['rss']['current'] == None):
+      rss_current = "Error"
+    else:
+      rss_current = '{:12.4e}'.format(g.pfdata['rss']['current'])
+
+    pf_time = '{:6.3f}'.format(time.time() - pf.start_time)
+    rss_best = '{:12.4e}'.format(g.pfdata['rss']['best'])
+
+    sb = g.pfdata['stage_brief']
+    while(len(sb)<8):
+      sb = sb + " "
+
+    print(sb, end = " ")
+    print(pf_display.pad_l(pf_time, 10), end="    ")
+    print(pf_display.pad_r(rss_best, 14), end=" ")
+    print(pf_display.pad_r(rss_current, 14), end=" ")
+    print()
+
+###########################################
+#  CLASS pf_ini
+###########################################
+class pf_init:
+
+  def run():  
+
+# If a spline fit, convert into a spline with the set number of nodes
+    for fn in range(len(g.pot_functions['functions'])):       
+      if(g.pot_functions['functions'][fn]['fit_type'] == 1):     
+        potential.vary_tabulated_points(fn)
+
+# Setup EFS
+    efs.init()                         # Initialise (allocate arrays)
+    efs_calc.set_weights()             # Set weightings
+    potential.efs_add_potentials()     # Load potentials
+    configs.efs_add_config()           # Add configs
+    
+# Setup BP
+    bp_calc.init()
+    bp_calc.set_weights()
+    potential.bp_add_potentials()
+    b_props.bp_add()
+    bp_calc.get_known()
+
+    g.pfdata = {}
+    
+    g.pfdata['stage'] = ''
+    g.pfdata['last_stage'] = None
+
+# Set up RSS
+    g.pfdata['rss'] = {'start': None,
+                       'current': None,
+                       'best': None,
+                       'counter': 0,
+                       'counter_successful': 0,
+                       'since_improvement': 0,}
+
+    g.pfdata['psize'] = potential.parameter_count()
+    g.pfdata['p'] = {'current': None, 'best': None,}
+
+    g.pfdata['bp'] = {'current': None, 'best': None,}
+
+    g.pfdata['max_density'] = {'bp_current': None, 'efs_current': None, 'bp_best': None, 'efs_best': None,}
+    
+# SAVE Starting Parameters
+    g.pfdata['params_start'] = numpy.zeros((g.pfdata['psize'],),)
+    a = 0
+    for fn in range(len(g.pot_functions['functions'])):        
+      if(g.pot_functions['functions'][fn]['fit_type'] == 1):     # TABULATED      
+        b = a + g.pot_functions['functions'][fn]['fit_size']     
+        g.pfdata['params_start'][a:b] = numpy.zeros((g.pot_functions['functions'][fn]['fit_size'],),)
+        a = b
+      elif(g.pot_functions['functions'][fn]['fit_type'] == 2):   # ANALYTIC  
+        b = a + g.pot_functions['functions'][fn]['fit_size'] 
+        g.pfdata['params_start'][a:b] = g.pot_functions['functions'][fn]['a_params'][:]
+        a = b    
+    
+# SAVE Variation
+    g.pfdata['params_var'] = numpy.zeros((2,g.pfdata['psize'],),)
+    a = 0
+    for fn in range(len(g.pot_functions['functions'])):        
+      if(g.pot_functions['functions'][fn]['fit_type'] == 1):     # TABULATED      
+        b = a + g.pot_functions['functions'][fn]['fit_size']     
+        g.pfdata['params_var'][0,a:b] = g.pot_functions['functions'][fn]['fit_parameters'][0,:]  # Lower
+        g.pfdata['params_var'][1,a:b] = g.pot_functions['functions'][fn]['fit_parameters'][1,:]  # Upper
+        a = b 
+      elif(g.pot_functions['functions'][fn]['fit_type'] == 2):   # ANALYTIC  
+        b = a + g.pot_functions['functions'][fn]['fit_size'] 
+        g.pfdata['params_var'][0,a:b] = g.pot_functions['functions'][fn]['fit_parameters'][0,:]  # Lower
+        g.pfdata['params_var'][1,a:b] = g.pot_functions['functions'][fn]['fit_parameters'][1,:]  # Upper
+        a = b  
+
+###########################################
+#  CLASS pf_sav
+###########################################
+class pf_save:
+ 
+  count = 0
+
+  def top(name):
+    pf_save.count = pf_save.count + 1
+ 
+    c = str(pf_save.count)
+    while(len(c)<4):
+      c = '0' + c
+    name = c + '_' + name
+
+    dir_out = g.dirs['wd'] + '/fitting/saved_potentials/' + name + '/'
+    plot_dir = dir_out + 'plots/'
+    pot_dir = dir_out + 'pots/'
+    std.make_dir(dir_out)
+    std.make_dir(plot_dir)
+    std.make_dir(pot_dir)
+    
+    p = numpy.copy(g.top_parameters[0][1])
+    pf_potential.update(p)
+    rss = pf.get_rss()
+
+    fh = open(dir_out + 'summary.txt', 'w')
+    fh.write("RSS:  " + '\n')
+    fh.write(str(g.top_parameters[0][0]) + '\n')
+    fh.write("" + '\n')
+    fh.write("P:  " + '\n')
+    for pn in p:
+      fh.write(str(pn) + '\n')
+    fh.write("" + '\n')
+    fh.write("EFS Density:" + '\n')
+    fh.write(str(g.top_parameters[0][4]) + '\n')
+    fh.write("" + '\n')
+    fh.write("BP Density:" + '\n')
+    fh.write(str(g.top_parameters[0][5]) + '\n')
+    fh.write("" + '\n')
+    fh.write("" + '\n')
+    for i in range(len(g.top_parameters[0][3]['bp_calculations'])):
+      
+      fh.write("Known:" + '\n')
+      ec = []
+      for ei in range(6):
+        ec.append([])
+        for ej in range(6):
+          ec[ei].append(str('{:6.3f}'.format(g.bp_known['bp_calculations'][i]['ec_gpa'][ei, ej])))
+
+      fh.write("a0:     " + str(g.bp_known['bp_calculations'][i]['a0']) + '\n')
+      fh.write("e0:     " + str(g.bp_known['bp_calculations'][i]['e0']) + '\n')
+      fh.write("B0:     " + str(g.bp_known['bp_calculations'][i]['b0_gpa']) + '\n')
+      for ei in range(6):
+        if(ei == 0):          
+          fh.write("EC:     ")
+        else:          
+          fh.write("        ")
+        for ej in range(6):
+          fh.write(ec[ei][ej] + ' ')
+        fh.write('\n')
+      fh.write('\n')
+
+      fh.write("Calculated:" + '\n')
+      ec = []
+      for ei in range(6):
+        ec.append([])
+        for ej in range(6):
+          ec[ei].append(str('{:6.3f}'.format(g.top_parameters[0][3]['bp_calculations'][i]['ec_gpa'][ei, ej])))
+
+      fh.write("a0:     " + str(g.top_parameters[0][3]['bp_calculations'][i]['a0']) + '\n')
+      fh.write("e0:     " + str(g.top_parameters[0][3]['bp_calculations'][i]['e0']) + '\n')
+      fh.write("B0:     " + str(g.top_parameters[0][3]['bp_calculations'][i]['b0_gpa']) + '\n')
+      for ei in range(6):
+        if(ei == 0):          
+          fh.write("EC:     ")
+        else:          
+          fh.write("        ")
+        for ej in range(6):
+          fh.write(ec[ei][ej] + ' ')
+        fh.write('\n')
+      fh.write("" + '\n')
+
+    fh.write("" + '\n')
+    fh.write("" + '\n')
+    fh.write("" + '\n')
+
+    fh.write("RSS Details:  " + '\n')
+    fh.write("===============================  " + '\n')
+    fh.write("Total:      " + str(g.top_parameters[0][0]) + '\n')
+    fh.write("a0:         " + str(bp.rss_by_type[0]) + '\n')
+    fh.write("e0:         " + str(bp.rss_by_type[1]) + '\n')
+    fh.write("b0:         " + str(bp.rss_by_type[2]) + '\n')
+    fh.write("ec:         " + str(bp.rss_by_type[3]) + '\n')
+    fh.write("g:          " + str(bp.rss_by_type[4]) + '\n')
+    fh.write("e:          " + str(bp.rss_by_type[5]) + '\n')
+    fh.write("v:          " + str(bp.rss_by_type[6]) + '\n')
+    fh.write("a0 (w):     " + str(bp.rss_by_type_w[0]) + '\n')
+    fh.write("e0 (w):     " + str(bp.rss_by_type_w[1]) + '\n')
+    fh.write("b0 (w):     " + str(bp.rss_by_type_w[2]) + '\n')
+    fh.write("ec (w):     " + str(bp.rss_by_type_w[3]) + '\n')
+    fh.write("g (w):      " + str(bp.rss_by_type_w[4]) + '\n')
+    fh.write("e (w):      " + str(bp.rss_by_type_w[5]) + '\n')
+    fh.write("v (w):      " + str(bp.rss_by_type_w[6]) + '\n')
+
+    fh.write("" + '\n')
+    fh.write("" + '\n')
+    fh.close()
+
+    potential.plot_python_potentials(plot_dir)
+    potential_output.full(pot_dir)
+
+    pf_top.save(dir_out, 'top_parameters.txt')
+
+###########################################
+#  CLASS pf_fina
+###########################################
+class pf_final:
+
+  def run():
+
+    p = g.pfdata['p']['best']
+    pf_potential.update(p)
+
+# Run EFS and BP
+    rss = rss_calc.run_calc()
+
+    print('') 
+    print('') 
+    print('')     
+    print('###########################################################################') 
+    print('###########################################################################') 
+    print('FINAL CALCULATION WITH BEST PARAMETERS') 
+    print('###########################################################################') 
+    print('###########################################################################') 
+    print('')     
+
+    b_props.bp_output_terminal()
+
+    print('')     
+    print('CONFIGS')    
+    for n in range(efs.cc):    
+      print('Config ' + str(n+1) + ':', efs.config_energy[n,2], efs.energies[n], (efs.config_energy[n,2]-efs.energies[n])**2)
+    print('All configs:                   ' + str(efs.total_rss))
+    print('All configs (energy):          ' + str(efs.energy_rss))
+    print('All configs (force):           ' + str(efs.force_rss))
+    print('All configs (stress):          ' + str(efs.stress_rss))
+    print('All configs weighted:          ' + str(efs.total_rss_weighted))
+    print('All configs weighted (energy): ' + str(efs.energy_rss_weighted))
+    print('All configs weighted (force):  ' + str(efs.force_rss_weighted))
+    print('All configs weighted (stress): ' + str(efs.stress_rss_weighted))
+
+    print('')   
+    for bp_id in range(bp.bp_configs_count):  
+      print('')   
+ 
+      print('BP  ' + str(bp_id)) 
+      print('================') 
+
+      rss_calc.print_line('a0', bp.known_alat[bp_id], bp.calc_alat[bp_id])
+      rss_calc.print_line('v0', None, bp.calc_v0[bp_id])
+      rss_calc.print_line('e0', bp.known_e0[bp_id], bp.calc_e0[bp_id])
+      rss_calc.print_line('b0', bp.known_b0[bp_id], bp.calc_b0[bp_id])
+      print('')   
+
+      print("Calculated Stiffness Matrix (GPA)")
+      for i in range(6):
+        for j in range(6):
+          print(str('{:14.6f}'.format(float(160.230732254e0 * bp.calc_ec[bp_id,i,j]))), end="")
+        print()
+      print("Known Stiffness Matrix (GPA)")
+      for i in range(6):
+        for j in range(6):
+          print(str('{:14.6f}'.format(float(160.230732254e0 * bp.known_ec[bp_id,i,j]))), end="")
+        print()
+#print(160.230732254e0 * bp.known_ec[bp_id,i,:])
+      
+      print('')   
+  
+    print('RSS:')    
+    print('a0:', g.rss['bp']['a0'], "   w: ",g.rss['bp']['a0_weighted'])
+    print('e0:', g.rss['bp']['e0'], "   w: ",g.rss['bp']['e0_weighted'])
+    print('b0:', g.rss['bp']['b0'], "   w: ",g.rss['bp']['b0_weighted'])
+    print('ec:', g.rss['bp']['ec'], "   w: ",g.rss['bp']['ec_weighted'])
+    print('g:', g.rss['bp']['g'], "   w: ",g.rss['bp']['g_weighted'])
+    print('e:', g.rss['bp']['e'], "   w: ",g.rss['bp']['e_weighted'])
+    print('v:', g.rss['bp']['v'], "   w: ",g.rss['bp']['v_weighted'])
+    print('')
+    print('')
+    print('RSS: ' + str(rss))
+    print('')
+    print('')
+    print('Max Density:', bp.max_density, efs.max_density)
+    print('')
+    print('')
+#print(g.rss)
+    print('')
+    
 ###########################################
 #  CLASS tria
 ###########################################

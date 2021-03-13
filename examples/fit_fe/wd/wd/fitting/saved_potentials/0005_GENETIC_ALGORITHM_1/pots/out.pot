@@ -1,0 +1,36 @@
+POTNAME 
+
+
+! PAIR  FE  FE
+START
+F_ON true
+F_TYPE PAIR
+FILE fe_pair_analytic.pot
+LABEL FE  FE
+F_GROUP 0
+R_CUT 6.5
+END
+
+
+! DENS  FE  
+START
+F_ON true
+F_TYPE DENS
+FILE fe_dens_analytic.pot
+LABEL FE  
+F_GROUP 1
+R_CUT 6.5
+END
+
+
+! EMBE  FE  
+START
+F_ON true
+F_TYPE EMBE
+FILE fe_embe_analytic.pot
+LABEL FE  
+F_GROUP 1
+R_CUT 6.5
+END
+
+

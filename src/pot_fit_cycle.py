@@ -23,16 +23,29 @@ class pf_cycle:
     
     g.pfdata['stage'] = 'Initialising Population'
     
-    parameters = copy.deepcopy(g.pfdata['params']['start'][:])
+    
+    # Add top parameters (if there are any)
+    
+    
+    cycle_start_parameters = []
+    new_p = copy.deepcopy(g.pfdata['params']['start'][:])
+    cycle_start_parameters.append(new_p)
+    
+    for i in range(len(g.top_parameters)):
+      new_p = copy.deepcopy(g.top_parameters[i][1][:])
+      cycle_start_parameters.append(new_p)
+
+    
+    
     n = 0
     for pn in range(pop_size):
       loop = True
       while(loop): 
         n = n + 1
-        if(n == 1):
-          g.pfdata['params']['pop'][pn, :] = g.pfdata['params']['start'][:]
+        if(n <= len(cycle_start_parameters)):
+          g.pfdata['params']['pop'][pn, :] = cycle_start_parameters[n-1][:]
         else:
-          g.pfdata['params']['pop'][pn, :] = pf_parameters.get_p()
+          g.pfdata['params']['pop'][pn, :] = pf_parameters.random_p()
         
         # Try - if it fails or rss == None, try next
         pf_potential.update(g.pfdata['params']['pop'][pn, :])
@@ -45,6 +58,7 @@ class pf_cycle:
             g.pfdata['params']['pop_rss'][pn] = rss
         except:
           pass
+
       
  
             

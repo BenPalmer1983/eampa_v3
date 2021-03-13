@@ -37,7 +37,8 @@ ccz = cc - 1
 rcut(cc) = rcut_in
 alat(cc) = alat_in
 uv(3 * ccz + 1: 3 * ccz + 3, 1:3) = uv_in(1:3,1:3) 
-stresses(3 * (cc-1) + 1: 3 * (cc-1) + 3, 1:3) = stresses_in(1:3,1:3) 
+stresses(cc,1:3,1:3) = stresses_in(1:3,1:3) 
+!stresses(3 * (cc-1) + 1: 3 * (cc-1) + 3, 1:3) = stresses_in(1:3,1:3) 
 
 
 IF(SIZE(labels_in,1) .EQ. SIZE(coords_in,1))THEN
@@ -52,13 +53,14 @@ IF(SIZE(labels_in,1) .EQ. SIZE(coords_in,1))THEN
   END IF
   key(cc, 1) = ka
   key(cc, 2) = kb
+  key(cc, 20) = SIZE(labels_in, 1)
   total_atoms = total_atoms + SIZE(labels_in, 1) 
-  
+
   ! STORE
   energies(cc) = energy_in                ! Total Energy
   labels(ka:kb) = labels_in(:)
   coords(ka:kb, 1:3) = coords_in(:, 1:3)
-  forces(ka:kb, 1:3) = forces_in(:, 1:3)  
+  forces(cc, 1:key(cc, 20), 1:3) = forces_in(1:key(cc, 20), 1:3)  
   
   ! E/F/S on
   key(cc, 11) = 1

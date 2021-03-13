@@ -3,7 +3,7 @@
 
 
 from f_fnc import fnc
-from eampa_lib.f_spline import spline
+#from eampa_lib.f_spline import spline
 import numpy
 import matplotlib.pyplot as plt
 
@@ -48,6 +48,28 @@ class make_plots:
     y = fnc.quartic_poly_rep_v(x, numpy.asarray(p, dtype=numpy.float32), numpy.asarray(p_fixed, dtype=numpy.float32))
     make_plots.plot('quartic_poly_rep', 'quartic_poly_rep', x, y) 
     
+    
+    
+    
+    x = numpy.linspace(0.0, 5.3, 100) 
+    p = numpy.asarray([-27.44481,15.738,2.208,-2.5,4.21,-0.7736,0.807,-2.319,2.66,-1.026,0.35,-0.0585,-0.00305])  
+    p_fixed = numpy.asarray([26.0,26.0,1.0,2.05,2.05,2.3,2.4,2.5,2.6,2.7,2.8,3.0,3.3,3.7,4.2,4.9,5.3])
+    y = fnc.ackland_mendelev_pair_v(x, p, p_fixed)
+    make_plots.plot('ackland_mendelev_pair', 'ackland_mendelev_pair', x, y) 
+    
+    #for i in range(100):
+    #  print(x[i], y[i])
+    
+    x = numpy.linspace(0.5, 6.5, 1001) 
+    p = numpy.asarray([0.1,-0.1,0.001,0.0001])  
+    p_fixed = numpy.asarray([26.0,26.0,1.0,2.0,3.0,4.0,5.0,6.5])
+    y = fnc.pair_spline_v(x, p, p_fixed)
+    make_plots.plot('pair_spline', 'pair_spline', x, y) 
+
+
+
+    
+    x = numpy.linspace(1.0, 7, 100) 
     
     
     
@@ -101,7 +123,7 @@ class make_plots:
     
     
   
-  
+    exit()
   
   
     #####################################

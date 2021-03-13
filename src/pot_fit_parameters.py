@@ -1,8 +1,102 @@
 
 class pf_parameters:
 
+            
 
-  def get_p():
+  def random_p(c=0.0, m=None):
+  
+    # Multiply the range
+    if(m == None):
+      m = 1.0
+
+    # Randomly pick over sized parameters (defined in input file)
+    rn = numpy.random.uniform()    
+    b = g.fitting['oversized_parameters'][0]
+    prb = 1.0
+    for i in range(1, len(g.fitting['oversized_parameters']),1):
+      prb = prb * g.fitting['oversized_parameters'][i]
+      if(rn<prb):
+        m = m * b
+      else:
+        break
+
+    # Get the upper and lower range
+    p_count = g.pfdata['psize']
+    lower = g.pfdata['params_var'][0,:]
+    upper = g.pfdata['params_var'][1,:]
+    p_range = upper - lower
+    
+    # If there's no center, take midpoint of upper/lower - else center it on the parameters c
+    if(type(c) != numpy.ndarray and c == 0.0):
+      center = lower + 0.5 * p_range 
+    else:
+      center = numpy.copy(c)
+    
+    # Multiply range
+    m_range = m * p_range
+    
+    # Get random parameters 0 to 1
+    r = numpy.random.rand(p_count)
+    
+    # New parameters
+    p_new = center + (r - 0.5) * m_range
+    
+    # Return
+    return p_new
+    
+    
+    
+  def random_variation(p_in, variation):
+    p_count = g.pfdata['psize']
+    lower = g.pfdata['params_var'][0,:]
+    upper = g.pfdata['params_var'][1,:]
+    p_range = upper - lower
+
+    # p_out
+    p_out = numpy.copy(p_in)
+    p_out = p_out +  variation * p_range * (numpy.random.rand(p_count) - 0.5)
+
+    return p_out
+
+
+  def mutate(p_in, variation):
+    p_count = g.pfdata['psize']
+    lower = g.pfdata['params_var'][0,:]
+    upper = g.pfdata['params_var'][1,:]
+    p_range = upper - lower
+
+    # p_out
+    p_out = numpy.copy(p_in)
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+###############################################################################################
+#
+# Delete some day
+#
+###############################################################################################    
+
+    
+    #e = 0
+    #if(g.pfdata['generation']['counter']>0):
+    #  e = g.pfdata['generation']['counter'] - 1
+    #p_new = c + (r - 0.5) * m_range * (g.fit['gen_var_factor'])**(e)
+    
+    
+    
+
+  def get_p_from_pool():
     pmax = g.pfdata['pool']['pmax']
     pn = g.pfdata['pool']['pn'] % pmax
     p = copy.deepcopy(g.pfdata['pool']['params'][pn, :])                     # Copy parameters
@@ -21,6 +115,7 @@ class pf_parameters:
     if(g.pfdata['pool']['pmax'] < (g.pfdata['pool']['sane_a'] + g.pfdata['pool']['sane_b'])):
       g.pfdata['pool']['pmax'] = g.pfdata['pool']['sane_a'] + g.pfdata['pool']['sane_b']
     g.pfdata['pool']['params'] = numpy.zeros((g.pfdata['pool']['pmax'],width,),)
+  
   
   def make_pool(p = None):
     print("Make Pool")
@@ -139,34 +234,6 @@ class pf_parameters:
     main.log("shuffle pool")
     numpy.random.shuffle(g.pfdata['pool']['params'])
 
-            
-
-  def random_p(c=0.0, m=1.0):
-    # 
-    p_count = g.pfdata['params']['count']
-    lower = g.pfdata['params']['var'][0,:]
-    upper = g.pfdata['params']['var'][1,:]
-    range = upper - lower
-    
-    # If there's no center, take midpoint of upper/lower - else center it on the parameters c
-    if(type(c) != numpy.ndarray and c == 0.0):
-      c = lower + 0.5 * range 
-    
-    # Multiply range
-    m_range = m * range
-    
-    # Get random parameters 0 to 1
-    r = numpy.random.rand(p_count)
-    
-    # New parameters
-    e = 0
-    if(g.pfdata['generation']['counter']>0):
-      e = g.pfdata['generation']['counter'] - 1
-    
-    p_new = c + (r - 0.5) * m_range * (g.fit['gen_var_factor'])**(e)
-    
-    # Return
-    return p_new
     
     
   def estimate_density(fn):  

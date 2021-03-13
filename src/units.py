@@ -19,6 +19,26 @@ class units:
     'ANG': 1E10,
     'BOHR': 1.89E10,
     }
+    
+    # AREA METERS SQUARED
+    area = {
+    'M2': 1.0,
+    'CM2': 1E4,
+    'MM2': 1E6,
+    'UM2': 1E12,
+    'NM2': 1E18,
+    'ANG2': 1E20,
+    }
+    
+    # VOLUME METERS CUBED
+    volume = {
+    'M2': 1.0,
+    'CM2': 1E6,
+    'MM2': 1E9,
+    'UM2': 1E18,
+    'NM2': 1E27,
+    'ANG2': 1E30,
+    }
 
     # ENERGY J
     energy = {
@@ -61,7 +81,7 @@ class units:
     # TEMPERATURE
     
     
-    unit_list = [length, energy, force, velocity, pressure, charge_density]
+    unit_list = [length, area, volume, energy, force, velocity, pressure, charge_density]
     
     for l in unit_list:
       if(conv_from in l.keys() and conv_to in l.keys()):

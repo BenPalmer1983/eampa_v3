@@ -27,11 +27,14 @@ class b_props:
     except:
       dir = ""
       bp_file = g.inp['bp']['bp_file']
+
+    if(not(os.path.isfile(bp_file))):
+      return None
     
     # Read BP data file
     bp_inp = read_config.read_file(bp_file)
 
-    
+
     
     # READ IN UNITS
     try:
@@ -56,20 +59,26 @@ class b_props:
         label_str, label_id = labels.add(potlabel)     
         
         newbp = b_props.make(label_id, label_str)
+        newbp['bp_key_str'] = k
 
         # There must be an alat value set
         newbp['alat'] = float(bp_inp[k]['alat'])
         newbp['alat'] = units.convert(bp_length, 'ang', newbp['alat'])
+        #newbp['label_str'] = label_str
                 
         try:
           if(bp_inp[k]['type'].lower() == 'sc'):
             newbp['type'] = 1
+            newbp['type_text'] = 'Simple Cubic'
           elif(bp_inp[k]['type'].lower() == 'bcc'):
             newbp['type'] = 2
+            newbp['type_text'] = 'Body Centered Cubic'
           elif(bp_inp[k]['type'].lower() == 'fcc'):
             newbp['type'] = 3
+            newbp['type_text'] = 'Face Centered Cubic'
           elif(bp_inp[k]['type'].lower() == 'zb'):
             newbp['type'] = 4
+            newbp['type_text'] = 'Zinc Blende'
         except:
           pass 
           
@@ -178,10 +187,9 @@ class b_props:
               
         except:
           pass
-          
+        #print(newbp)  
         # Save to list
         g.bulk_properties.append(newbp)
-
 
         
   
@@ -192,6 +200,7 @@ class b_props:
     #
    
     bp_d ={
+           'bp_key_str': '',
            'label_id': label_id,
            'label_str': label_str,
            'alat': None,
@@ -206,6 +215,8 @@ class b_props:
            'e': None,
            'poisson': None,
            'amu_per_crystal': None,
+           'type': -1,
+           'type_text': '',
           }
     bp_d['uv'][:,:] = 0.0
     bp_d['uv'][0,0] = 1.0
@@ -222,52 +233,47 @@ class b_props:
   @staticmethod
   def bp_add():  
   
-
+    #print(g.pot_labels)
   
-    for bp_n in g.bulk_properties:
-      #bp_id = bp.add_fcc(6.5, g.bulk_properties[bp_n]['alat'], 1)    
-      #add_bp_config(rcut_in, alat_in, uv_in, label_in, crystal_type_in, expansion_in, bp_id)
-      """
-      rcut = g.bulk_properties[bp_n]['rcut']
-      alat = g.bulk_properties[bp_n]['alat']
-      uv = g.bulk_properties[bp_n]['uv']
-      label = g.bulk_properties[bp_n]['label_id']
-      type = g.bulk_properties[bp_n]['type']
-      expansion = g.bulk_properties[bp_n]['expansion']
-      """
-      rcut = bp_n['rcut']
-      alat = bp_n['alat']
-      uv = bp_n['uv']
-      label = bp_n['label_id']
-      type = bp_n['type']
-      expansion = bp_n['expansion']
+    for bp_i in range(len(g.bulk_properties)):
+      bp_n = g.bulk_properties[bp_i]
+      label_str = bp_n['label_str'].upper()
+      if(label_str in g.pot_labels):
+
+        rcut = bp_n['rcut']
+        alat = bp_n['alat']
+        uv = bp_n['uv']
+        label = bp_n['label_id']
+        type = bp_n['type']
+        expansion = bp_n['expansion']
       
       
-      # Add Config
-      bp_id = int(bp.add_bp_config(rcut, alat, uv, label, type, expansion))
-    
-      # Add known data
-      bp.add_alat(bp_id, bp_n['alat'])
-      bp.add_e0(bp_id, bp_n['e0'])
-      bp.add_b0(bp_id, bp_n['b0'])
-      bp.add_ec(bp_id, bp_n['ec'])
-      bp.add_amu_per_crystal(bp_id, bp_n['amu_per_crystal'])
+        # Add Config
+        bp_id = int(bp.add_bp_config(rcut, alat, uv, label, type, expansion))
+        g.bulk_properties[bp_i]['fortran_id'] = bp_id
+
+        # Add known data
+        bp.add_alat(bp_id, bp_n['alat'])
+        bp.add_e0(bp_id, bp_n['e0'])
+        bp.add_b0(bp_id, bp_n['b0'])
+        bp.add_ec(bp_id, bp_n['ec'])
+        bp.add_amu_per_crystal(bp_id, bp_n['amu_per_crystal'])
       
-      g.bp_ids[bp_id] = {}
-      g.bp_ids[bp_id]['rcut'] = rcut
-      g.bp_ids[bp_id]['alat'] = alat
-      g.bp_ids[bp_id]['uv'] = uv
-      g.bp_ids[bp_id]['label'] = label
-      g.bp_ids[bp_id]['type'] = type
-      g.bp_ids[bp_id]['expansion'] = expansion
-      g.bp_ids[bp_id]['e0'] = bp_n['e0']
-      g.bp_ids[bp_id]['b0'] = bp_n['b0']
-      g.bp_ids[bp_id]['ec'] = bp_n['ec']
-      g.bp_ids[bp_id]['amu_per_crystal'] = bp_n['amu_per_crystal']
-      
-      
-      
-    
+        g.bp_ids[bp_id] = {}
+        g.bp_ids[bp_id]['label_str'] = label_str
+        g.bp_ids[bp_id]['rcut'] = rcut
+        g.bp_ids[bp_id]['alat'] = alat
+        g.bp_ids[bp_id]['uv'] = uv
+        g.bp_ids[bp_id]['label'] = label
+        g.bp_ids[bp_id]['type'] = type
+        g.bp_ids[bp_id]['expansion'] = expansion
+        g.bp_ids[bp_id]['e0'] = bp_n['e0']
+        g.bp_ids[bp_id]['b0'] = bp_n['b0']
+        g.bp_ids[bp_id]['ec'] = bp_n['ec']
+        g.bp_ids[bp_id]['amu_per_crystal'] = bp_n['amu_per_crystal']
+        g.bp_ids[bp_id]['type'] = bp_n['type']
+        g.bp_ids[bp_id]['type_text'] = bp_n['type_text']
+        g.bp_ids[bp_id]['bp_key_str'] = bp_n['bp_key_str']
  
     # Add rss multiplication values
     try:
@@ -311,7 +317,15 @@ class b_props:
 
       t_pad = 30
       f_pad = 18
-      
+
+      std.write_file_line(fh, '', 1, '', 1)
+      std.write_file_line(fh, '', 1, '', 1)
+      std.write_file_line(fh, '', 1, '', 1)      
+      std.write_file_line(fh, '######################################################', 1, '', 1)
+      std.write_file_line(fh, 'LABEL  ' + str(g.bp_ids[bp_id]['label_str'] ), 1, '', 1)
+      std.write_file_line(fh, '######################################################', 1, '', 1)
+      std.write_file_line(fh, '', 1, '', 1)
+      std.write_file_line(fh, '', 1, '', 1)
       
       std.write_file_line(fh, '######################################################', 1, '', 1)
       std.write_file_line(fh, 'Known Properties', 1, '', 1)
@@ -524,7 +538,22 @@ class b_props:
       bp_b0 = g.bp_ids[bp_id+1]['b0']
       bp_ec = g.bp_ids[bp_id+1]['ec']
       bp_amu_per_crystal = g.bp_ids[bp_id+1]['amu_per_crystal']
-      
+
+ 
+
+
+      std.print_file_line('', 1, '', 1)
+      std.print_file_line('', 1, '', 1)
+      std.print_file_line('', 1, '', 1)   
+      std.print_file_line('############################################################################################################', 1, '', 1)
+      std.print_file_line('BP KEY          ' + str(g.bp_ids[bp_id+1]['bp_key_str'].upper()), 1, '', 1)
+      std.print_file_line('LABEL           ' + str(g.bp_ids[bp_id+1]['label_str']), 1, '', 1)
+      std.print_file_line('TYPE            ' + str(g.bp_ids[bp_id+1]['type_text']), 1, '', 1)
+      std.print_file_line('############################################################################################################', 1, '', 1)
+
+
+
+
 
       std.print_file_line('', 1, '', 1)
       std.print_file_line('######################################################', 1, '', 1)
@@ -566,10 +595,7 @@ class b_props:
       std.print_file_line('', 1, '', 1)
     
     
-    
-    
-    
-    
+      
 
       std.print_file_line('######################################################', 1, '', 1)
       std.print_file_line('Calculated Properties', 1, '', 1)
@@ -584,8 +610,25 @@ class b_props:
       std.print_file_line('b0:', t_pad, bp.calc_b0[bp_id], f_pad)
       std.print_file_line('b0/GPA:', t_pad, 160.230732254e0 * bp.calc_b0[bp_id], f_pad)
       std.print_file_line('', 1, '', 1)  
+      std.print_file_line('Stiffness Matrix', 1, '', 1)
+      std.print_file_line('#################', 1, '', 1)
+      std.print_file_line('Stiffness:', t_pad, bp.calc_ec[bp_id,0,:], f_pad)
+      for i in range(1,6):   
+        std.print_file_line('', t_pad, bp.calc_ec[bp_id,i,:], f_pad)
+      std.print_file_line('', 1, '', 1)
+      std.print_file_line('Stiffness (GPA):', t_pad, 160.230732254e0 * bp.calc_ec[bp_id,0,:], f_pad)
+      for i in range(1,6):   
+        std.print_file_line('', t_pad, 160.230732254e0 * bp.calc_ec[bp_id,i,:], f_pad)
+      std.print_file_line('', 1, '', 1)
+      std.print_file_line('', 1, '', 1)
     
     
+
+
+
+
+
+
     
     """ 
     for bp_id in range(bp.bp_configs_count):
@@ -656,6 +699,7 @@ class b_props:
   @staticmethod
   def bp_eos_plot(dir):       
   
+    
     for bp_id in range(bp.bp_configs_count):
     
       # EQUATION OF STATE
@@ -679,8 +723,8 @@ class b_props:
       plt.plot(bp.calc_volumes[bp_id, 0, 0:s], bp.calc_energies_fit[bp_id, 0, 0:s], color='k', ls='solid')
 
       
-      plt.savefig(dir + '/' + 'eos.svg')
-      plt.savefig(dir + '/' + 'eos.eps')
+      plt.savefig(dir + '/' + 'eos_' + str(bp_id) + '.svg')
+      plt.savefig(dir + '/' + 'eos_' + str(bp_id) + '.eps')
       
       
       # ELASTIC CONSTANTS
@@ -709,8 +753,8 @@ class b_props:
         axs[int(numpy.floor(dn/3)), dn % 3].set_ylabel('Energy (eV)')
                
  
-      plt.savefig(dir + '/' + 'ec.svg')
-      plt.savefig(dir + '/' + 'ec.eps')
+      plt.savefig(dir + '/' + 'ec_' + str(bp_id) + '.svg')
+      plt.savefig(dir + '/' + 'ec_' + str(bp_id) + '.eps')
       
     """
     n = globals.d['eos_data_size']

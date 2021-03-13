@@ -1,0 +1,46 @@
+
+# Run types:   plot, e, ef, efs, bp, es, rss, fit
+run type=fit
+
+#
+wd option=1
+
+# Memory
+mem bp=2GB efs=2GB
+
+# Display
+display output=1
+
+# Input files/dirs
+potential dir="pot/fe_olsson" index_file="fe.pot" rescale_embedding=True
+configs dir="configs"
+bp dir='bp' bp_file='bp.dat' eos_size=6 eos_strain=0.001 ec_size=6 ec_strain=0.001
+
+# Rss weights
+# config * (e + f + s)   bp * (a0 + e0 + b0 + ec + g + e + v)
+# Weighting config = 0 and bp = 0 should turn off those calcs
+rss_weights config=1.7 energy=1.2 force=1.5 stress=1.3 bp=1000.0 a0=25.0 e0=25.0 b0=1.0 ec=1.0 g=1.00 e=1.00 v=1.00 negec=1000.0
+
+# Rss weights - max density, outside of accepted range
+rss_max_density min=0.1 max=100.0 scale_factor=10.0 scale_exponent=4.0 zero_density_factor=1.0e8
+
+
+
+
+# Fitting options
+fitting top_parameters=100 load_top_parameters=0 oversized_parameters=2.0,0.25,0.5,0.5,0.5
+fit1 type=random random_size=1000
+fit2 type=random random_size=1000
+fit3 type=ga gens=12 pop_size=1000 fresh_size=200 no_clone_var=0.0001 gen_variation_multiplier=0.2
+fit4 type=sa sa_temp_start=10.0 sa_temp_end=0.01 sa_loops_t=15 sa_loops_i=1000 sa_step=0.01 sa_step_factor=0.25
+
+
+# Fit Results
+fit_results results_dir=results
+
+
+# Label masks
+mask fe1=fe fe2=fe fe3=fe fe4=fe
+
+# DFT
+dft Al=32,-1264.06398979,Ry,-3.36,eV Fe=16,-5268.188,Ry,-4.316,eV Pd=32,-16384.958,Ry,-3.91,eV

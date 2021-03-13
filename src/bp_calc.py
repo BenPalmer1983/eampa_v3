@@ -28,6 +28,8 @@ class bp_calc:
   def run():  
   
     print("Calc Bulk Properties") 
+
+    bp_calc.output_dir()
     
     # Setup BP
     bp_calc.init()
@@ -41,10 +43,14 @@ class bp_calc:
     # Calculate energies of configurations for all structures
     bp.energy() 
    
+    #print(bp.cc)
+    #print(bp.calc_count)
+    #print(bp.cc_log[0,1)
+
+
         
     # Calculate BP
     bp.calculate_bp()   
-    
     
     #print(bp.rss)
     
@@ -54,6 +60,10 @@ class bp_calc:
     
     # Output to File
     #b_props.bp_output()
+
+
+    b_props.bp_eos_plot(g.dirs['wd'] + '/bp')
+    
     
     # Plots
     #b_props.bp_eos_plot()
@@ -62,6 +72,9 @@ class bp_calc:
     
     
     
+
+  def output_dir():
+    std.make_dir(g.dirs['wd'] + '/bp')
     
   def init():
     # Log
@@ -107,11 +120,14 @@ class bp_calc:
     bp.set_rss_g(g.rss_weights['g'])
     bp.set_rss_e(g.rss_weights['e'])
     bp.set_rss_v(g.rss_weights['v'])
+    bp.set_rss_neg_ec(g.rss_weights['negec'])
     
         
         
   def get_results(): 
+
     bp_calc.get_known()  
+
     # Make Dictionary
     g.bp_results = {}    
     try:             
@@ -120,6 +136,7 @@ class bp_calc:
       g.bp_results['bp_calculations'] = []
       g.bp_results['input'] = {}
       bp_id = 0
+
       while(bp.bp_keys_i[bp_id,0] > -1):
         g.bp_results['input'][bp_id] = g.bp_ids[bp_id+1]
         g.bp_results['bp_calculations'].append({'a0': None, 'e0': None, 'b0': None, 'ec': None, 'g': None, 'e': None, 'v': None,'b0_gpa': None,'ec_gpa': None,})
@@ -137,6 +154,7 @@ class bp_calc:
             for j in range(6):
               g.bp_results['bp_calculations'][bp_id]['ec'][i,j] = float(bp.calc_ec[bp_id, i, j])
               g.bp_results['bp_calculations'][bp_id]['ec_gpa'][i,j] = 160.230732254 * float(bp.calc_ec[bp_id, i, j])
+        
         if(bp.known_set[bp_id, 4] == 1):
           g.bp_results['bp_calculations'][bp_id]['g'] = float(bp.calc_g[bp_id])
         if(bp.known_set[bp_id, 5] == 1):
@@ -147,7 +165,6 @@ class bp_calc:
     except:
       g.bp_results['ok'] = False
       g.bp_results['cc'] = 0 
-
 
   def get_known(): 
     # Make Dictionary
@@ -190,8 +207,22 @@ class bp_calc:
     
     
     
-  def get_rss():  
-     
+  def get_rss():      
+
+    """
+    # Bias so worse RSS if the density is out of range
+    f = 1.0  
+    if(bp.max_density < g.rss_max_density['min']):
+      f = 1.0 + (100.0 * (g.rss_max_density['min'] - bp.max_density))**4
+    if(bp.max_density > g.rss_max_density['max']):
+      f = 1.0 + (g.rss_max_density['scale_factor'] * (bp.max_density - 0.8))**g.rss_max_density['scale_exponent']
+    """
+    f = 1.0  
+    if(bp.max_density == 0.0):
+      f = g.rss_max_density['zero_density_factor']  
+
+    
+
     try:
       # Make Dictionary
       g.rss['bp'] = {}
@@ -199,7 +230,7 @@ class bp_calc:
       g.rss['bp']['cc'] = int(bp.cc)
       # Totals
       g.rss['bp']['total_rss'] = float(bp.rss_total_rss)
-      g.rss['bp']['total_rss_weighted'] = float(bp.rss_total_rss_w)
+      g.rss['bp']['total_rss_weighted'] = f * float(bp.rss_total_rss_w)
       # Individual RSS
       g.rss['bp']['a0'] = float(bp.rss_by_type[0])
       g.rss['bp']['e0'] = float(bp.rss_by_type[1])
@@ -209,53 +240,25 @@ class bp_calc:
       g.rss['bp']['e'] = float(bp.rss_by_type[5])    
       g.rss['bp']['v'] = float(bp.rss_by_type[6])
       # Weighted RSS
-      g.rss['bp']['a0_weighted'] = float(bp.rss_by_type_w[0])
-      g.rss['bp']['e0_weighted'] = float(bp.rss_by_type_w[1])
-      g.rss['bp']['b0_weighted'] = float(bp.rss_by_type_w[2])
-      g.rss['bp']['ec_weighted'] = float(bp.rss_by_type_w[3])
-      g.rss['bp']['g_weighted'] = float(bp.rss_by_type_w[4])
-      g.rss['bp']['e_weighted'] = float(bp.rss_by_type_w[5])    
-      g.rss['bp']['v_weighted'] = float(bp.rss_by_type_w[6])
+      g.rss['bp']['a0_weighted'] = f * float(bp.rss_by_type_w[0])
+      g.rss['bp']['e0_weighted'] = f * float(bp.rss_by_type_w[1])
+      g.rss['bp']['b0_weighted'] = f * float(bp.rss_by_type_w[2])
+      g.rss['bp']['ec_weighted'] = f * float(bp.rss_by_type_w[3])
+      g.rss['bp']['g_weighted'] = f * float(bp.rss_by_type_w[4])
+      g.rss['bp']['e_weighted'] = f * float(bp.rss_by_type_w[5])    
+      g.rss['bp']['v_weighted'] = f * float(bp.rss_by_type_w[6])
     except:
       # Make Dictionary
       g.rss['bp'] = {}
       g.rss['bp']['ok'] = False
       g.rss['bp']['cc'] = 0 
            
+
+
+    for i in range(bp.residuals_n):
+      g.rss['residual'].append(f * float(bp.residuals[i]))
       
       
       
       
-      
-    """   
-    try:
-      # Make Dictionary
-      g.rss_bp = {}
-      g.rss_bp['ok'] = True  
-      g.rss_bp['cc'] = int(bp.cc)
-      # Totals
-      g.rss_bp['total_rss'] = float(bp.rss_total_rss)
-      g.rss_bp['total_rss_weighted'] = float(bp.rss_total_rss_w)
-      # Individual RSS
-      g.rss_bp['a0'] = float(bp.rss_by_type[0])
-      g.rss_bp['e0'] = float(bp.rss_by_type[1])
-      g.rss_bp['b0'] = float(bp.rss_by_type[2])
-      g.rss_bp['ec'] = float(bp.rss_by_type[3])
-      g.rss_bp['g'] = float(bp.rss_by_type[4])
-      g.rss_bp['e'] = float(bp.rss_by_type[5])    
-      g.rss_bp['v'] = float(bp.rss_by_type[6])
-      # Weighted RSS
-      g.rss_bp['a0_weighted'] = float(bp.rss_by_type_w[0])
-      g.rss_bp['e0_weighted'] = float(bp.rss_by_type_w[1])
-      g.rss_bp['b0_weighted'] = float(bp.rss_by_type_w[2])
-      g.rss_bp['ec_weighted'] = float(bp.rss_by_type_w[3])
-      g.rss_bp['g_weighted'] = float(bp.rss_by_type_w[4])
-      g.rss_bp['e_weighted'] = float(bp.rss_by_type_w[5])    
-      g.rss_bp['v_weighted'] = float(bp.rss_by_type_w[6])
-    except:
-      # Make Dictionary
-      g.rss_bp = {}
-      g.rss_bp['ok'] = False
-      g.rss_bp['cc'] = 0 
-    """  
-    
+
