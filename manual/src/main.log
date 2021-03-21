@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2019.11.14)  21 MAR 2021 00:59
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2019.11.14)  21 MAR 2021 01:22
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -2398,6 +2398,24 @@ LaTeX Warning: Label `graph:graph1' multiply defined.
 
 LaTeX Warning: Label `graph:graph1' multiply defined.
 
+
+LaTeX Warning: Label `graph:graph1' multiply defined.
+
+
+LaTeX Warning: Label `graph:graph1' multiply defined.
+
+
+LaTeX Warning: Label `graph:graph1' multiply defined.
+
+
+LaTeX Warning: Label `graph:graph1' multiply defined.
+
+
+LaTeX Warning: Label `graph:graph1' multiply defined.
+
+
+LaTeX Warning: Label `graph:graph1' multiply defined.
+
 )
 \openout1 = `main.aux'.
 
@@ -2526,13 +2544,27 @@ Package pdftex.def Info: img/coverart.png  used on input line 123.
 
 
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map} <./img/coverart.png>] (./ma
-in.toc)
+in.toc<<oml.cmap>><<oms.cmap>><<omx.cmap>>
+LaTeX Font Info:    Try loading font information for U+msa on input line 5.
+ (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd
+File: umsa.fd 2013/01/14 v3.01 AMS symbols A
+)
+LaTeX Font Info:    Try loading font information for U+msb on input line 5.
+
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd
+File: umsb.fd 2013/01/14 v3.01 AMS symbols B
+)
+LaTeX Font Info:    Try loading font information for U+lasy on input line 5.
+
+(/usr/share/texlive/texmf-dist/tex/latex/base/ulasy.fd
+File: ulasy.fd 1998/08/17 v2.2e LaTeX symbol font definitions
+) [1
+
+])
 \tf@toc=\write6
 \openout6 = `main.toc'.
 
- [1
-
-]
+ [1]
 Chapter 1.
 LaTeX Font Info:    Try loading font information for OMS+cmr on input line 163.
 
@@ -2541,21 +2573,7 @@ File: omscmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
 (Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 163.
-<<oms.cmap>><<oml.cmap>><<omx.cmap>>
-LaTeX Font Info:    Try loading font information for U+msa on input line 178.
- (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd
-File: umsa.fd 2013/01/14 v3.01 AMS symbols A
-)
-LaTeX Font Info:    Try loading font information for U+msb on input line 178.
-
-(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd
-File: umsb.fd 2013/01/14 v3.01 AMS symbols B
-)
-LaTeX Font Info:    Try loading font information for U+lasy on input line 178.
-
-(/usr/share/texlive/texmf-dist/tex/latex/base/ulasy.fd
-File: ulasy.fd 1998/08/17 v2.2e LaTeX symbol font definitions
-) [2
+ [2
 
 ]
 Chapter 2.
@@ -2576,7 +2594,7 @@ Package epstopdf Info: Output file is already uptodate.
 
 pdfTeX warning: pdflatex (file ./img/atom_neighbours-eps-converted-to.pdf): PDF
  inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<img/atom_neighbours-eps-converted-to.pdf, id=32, 867.24pt x 650.43pt>
+<img/atom_neighbours-eps-converted-to.pdf, id=35, 867.24pt x 650.43pt>
 File: img/atom_neighbours-eps-converted-to.pdf Graphic file (type pdf)
 <use img/atom_neighbours-eps-converted-to.pdf>
 Package pdftex.def Info: img/atom_neighbours-eps-converted-to.pdf  used on inpu
@@ -2645,20 +2663,20 @@ df>
 (epstopdf)                    size: 12199 bytes
 (epstopdf)             Command: <repstopdf --outfile=img/plots/lennard_jones-ep
 s-converted-to.pdf img/plots/lennard_jones.eps>
-(epstopdf)             \includegraphics on input line 1037.
+(epstopdf)             \includegraphics on input line 1044.
 Package epstopdf Info: Output file is already uptodate.
 
 
 pdfTeX warning: pdflatex (file ./img/plots/lennard_jones-eps-converted-to.pdf):
  PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<img/plots/lennard_jones-eps-converted-to.pdf, id=134, 505.89pt x 361.35pt>
+<img/plots/lennard_jones-eps-converted-to.pdf, id=137, 505.89pt x 361.35pt>
 File: img/plots/lennard_jones-eps-converted-to.pdf Graphic file (type pdf)
 <use img/plots/lennard_jones-eps-converted-to.pdf>
 Package pdftex.def Info: img/plots/lennard_jones-eps-converted-to.pdf  used on 
-input line 1037.
+input line 1044.
 (pdftex.def)             Requested size: 505.88875pt x 361.34912pt.
 
-Overfull \hbox (68.9142pt too wide) in paragraph at lines 1037--1038
+Overfull \hbox (68.9142pt too wide) in paragraph at lines 1044--1045
  []\OT1/cmr/m/n/10 [scale=0.6] 
  []
 
@@ -2673,20 +2691,20 @@ Package epstopdf Info: Source file: <img/plots/morse.eps>
 (epstopdf)                    size: 10975 bytes
 (epstopdf)             Command: <repstopdf --outfile=img/plots/morse-eps-conver
 ted-to.pdf img/plots/morse.eps>
-(epstopdf)             \includegraphics on input line 1067.
+(epstopdf)             \includegraphics on input line 1074.
 Package epstopdf Info: Output file is already uptodate.
 
 
 pdfTeX warning: pdflatex (file ./img/plots/morse-eps-converted-to.pdf): PDF inc
 lusion: found PDF version <1.7>, but at most version <1.5> allowed
-<img/plots/morse-eps-converted-to.pdf, id=135, 505.89pt x 361.35pt>
+<img/plots/morse-eps-converted-to.pdf, id=138, 505.89pt x 361.35pt>
 File: img/plots/morse-eps-converted-to.pdf Graphic file (type pdf)
 <use img/plots/morse-eps-converted-to.pdf>
 Package pdftex.def Info: img/plots/morse-eps-converted-to.pdf  used on input li
-ne 1067.
+ne 1074.
 (pdftex.def)             Requested size: 505.88875pt x 361.34912pt.
 
-Overfull \hbox (68.9142pt too wide) in paragraph at lines 1067--1068
+Overfull \hbox (68.9142pt too wide) in paragraph at lines 1074--1075
  []\OT1/cmr/m/n/10 [scale=0.6] 
  []
 
@@ -2702,20 +2720,20 @@ Package epstopdf Info: Source file: <img/plots/buckingham.eps>
 (epstopdf)                    size: 13699 bytes
 (epstopdf)             Command: <repstopdf --outfile=img/plots/buckingham-eps-c
 onverted-to.pdf img/plots/buckingham.eps>
-(epstopdf)             \includegraphics on input line 1096.
+(epstopdf)             \includegraphics on input line 1103.
 Package epstopdf Info: Output file is already uptodate.
 
 
 pdfTeX warning: pdflatex (file ./img/plots/buckingham-eps-converted-to.pdf): PD
 F inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<img/plots/buckingham-eps-converted-to.pdf, id=136, 505.89pt x 361.35pt>
+<img/plots/buckingham-eps-converted-to.pdf, id=139, 505.89pt x 361.35pt>
 File: img/plots/buckingham-eps-converted-to.pdf Graphic file (type pdf)
 <use img/plots/buckingham-eps-converted-to.pdf>
 Package pdftex.def Info: img/plots/buckingham-eps-converted-to.pdf  used on inp
-ut line 1096.
+ut line 1103.
 (pdftex.def)             Requested size: 505.88875pt x 361.34912pt.
 
-Overfull \hbox (68.9142pt too wide) in paragraph at lines 1096--1097
+Overfull \hbox (68.9142pt too wide) in paragraph at lines 1103--1104
  []\OT1/cmr/m/n/10 [scale=0.6] 
  []
 
@@ -2734,20 +2752,20 @@ o.pdf>
 (epstopdf)                    size: 11613 bytes
 (epstopdf)             Command: <repstopdf --outfile=img/plots/quartic_poly_rep
 -eps-converted-to.pdf img/plots/quartic_poly_rep.eps>
-(epstopdf)             \includegraphics on input line 1141.
+(epstopdf)             \includegraphics on input line 1148.
 Package epstopdf Info: Output file is already uptodate.
 
 
 pdfTeX warning: pdflatex (file ./img/plots/quartic_poly_rep-eps-converted-to.pd
 f): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<img/plots/quartic_poly_rep-eps-converted-to.pdf, id=140, 505.89pt x 361.35pt>
+<img/plots/quartic_poly_rep-eps-converted-to.pdf, id=143, 505.89pt x 361.35pt>
 File: img/plots/quartic_poly_rep-eps-converted-to.pdf Graphic file (type pdf)
 <use img/plots/quartic_poly_rep-eps-converted-to.pdf>
 Package pdftex.def Info: img/plots/quartic_poly_rep-eps-converted-to.pdf  used 
-on input line 1141.
+on input line 1148.
 (pdftex.def)             Requested size: 505.88875pt x 361.34912pt.
 
-Overfull \hbox (68.9142pt too wide) in paragraph at lines 1141--1142
+Overfull \hbox (68.9142pt too wide) in paragraph at lines 1148--1149
  []\OT1/cmr/m/n/10 [scale=0.6] 
  []
 
@@ -2764,21 +2782,21 @@ to.pdf>
 (epstopdf)                    size: 13567 bytes
 (epstopdf)             Command: <repstopdf --outfile=img/plots/quadratic_densit
 y-eps-converted-to.pdf img/plots/quadratic_density.eps>
-(epstopdf)             \includegraphics on input line 1174.
+(epstopdf)             \includegraphics on input line 1181.
 Package epstopdf Info: Output file is already uptodate.
 
 
 pdfTeX warning: pdflatex (file ./img/plots/quadratic_density-eps-converted-to.p
 df): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<img/plots/quadratic_density-eps-converted-to.pdf, id=171, 505.89pt x 361.35pt>
+<img/plots/quadratic_density-eps-converted-to.pdf, id=174, 505.89pt x 361.35pt>
 
 File: img/plots/quadratic_density-eps-converted-to.pdf Graphic file (type pdf)
 <use img/plots/quadratic_density-eps-converted-to.pdf>
 Package pdftex.def Info: img/plots/quadratic_density-eps-converted-to.pdf  used
- on input line 1174.
+ on input line 1181.
 (pdftex.def)             Requested size: 505.88875pt x 361.34912pt.
 
-Overfull \hbox (68.9142pt too wide) in paragraph at lines 1174--1175
+Overfull \hbox (68.9142pt too wide) in paragraph at lines 1181--1182
  []\OT1/cmr/m/n/10 [scale=0.6] 
  []
 
@@ -2794,20 +2812,20 @@ Package epstopdf Info: Source file: <img/plots/slater_4s.eps>
 (epstopdf)                    size: 11923 bytes
 (epstopdf)             Command: <repstopdf --outfile=img/plots/slater_4s-eps-co
 nverted-to.pdf img/plots/slater_4s.eps>
-(epstopdf)             \includegraphics on input line 1200.
+(epstopdf)             \includegraphics on input line 1207.
 Package epstopdf Info: Output file is already uptodate.
 
 
 pdfTeX warning: pdflatex (file ./img/plots/slater_4s-eps-converted-to.pdf): PDF
  inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<img/plots/slater_4s-eps-converted-to.pdf, id=198, 505.89pt x 361.35pt>
+<img/plots/slater_4s-eps-converted-to.pdf, id=201, 505.89pt x 361.35pt>
 File: img/plots/slater_4s-eps-converted-to.pdf Graphic file (type pdf)
 <use img/plots/slater_4s-eps-converted-to.pdf>
 Package pdftex.def Info: img/plots/slater_4s-eps-converted-to.pdf  used on inpu
-t line 1200.
+t line 1207.
 (pdftex.def)             Requested size: 505.88875pt x 361.34912pt.
 
-Overfull \hbox (68.9142pt too wide) in paragraph at lines 1200--1201
+Overfull \hbox (68.9142pt too wide) in paragraph at lines 1207--1208
  []\OT1/cmr/m/n/10 [scale=0.6] 
  []
 
@@ -2823,20 +2841,20 @@ f>
 (epstopdf)                    size: 14940 bytes
 (epstopdf)             Command: <repstopdf --outfile=img/plots/fs_embedding-eps
 -converted-to.pdf img/plots/fs_embedding.eps>
-(epstopdf)             \includegraphics on input line 1234.
+(epstopdf)             \includegraphics on input line 1241.
 Package epstopdf Info: Output file is already uptodate.
 
 
 pdfTeX warning: pdflatex (file ./img/plots/fs_embedding-eps-converted-to.pdf): 
 PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<img/plots/fs_embedding-eps-converted-to.pdf, id=199, 505.89pt x 361.35pt>
+<img/plots/fs_embedding-eps-converted-to.pdf, id=202, 505.89pt x 361.35pt>
 File: img/plots/fs_embedding-eps-converted-to.pdf Graphic file (type pdf)
 <use img/plots/fs_embedding-eps-converted-to.pdf>
 Package pdftex.def Info: img/plots/fs_embedding-eps-converted-to.pdf  used on i
-nput line 1234.
+nput line 1241.
 (pdftex.def)             Requested size: 505.88875pt x 361.34912pt.
 
-Overfull \hbox (68.9142pt too wide) in paragraph at lines 1234--1235
+Overfull \hbox (68.9142pt too wide) in paragraph at lines 1241--1242
  []\OT1/cmr/m/n/10 [scale=0.6] 
  []
 
@@ -2853,23 +2871,23 @@ Package epstopdf Info: Source file: <img/plots/mendelev_embedding.eps>
 (epstopdf)                    size: 12236 bytes
 (epstopdf)             Command: <repstopdf --outfile=img/plots/mendelev_embeddi
 ng-eps-converted-to.pdf img/plots/mendelev_embedding.eps>
-(epstopdf)             \includegraphics on input line 1260.
+(epstopdf)             \includegraphics on input line 1267.
 Package epstopdf Info: Output file is already uptodate.
 
 
 pdfTeX warning: pdflatex (file ./img/plots/mendelev_embedding-eps-converted-to.
 pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
 
-<img/plots/mendelev_embedding-eps-converted-to.pdf, id=233, 505.89pt x 361.35pt
+<img/plots/mendelev_embedding-eps-converted-to.pdf, id=236, 505.89pt x 361.35pt
 >
 File: img/plots/mendelev_embedding-eps-converted-to.pdf Graphic file (type pdf)
 
 <use img/plots/mendelev_embedding-eps-converted-to.pdf>
 Package pdftex.def Info: img/plots/mendelev_embedding-eps-converted-to.pdf  use
-d on input line 1260.
+d on input line 1267.
 (pdftex.def)             Requested size: 505.88875pt x 361.34912pt.
 
-Overfull \hbox (68.9142pt too wide) in paragraph at lines 1260--1261
+Overfull \hbox (68.9142pt too wide) in paragraph at lines 1267--1268
  []\OT1/cmr/m/n/10 [scale=0.6] 
  []
 
@@ -2886,20 +2904,20 @@ o.pdf>
 (epstopdf)                    size: 13214 bytes
 (epstopdf)             Command: <repstopdf --outfile=img/plots/triple_embedding
 -eps-converted-to.pdf img/plots/triple_embedding.eps>
-(epstopdf)             \includegraphics on input line 1286.
+(epstopdf)             \includegraphics on input line 1293.
 Package epstopdf Info: Output file is already uptodate.
 
 
 pdfTeX warning: pdflatex (file ./img/plots/triple_embedding-eps-converted-to.pd
 f): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<img/plots/triple_embedding-eps-converted-to.pdf, id=263, 505.89pt x 361.35pt>
+<img/plots/triple_embedding-eps-converted-to.pdf, id=267, 505.89pt x 361.35pt>
 File: img/plots/triple_embedding-eps-converted-to.pdf Graphic file (type pdf)
 <use img/plots/triple_embedding-eps-converted-to.pdf>
 Package pdftex.def Info: img/plots/triple_embedding-eps-converted-to.pdf  used 
-on input line 1286.
+on input line 1293.
 (pdftex.def)             Requested size: 505.88875pt x 361.34912pt.
 
-Overfull \hbox (68.9142pt too wide) in paragraph at lines 1286--1287
+Overfull \hbox (68.9142pt too wide) in paragraph at lines 1293--1294
  []\OT1/cmr/m/n/10 [scale=0.6] 
  []
 
@@ -2915,21 +2933,21 @@ to.pdf>
 (epstopdf)                    size: 13598 bytes
 (epstopdf)             Command: <repstopdf --outfile=img/plots/ackland_embeddin
 g-eps-converted-to.pdf img/plots/ackland_embedding.eps>
-(epstopdf)             \includegraphics on input line 1313.
+(epstopdf)             \includegraphics on input line 1320.
 Package epstopdf Info: Output file is already uptodate.
 
 
 pdfTeX warning: pdflatex (file ./img/plots/ackland_embedding-eps-converted-to.p
 df): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<img/plots/ackland_embedding-eps-converted-to.pdf, id=264, 505.89pt x 361.35pt>
+<img/plots/ackland_embedding-eps-converted-to.pdf, id=268, 505.89pt x 361.35pt>
 
 File: img/plots/ackland_embedding-eps-converted-to.pdf Graphic file (type pdf)
 <use img/plots/ackland_embedding-eps-converted-to.pdf>
 Package pdftex.def Info: img/plots/ackland_embedding-eps-converted-to.pdf  used
- on input line 1313.
+ on input line 1320.
 (pdftex.def)             Requested size: 505.88875pt x 361.34912pt.
 
-Overfull \hbox (68.9142pt too wide) in paragraph at lines 1313--1314
+Overfull \hbox (68.9142pt too wide) in paragraph at lines 1320--1321
  []\OT1/cmr/m/n/10 [scale=0.6] 
  []
 
@@ -2946,20 +2964,20 @@ f>
 (epstopdf)                    size: 11910 bytes
 (epstopdf)             Command: <repstopdf --outfile=img/plots/cubic_spline-eps
 -converted-to.pdf img/plots/cubic_spline.eps>
-(epstopdf)             \includegraphics on input line 1351.
+(epstopdf)             \includegraphics on input line 1358.
 Package epstopdf Info: Output file is already uptodate.
 
 
 pdfTeX warning: pdflatex (file ./img/plots/cubic_spline-eps-converted-to.pdf): 
 PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<img/plots/cubic_spline-eps-converted-to.pdf, id=299, 505.89pt x 361.35pt>
+<img/plots/cubic_spline-eps-converted-to.pdf, id=302, 505.89pt x 361.35pt>
 File: img/plots/cubic_spline-eps-converted-to.pdf Graphic file (type pdf)
 <use img/plots/cubic_spline-eps-converted-to.pdf>
 Package pdftex.def Info: img/plots/cubic_spline-eps-converted-to.pdf  used on i
-nput line 1351.
+nput line 1358.
 (pdftex.def)             Requested size: 505.88875pt x 361.34912pt.
 
-Overfull \hbox (68.9142pt too wide) in paragraph at lines 1351--1352
+Overfull \hbox (68.9142pt too wide) in paragraph at lines 1358--1359
  []\OT1/cmr/m/n/10 [scale=0.6] 
  []
 
@@ -2973,28 +2991,24 @@ Package epstopdf Info: Source file: <img/plots/quintic_spline.eps>
 (epstopdf)                    size: 20103 bytes
 (epstopdf)             Output file: <img/plots/quintic_spline-eps-converted-to.
 pdf>
+(epstopdf)                    date: 2021-03-21 00:59:10
+(epstopdf)                    size: 11479 bytes
 (epstopdf)             Command: <repstopdf --outfile=img/plots/quintic_spline-e
 ps-converted-to.pdf img/plots/quintic_spline.eps>
-(epstopdf)             \includegraphics on input line 1385.
-runsystem(repstopdf --outfile=img/plots/quintic_spline-eps-converted-to.pdf img
-/plots/quintic_spline.eps)...executed safely (allowed).
-
-Package epstopdf Info: Result file: <img/plots/quintic_spline-eps-converted-to.
-pdf>
-(epstopdf)                    date: 2021-03-21 00:59:10
-(epstopdf)                    size: 11479 bytes.
+(epstopdf)             \includegraphics on input line 1392.
+Package epstopdf Info: Output file is already uptodate.
 
 
 pdfTeX warning: pdflatex (file ./img/plots/quintic_spline-eps-converted-to.pdf)
 : PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<img/plots/quintic_spline-eps-converted-to.pdf, id=366, 505.89pt x 361.35pt>
+<img/plots/quintic_spline-eps-converted-to.pdf, id=369, 505.89pt x 361.35pt>
 File: img/plots/quintic_spline-eps-converted-to.pdf Graphic file (type pdf)
 <use img/plots/quintic_spline-eps-converted-to.pdf>
 Package pdftex.def Info: img/plots/quintic_spline-eps-converted-to.pdf  used on
- input line 1385.
+ input line 1392.
 (pdftex.def)             Requested size: 505.88875pt x 361.34912pt.
 
-Overfull \hbox (68.9142pt too wide) in paragraph at lines 1385--1386
+Overfull \hbox (68.9142pt too wide) in paragraph at lines 1392--1393
  []\OT1/cmr/m/n/10 [scale=0.6] 
  []
 
@@ -3002,7 +3016,7 @@ Overfull \hbox (68.9142pt too wide) in paragraph at lines 1385--1386
 LaTeX Warning: `h' float specifier changed to `ht'.
 
 
-LaTeX Warning: Empty bibliography on input line 1441.
+LaTeX Warning: Empty bibliography on input line 1448.
 
 [27 <./img/plots/mendelev_embedding-eps-converted-to.pdf>] [28 <./img/plots/tri
 ple_embedding-eps-converted-to.pdf>] [29 <./img/plots/ackland_embedding-eps-con
@@ -3024,13 +3038,13 @@ Package logreq Info: Writing requests to 'main.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 38382 strings out of 492982
- 761392 string characters out of 6134895
+ 38383 strings out of 492982
+ 761409 string characters out of 6134895
  1143171 words of memory out of 5000000
  41338 multiletter control sequences out of 15000+600000
  535485 words of font info for 44 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 71i,23n,69p,10368b,1620s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 71i,23n,69p,10368b,1622s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></us
 r/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/shar
 e/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texl
@@ -3043,10 +3057,10 @@ sfonts/cm/cmr9.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/c
 m/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy
 5.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb><
 /usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt9.pfb>
-Output written on main.pdf (32 pages, 660621 bytes).
+Output written on main.pdf (33 pages, 665397 bytes).
 PDF statistics:
- 563 PDF objects out of 1000 (max. 8388607)
- 172 compressed objects within 2 object streams
+ 566 PDF objects out of 1000 (max. 8388607)
+ 174 compressed objects within 2 object streams
  0 named destinations out of 1000 (max. 500000)
  127 words of extra memory for PDF output out of 10000 (max. 10000000)
 

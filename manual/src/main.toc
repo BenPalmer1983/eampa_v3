@@ -56,6 +56,10 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {chapter}{\numberline {4}How To Use}{17}
 \defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {4.1}Set Up Working Directory}{17}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {4.2}}{17}
+\defcounter {refsection}{0}\relax 
 \contentsline {chapter}{Appendices}{18}
 \defcounter {refsection}{0}\relax 
 \contentsline {chapter}{\numberline {A}Functions}{19}
