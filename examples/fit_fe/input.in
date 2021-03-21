@@ -1,6 +1,6 @@
 
 # Run types:   plot, e, ef, efs, bp, es, rss, fit
-run type=fit
+run type=rss
 
 #
 wd option=1

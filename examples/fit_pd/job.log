@@ -1,106 +1,106 @@
 #############################################################################
-5.378E-03 ###   Sat, 13 Mar 2021 15:58:18 +0000
+5.439E-03 ###   Sat, 13 Mar 2021 20:49:20 +0000
 #############################################################################
 
 ####TIME#############LOG#####################################################
-1.235E-02 ###   Script: /cloud/Code/python/eampa/eampa.py
-1.599E-02 ###   Loaded: input.in
+1.230E-02 ###   Script: /cloud/Code/python/eampa/eampa.py
+1.574E-02 ###   Loaded: input.in
 #############################################
   Read Input
-  Time: 1.782E-02
+  Time: 1.749E-02
 #############################################
-1.952E-02 ###   rss
-2.122E-02 ###   a0: 25.0
-2.122E-02 ###   b0: 1.0
-2.123E-02 ###   bp: 1000.0
-2.123E-02 ###   config: 1.7
-2.123E-02 ###   e: 1.0
-2.123E-02 ###   e0: 25.0
-2.123E-02 ###   ec: 1.0
-2.123E-02 ###   energy: 1.2
-2.123E-02 ###   force: 1.5
-2.123E-02 ###   g: 1.0
-2.123E-02 ###   negec: 1000.0
-2.124E-02 ###   stress: 1.3
-2.124E-02 ###   v: 1.0
-2.124E-02 ###   
-2.294E-02 ###   max: 100.0
-2.294E-02 ###   min: 0.1
-2.294E-02 ###   scale_exponent: 4.0
-2.294E-02 ###   scale_factor: 10.0
-2.294E-02 ###   zero_density_factor: 100000000.0
-2.294E-02 ###   
-2.472E-02 ###   pot_dir: None
-2.473E-02 ###   pot_name: None
-2.473E-02 ###   results_dir: results
-2.473E-02 ###   
-2.649E-02 ###   bp_file: bp.dat
-2.649E-02 ###   dir: bp
-2.649E-02 ###   ec_size: 6
-2.649E-02 ###   ec_strain: 0.001
-2.650E-02 ###   eos_size: 6
-2.650E-02 ###   eos_strain: 0.001
-2.650E-02 ###   
-2.818E-02 ###   FE1: FE
-2.818E-02 ###   FE2: FE
-2.818E-02 ###   FE3: FE
-2.818E-02 ###   FE4: FE
-2.819E-02 ###   
-2.992E-02 ###   1: {'label_id': 1, 'label_text': 'AL', 'atom_count': 32, 'relaxed_energy': -1264.06398979, 'relaxed_energy_unit': 'Ry', 'coh_energy': -3.36, 'coh_energy_unit': 'eV', 'calc_relaxed_dft_ev': -537.454181036, 'calc_coh_ev': -3.36, 'calc_apaev': 534.094181036}
-2.992E-02 ###   2: {'label_id': 2, 'label_text': 'FE', 'atom_count': 16, 'relaxed_energy': -5268.188, 'relaxed_energy_unit': 'Ry', 'coh_energy': -4.316, 'coh_energy_unit': 'eV', 'calc_relaxed_dft_ev': -4479.851795407, 'calc_coh_ev': -4.316, 'calc_apaev': 4475.5357954070005}
-2.992E-02 ###   3: {'label_id': 3, 'label_text': 'PD', 'atom_count': 32, 'relaxed_energy': -16384.958, 'relaxed_energy_unit': 'Ry', 'coh_energy': -3.91, 'coh_energy_unit': 'eV', 'calc_relaxed_dft_ev': -6966.549363269, 'calc_coh_ev': -3.91, 'calc_apaev': 6962.639363269001}
-2.992E-02 ###   
+1.918E-02 ###   rss
+2.084E-02 ###   a0: 25.0
+2.084E-02 ###   b0: 1.0
+2.084E-02 ###   bp: 1000.0
+2.084E-02 ###   config: 1.7
+2.084E-02 ###   e: 1.0
+2.085E-02 ###   e0: 25.0
+2.085E-02 ###   ec: 1.0
+2.085E-02 ###   energy: 1.2
+2.085E-02 ###   force: 1.5
+2.085E-02 ###   g: 1.0
+2.085E-02 ###   negec: 1000.0
+2.085E-02 ###   stress: 1.3
+2.085E-02 ###   v: 1.0
+2.085E-02 ###   
+2.253E-02 ###   max: 100.0
+2.253E-02 ###   min: 0.1
+2.253E-02 ###   scale_exponent: 4.0
+2.253E-02 ###   scale_factor: 10.0
+2.253E-02 ###   zero_density_factor: 100000000.0
+2.253E-02 ###   
+2.426E-02 ###   pot_dir: None
+2.426E-02 ###   pot_name: None
+2.427E-02 ###   results_dir: results
+2.427E-02 ###   
+2.612E-02 ###   bp_file: bp.dat
+2.613E-02 ###   dir: bp
+2.613E-02 ###   ec_size: 6
+2.613E-02 ###   ec_strain: 0.001
+2.613E-02 ###   eos_size: 6
+2.613E-02 ###   eos_strain: 0.001
+2.613E-02 ###   
+2.791E-02 ###   FE1: FE
+2.792E-02 ###   FE2: FE
+2.792E-02 ###   FE3: FE
+2.792E-02 ###   FE4: FE
+2.792E-02 ###   
+2.972E-02 ###   1: {'label_id': 1, 'label_text': 'AL', 'atom_count': 32, 'relaxed_energy': -1264.06398979, 'relaxed_energy_unit': 'Ry', 'coh_energy': -3.36, 'coh_energy_unit': 'eV', 'calc_relaxed_dft_ev': -537.454181036, 'calc_coh_ev': -3.36, 'calc_apaev': 534.094181036}
+2.972E-02 ###   2: {'label_id': 2, 'label_text': 'FE', 'atom_count': 16, 'relaxed_energy': -5268.188, 'relaxed_energy_unit': 'Ry', 'coh_energy': -4.316, 'coh_energy_unit': 'eV', 'calc_relaxed_dft_ev': -4479.851795407, 'calc_coh_ev': -4.316, 'calc_apaev': 4475.5357954070005}
+2.972E-02 ###   3: {'label_id': 3, 'label_text': 'PD', 'atom_count': 32, 'relaxed_energy': -16384.958, 'relaxed_energy_unit': 'Ry', 'coh_energy': -3.91, 'coh_energy_unit': 'eV', 'calc_relaxed_dft_ev': -6966.549363269, 'calc_coh_ev': -3.91, 'calc_apaev': 6962.639363269001}
+2.973E-02 ###   
 #############################################
   Setup Directories
-  Time: 3.161E-02
+  Time: 3.138E-02
 #############################################
-3.329E-02 ###   WD: wd/wd
-3.504E-02 ###   wd   wd/wd
-3.731E-02 ###   input   wd/wd/input
-3.947E-02 ###   output   wd/wd/output
-4.177E-02 ###   results   wd/wd/results
-4.404E-02 ###   plots   wd/wd/plots
+3.298E-02 ###   WD: wd/wd
+3.524E-02 ###   wd   wd/wd
+3.743E-02 ###   input   wd/wd/input
+3.970E-02 ###   output   wd/wd/output
+4.186E-02 ###   results   wd/wd/results
+4.410E-02 ###   plots   wd/wd/plots
 4.644E-02 ###   configs   wd/wd/configs
-4.827E-02 ###   fitting   wd/wd/fitting
-5.196E-02 ###   fitting_generations   wd/wd/fitting/generations
-5.424E-02 ###   fitting_finished   wd/wd/fitting/finished
+4.867E-02 ###   fitting   wd/wd/fitting
+5.101E-02 ###   fitting_generations   wd/wd/fitting/generations
+5.329E-02 ###   fitting_finished   wd/wd/fitting/finished
 #############################################
   Memory
-  Time: 5.583E-02
+  Time: 5.493E-02
 #############################################
-5.756E-02 ###   EFS 2000000000.0
-5.927E-02 ###   config size       255102
-6.094E-02 ###   ghost size        3061224
-6.262E-02 ###   nl size           25510204
-6.430E-02 ###   BP 2000000000.0
-6.600E-02 ###   config size       255102
-6.769E-02 ###   ghost size        3061224
-6.931E-02 ###   nl size           25510204
+5.659E-02 ###   EFS 2000000000.0
+5.821E-02 ###   config size       255102
+5.983E-02 ###   ghost size        3061224
+6.151E-02 ###   nl size           25510204
+6.314E-02 ###   BP 2000000000.0
+6.485E-02 ###   config size       255102
+6.664E-02 ###   ghost size        3061224
+6.838E-02 ###   nl size           25510204
 #############################################
   Potential Load
-  Time: 7.095E-02
+  Time: 7.005E-02
 #############################################
-7.367E-02 ###   Potential file: pot/pd/pd.pot
-7.534E-02 ###   Loading: pot/pd/pd.pot
-7.975E-02 ###   Load zbl
-1.867E+00 ###   std  configs/pd_config_0008.out
-1.872E+00 ###   std  configs/pd_config_0006.out
-1.877E+00 ###   std  configs/pd_config_0001.out
-1.882E+00 ###   std  configs/pd_config_0010.out
-1.888E+00 ###   std  configs/pd_config_0007.out
-1.894E+00 ###   std  configs/pd_config_0009.out
-1.901E+00 ###   std  configs/pd_eos_004.out
-1.907E+00 ###   std  configs/coords_256_pd.dat
-1.912E+00 ###   std  configs/pd_config_0004.out
-1.919E+00 ###   std  configs/pd_config_0003.out
-1.924E+00 ###   std  configs/pd_eos_007.out
-1.929E+00 ###   std  configs/pd_eos_001.out
-1.934E+00 ###   std  configs/pd_config_0002.out
-1.941E+00 ###   std  configs/pd_config_0005.out
-2.494E+00 ###   BP Allocated Memory
-2.494E+00 ###   
-2.496E+00 ###   2GB
-2.496E+00 ###   
-2.498E+00 ###   255102 3061224 25510204
-2.498E+00 ###   
-2.987E+00 ###   Best rss: None (since last: 1)
+7.274E-02 ###   Potential file: pot/pd/pd.pot
+7.438E-02 ###   Loading: pot/pd/pd.pot
+7.843E-02 ###   Load zbl
+8.518E-01 ###   std  configs/pd_config_0008.out
+8.571E-01 ###   std  configs/pd_config_0006.out
+8.622E-01 ###   std  configs/pd_config_0001.out
+8.683E-01 ###   std  configs/pd_config_0010.out
+8.738E-01 ###   std  configs/pd_config_0007.out
+8.794E-01 ###   std  configs/pd_config_0009.out
+8.848E-01 ###   std  configs/pd_eos_004.out
+8.900E-01 ###   std  configs/coords_256_pd.dat
+8.942E-01 ###   std  configs/pd_config_0004.out
+8.997E-01 ###   std  configs/pd_config_0003.out
+9.056E-01 ###   std  configs/pd_eos_007.out
+9.110E-01 ###   std  configs/pd_eos_001.out
+9.163E-01 ###   std  configs/pd_config_0002.out
+9.216E-01 ###   std  configs/pd_config_0005.out
+1.472E+00 ###   BP Allocated Memory
+1.472E+00 ###   
+1.474E+00 ###   2GB
+1.474E+00 ###   
+1.476E+00 ###   255102 3061224 25510204
+1.476E+00 ###   
+1.980E+00 ###   Best rss: None (since last: 1)

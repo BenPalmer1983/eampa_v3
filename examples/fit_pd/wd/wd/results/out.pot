@@ -1,34 +1,34 @@
 POTNAME 
 
 
-! PAIR  FE  FE
+! PAIR  PD  PD
 START
 F_ON true
 F_TYPE PAIR
-FILE pair_fe_fe_0.pot
-LABEL FE  FE
+FILE pd_pair_analytic.pot
+LABEL PD  PD
 F_GROUP 0
 R_CUT 6.5
 END
 
 
-! DENS  FE  
+! DENS  PD  
 START
 F_ON true
 F_TYPE DENS
-FILE dens_fe_1.pot
-LABEL FE  
+FILE pd_dens_analytic.pot
+LABEL PD  
 F_GROUP 1
 R_CUT 6.5
 END
 
 
-! EMBE  FE  
+! EMBE  PD  
 START
 F_ON true
 F_TYPE EMBE
-FILE embe_fe_1.pot
-LABEL FE  
+FILE pd_embe_analytic.pot
+LABEL PD  
 F_GROUP 1
 R_CUT 6.5
 END

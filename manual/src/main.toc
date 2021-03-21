@@ -1,0 +1,97 @@
+\boolfalse {citerequest}\boolfalse {citetracker}\boolfalse {pagetracker}\boolfalse {backtracker}\relax 
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {1}Introduction}{2}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {1.1}What does it do?}{2}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {1.1.1}Properties of an Interatomic Potential}{2}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {2}Background}{3}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {2.1}Embedded Atom Method}{3}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.1.1}EAM Potential}{3}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.1.2}Two Band EAM Potential}{3}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.1.3}Many Bands for the Embedded Atom Method}{3}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.1.4}Calculating Energy, Force and Stress}{3}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{Neighbour List}{4}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{Computing Total Energy}{6}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{Computing Forces on Atoms}{7}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{Computing Forces on Atoms}{7}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{Pseudo Code for the Energy, Force and Stress Subroutine}{7}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {2.2}Equation of State for Cubic Crystals}{8}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.2.1}Murnaghan Equation of State}{8}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.2.2}Birch-Murnaghan Equation of State}{9}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.2.3}Fitting Method}{9}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.2.4}Calculating Elastic Constants for Orthorhombic Crystal}{9}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.2.5}Elastic Constants: Bulk Modulus, Young's Modulus, Shear Modulus and Poisson Ratio}{12}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {2.3}Force Matching}{13}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {2.4}D-Band and S-Band}{13}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.4.1}Finnis-Sinclair Potential with S and D Band Contributions}{13}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.4.2}Density and Embedding Groups}{15}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {3}Installation}{16}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {3.1}Requirements}{16}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {3.2}How To Install}{16}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {4}How To Use}{17}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{Appendices}{18}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {A}Functions}{19}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {A.1}Introduction}{19}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {A.2}Pair Functions}{19}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {A.2.1}Lennard-Jones}{19}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {A.2.2}Morse}{19}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {A.2.3}Buckingham}{20}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {A.2.4}ZBL}{20}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {A.2.5}Quartic Polynomial Plus Exponential Repulsion}{21}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {A.3}Density Functions}{21}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {A.3.1}Quadratic Density}{21}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {A.3.2}Slater 4S (Squared)}{22}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {A.4}Embedding Functions}{23}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {A.4.1}Finnis-Sinclair Embedding}{23}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {A.4.2}Mendelev Embedding}{23}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {A.4.3}Triple Embedding}{24}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {A.4.4}Ackland Embedding}{25}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {A.5}Generic Functions}{26}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {A.5.1}Cubic Splines}{26}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {A.5.2}Quintic Splines}{27}

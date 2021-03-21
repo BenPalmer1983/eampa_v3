@@ -1,0 +1,119 @@
+POTNAME fepd_pot
+
+/* comment block */
+""" comment block """
+
+
+!###########################
+!# PAIR
+!###########################
+
+
+
+
+! Pair FE FE
+START
+FILE              fe_pair_analytic.pot
+FIT               fe_pair.fit
+LABEL             FE   FE
+F_ON true
+F_TYPE            PAIR            ! PAIR DENS EMBE
+F_GROUP
+R_CUT              6.5
+ZOOR     true  ! zero out of range
+END
+
+
+! Pair FE PD
+START
+FILE              fepd_pair_analytic.pot
+FIT               fepd_pair.fit
+LABEL             FE   PD
+F_ON true
+F_TYPE            PAIR            ! PAIR DENS EMBE
+F_GROUP
+R_CUT              6.5
+ZOOR     true  ! zero out of range
+END
+
+
+! Pair PD PD
+START
+FILE              pd_pair_analytic.pot
+FIT               pd_pair.fit
+LABEL             PD   PD
+F_ON true
+F_TYPE            PAIR            ! PAIR DENS EMBE
+F_GROUP
+R_CUT              6.5
+ZOOR     true  ! zero out of range
+END
+
+
+
+
+
+!###########################
+!# DENSITY
+!###########################
+
+
+
+
+! FE Density
+START
+FILE              fe_dens_analytic.pot
+FIT               fe_dens.fit
+LABEL             FE
+F_ON true
+F_TYPE            DENS            ! PAIR DENS EMBE
+F_GROUP           1
+R_CUT             6.5
+END
+
+
+! PD Density
+START
+FILE              pd_dens_analytic.pot
+FIT               pd_dens.fit
+LABEL             PD
+F_ON true
+F_TYPE            DENS            ! PAIR DENS EMBE
+F_GROUP           1
+R_CUT             6.5
+END
+
+
+!###########################
+!# EMBEDDING
+!###########################
+
+
+
+! FE Embedding
+START
+FILE              fe_embe_analytic.pot
+FIT               fe_embe.fit
+LABEL             FE
+F_ON true
+F_TYPE            EMBE            ! PAIR DENS EMBE
+F_GROUP           1
+R_CUT              6.5
+ZOOR     true  ! zero out of range
+END
+
+! PD Embedding
+START
+FILE              pd_embe_analytic.pot
+FIT               pd_embe.fit
+LABEL             PD
+F_ON true
+F_TYPE            EMBE            ! PAIR DENS EMBE
+F_GROUP           1
+R_CUT              6.5
+ZOOR     true  ! zero out of range
+END
+
+
+
+

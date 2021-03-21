@@ -33,8 +33,6 @@ fit1 type=random random_size=1000
 fit2 type=random random_size=1000
 fit3 type=ga gens=12 pop_size=1000 fresh_size=200 no_clone_var=0.0001 gen_variation_multiplier=0.2
 fit4 type=sa sa_temp_start=10.0 sa_temp_end=0.01 sa_loops_t=15 sa_loops_i=1000 sa_step=0.01 sa_step_factor=0.25
-fit5 type=ga gens=12 pop_size=2000 fresh_size=500 no_clone_var=0.0001 gen_variation_multiplier=0.2
-fit6 type=sa sa_temp_start=10.0 sa_temp_end=0.01 sa_loops_t=15 sa_loops_i=5000 sa_step=0.01 sa_step_factor=0.25
 
 
 # Fit Results
