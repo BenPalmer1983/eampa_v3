@@ -1,0 +1,6 @@
+#TYPE morse
+#P 4.669 1.256 2.8
+#TITLE Morse
+#X Distance/Angs
+#Y Energy/eV
+#PLOT morse.eps

@@ -1,0 +1,1 @@
+SIMULATED ANNEALING 1           7.1358e+06    -->    9.1933e+03      3308.577        

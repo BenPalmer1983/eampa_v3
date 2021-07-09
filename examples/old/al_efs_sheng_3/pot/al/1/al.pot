@@ -1,0 +1,58 @@
+POTNAME al_pot
+
+/* comment block */
+""" comment block """
+
+
+
+!###########################
+!# PAIR
+!###########################
+
+! Pair AL AL
+START
+FILE              al_pair_a.pot
+FIT               al_pair_a.fit
+LABEL             AL AL
+F_ON true
+F_TYPE            PAIR            ! PAIR DENS EMBE
+F_GROUP
+R_CUT              6.5
+ZOOR     true  ! zero out of range
+END
+
+
+
+!###########################
+!# DENSITY
+!###########################
+
+! AL Density
+START
+FILE              al_dens_b.pot
+FIT               al_dens_b.fit
+LABEL             AL
+F_ON true
+F_TYPE            DENS            ! PAIR DENS EMBE
+F_GROUP           Group1
+R_CUT             6.5
+END
+
+
+
+!###########################
+!# EMBEDDING
+!###########################
+
+! AL Embedding
+START
+FILE              al_embe_4.pot
+FIT               al_embe_4.fit
+LABEL             AL
+F_ON true
+F_TYPE            EMBE            ! PAIR DENS EMBE
+F_GROUP           Group1
+R_CUT              6.5
+ZOOR     true  ! zero out of range
+END
+

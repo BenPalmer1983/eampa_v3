@@ -1,0 +1,7 @@
+#TYPE ackland_mendelev_pair
+#P                        0.01 -0.007 0.001 0.00001
+#PF  26.0 26.0 1.0 1.5    2.5   3.5   4.5   5.5 
+#TITLE Ackland Mendelev Pair
+#X Distance/Angs
+#Y Energy/eV
+#PLOT ackland_mendelev_pair.eps

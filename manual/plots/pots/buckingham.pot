@@ -1,0 +1,6 @@
+#TYPE buckingham
+#P 6.0 0.5 12.0
+#TITLE Buckingham Potential
+#X Distance/Angs
+#Y Energy/eV
+#PLOT buckingham.eps

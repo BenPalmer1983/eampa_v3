@@ -1,0 +1,1 @@
+G_SIMULATED ANNEALING 1         7.1358e+06    -->    2.6783e+06      3230.285        

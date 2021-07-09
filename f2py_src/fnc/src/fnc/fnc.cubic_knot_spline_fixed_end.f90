@@ -37,9 +37,12 @@ REAL(kind=DoubleReal) :: c(1:4)
 
 IF(SIZE(p_fixed,1) .LT. SIZE(p,1))THEN
   y = 0.0D0
+ELSE IF(r .GT. p_fixed(SIZE(p,1) + 1))THEN   !  qa, qb, rzbl, r, v(r), v'(r) ..... nsize
+  y = p_fixed(SIZE(p,1) + 2)
 ELSE
   nodes_in = 0.0D0
   y = 0.0D0
+  nsize = 1 
 
   ! LOAD X and Y POINTS
   nodes_in(1:SIZE(p,1),1) = p_fixed(1:SIZE(p,1))  ! r
@@ -47,25 +50,18 @@ ELSE
   nodes_in(1:SIZE(p,1),3) = 0.0D0                 ! v'(r)
   nodes_in(1:SIZE(p,1),4) = 0.0D0                 ! v''(r)  
   
-  IF(SIZE(p,1) + 3 .EQ. SIZE(p_fixed,1))THEN
-    nsize = 1 
+  ! 
+  IF((SIZE(p_fixed,1) .EQ. SIZE(p,1) + 3) .OR. &
+     (SIZE(p_fixed,1) .EQ. SIZE(p,1) + 4) )THEN
     nodes_in(SIZE(p,1)+1,1) = p_fixed(SIZE(p,1) + 1)
     nodes_in(SIZE(p,1)+1,2) = p_fixed(SIZE(p,1) + 2)
     nodes_in(SIZE(p,1)+1,3) = p_fixed(SIZE(p,1) + 3) 
     nodes_in(SIZE(p,1)+1,4) = 0.0D0
+    IF(SIZE(p,1) + 4 .EQ. SIZE(p_fixed,1))THEN
+      nsize = INT(CEILING(p_fixed(SIZE(p, 1)+4))) 
+    END IF
   END IF
-  
-  IF(SIZE(p,1) + 4 .EQ. SIZE(p_fixed,1))THEN
-    nodes_in(SIZE(p,1)+1,1) = p_fixed(SIZE(p,1) + 1)
-    nodes_in(SIZE(p,1)+1,2) = p_fixed(SIZE(p,1) + 2)
-    nodes_in(SIZE(p,1)+1,3) = p_fixed(SIZE(p,1) + 3) 
-    nodes_in(SIZE(p,1)+1,4) = 0.0D0
-    nsize = INT(CEILING(p_fixed(SIZE(p, 1)+4))) 
-  END IF
-  
-  
-  !print *,r, nodes_in(SIZE(p,1)+1,1), nodes_in(SIZE(p,1)+1,2), nodes_in(SIZE(p,1)+1,3) 
-  
+
   ! IF EXACTLY A NODE
   complete = .FALSE.
   DO n = 1, SIZE(nodes_in, 1)     

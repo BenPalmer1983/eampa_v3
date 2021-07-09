@@ -13,17 +13,16 @@ class efs_calc:
   
     print("Calc Energy") 
     efs_calc.output_dir()
-  
+
     # Setup EFS
     efs.init()                         # Initialise (allocate arrays)
-    potential.efs_add_potentials()     # Load potentials
+    potential.load_to_efs()
     configs.efs_add_config()           # Add configs
     efs.energy()
+    configs.efs_results()              # Load Results
     efs_calc.output()
     efs_calc.save_to_file()
-    potential.plot_fortran_potentials()
-    potential.plot_python_potentials()
-    
+
   
   def run_energy_force():
   
@@ -32,13 +31,13 @@ class efs_calc:
     
     # Setup EFS
     efs.init()                         # Initialise (allocate arrays)
-    potential.efs_add_potentials()     # Load potentials
+    potential.load_to_efs()
     configs.efs_add_config()           # Add configs
-    efs.energy_force() 
+    efs.energy_force()
+    configs.efs_results()              # Load Results
     efs_calc.output()
     efs_calc.save_to_file()
-    potential.plot_fortran_potentials()
-    potential.plot_python_potentials()
+
   
   
   def run_energy_force_stress():
@@ -48,19 +47,17 @@ class efs_calc:
     
     # Setup EFS
     efs.init()                         # Initialise (allocate arrays)
-    potential.efs_add_potentials()     # Load potentials
+    potential.load_to_efs()
     configs.efs_add_config()           # Add configs
-    efs.energy_force_stress() 
+    efs.energy_force_stress()
     configs.efs_results()              # Load Results
     efs_calc.output()
     efs_calc.save_to_file()
-    #efs_calc.output_rss()
-    potential.plot_fortran_potentials()
-    potential.plot_python_potentials()
 
-    #efs.max_density_calc()
+
 
   def output_dir():
+    # MAKE DIRS
     std.make_dir(g.dirs['wd'] + '/efs')
 
 
@@ -108,6 +105,13 @@ class efs_calc:
 
     if(out_dir == None):
       out_dir = g.dirs['wd'] + '/efs'
+    plot_dir = out_dir + '/plots'
+    std.make_dir(out_dir)
+    std.make_dir(plot_dir)
+
+    #################################
+    #  efs_results
+    #################################
   
     t_pad = 12
     f_pad = 18
@@ -126,7 +130,7 @@ class efs_calc:
 
       # Config calcs      
       nat = efs.key[n,1] - efs.key[n,0] + 1
-      a = efs.key[n, 0]
+      a = efs.key[n, 0] - 1
       b = efs.key[n, 1]
 
       e_on = efs.key[n, 10]
@@ -138,8 +142,6 @@ class efs_calc:
       fh.write(g.configs['configs'][n]['file_path'] + '\n')
       fh.write('###############################################################\n')
       fh.write('\n')
-
-      
 
       fh.write(std.pad("Atom Count:", margin))
       fh.write(str(nat))
@@ -188,13 +190,42 @@ class efs_calc:
       fh.write('\n')
       fh.write('\n')
 
-      
+      if(efs.stresses_calculated[n] == 1):
+        fh.write('Stress (Known/Calculated):\n')        
+        fh.write(std.pad('{:10.5f}'.format(efs.stresses[n,0,0]), 14))
+        fh.write(std.pad('{:10.5f}'.format(efs.stresses[n,0,1]), 14))
+        fh.write(std.pad('{:10.5f}'.format(efs.stresses[n,0,2]), 14)) 
+        fh.write("          ")
+        fh.write(std.pad('{:10.5f}'.format(efs.config_stresses[n,0,0]), 14))
+        fh.write(std.pad('{:10.5f}'.format(efs.config_stresses[n,0,1]), 14))
+        fh.write(std.pad('{:10.5f}'.format(efs.config_stresses[n,0,2]), 14)) 
+        fh.write('\n') 
+        fh.write(std.pad('{:10.5f}'.format(efs.stresses[n,1,0]), 14))
+        fh.write(std.pad('{:10.5f}'.format(efs.stresses[n,1,1]), 14))
+        fh.write(std.pad('{:10.5f}'.format(efs.stresses[n,1,2]), 14)) 
+        fh.write("          ")
+        fh.write(std.pad('{:10.5f}'.format(efs.config_stresses[n,1,0]), 14))
+        fh.write(std.pad('{:10.5f}'.format(efs.config_stresses[n,1,1]), 14))
+        fh.write(std.pad('{:10.5f}'.format(efs.config_stresses[n,1,2]), 14)) 
+        fh.write('\n') 
+        fh.write(std.pad('{:10.5f}'.format(efs.stresses[n,2,0]), 14))
+        fh.write(std.pad('{:10.5f}'.format(efs.stresses[n,2,1]), 14))
+        fh.write(std.pad('{:10.5f}'.format(efs.stresses[n,2,2]), 14)) 
+        fh.write("          ")
+        fh.write(std.pad('{:10.5f}'.format(efs.config_stresses[n,2,0]), 14))
+        fh.write(std.pad('{:10.5f}'.format(efs.config_stresses[n,2,1]), 14))
+        fh.write(std.pad('{:10.5f}'.format(efs.config_stresses[n,2,2]), 14)) 
+        fh.write('\n') 
+
+       
+        fh.write('\n')        
+        fh.write('\n')        
 
       fh.write(std.pad("Atom Coords:", margin))
       fh.write('\n')
       nn = 0
       for cn in range(a, b, 1):
-        fh.write(std.pad(str(nn) + ":", 8))
+        fh.write(std.pad(str(nn+1) + ":", 8))
         fh.write(std.pad(labels.get(efs.labels[cn]) + " [" + str(efs.labels[cn]) + "]", 20))
         fh.write(std.pad('{:6.3f}'.format(efs.coords[cn,0]), 14))
         fh.write(std.pad('{:6.3f}'.format(efs.coords[cn,1]), 14))
@@ -220,6 +251,123 @@ class efs_calc:
     fh.write('###############################################################')
     fh.write('###############################################################\n')
     fh.close()
+
+
+    #################################
+    #  forces_calculated
+    #################################
+  
+    for n in range(efs.cc):
+      file_path_n = g.configs['configs'][n]['file_path']
+      file_name_n = file_path_n.split("/")
+      file_name_n = file_name_n[-1]
+      a = efs.key[n, 0] - 1
+      b = efs.key[n, 1] 
+      strn = str(n + 1)
+      while(len(strn)<5):
+        strn = "0" + strn
+      std.make_dir(out_dir + "/forces_calculated")
+      fh = open(out_dir + "/forces_calculated" + '/' + file_name_n + '.txt', 'w')
+      nn = 0
+      for cn in range(a, b, 1):
+        if(f_on == 1):
+          fh.write(std.pad(str(nn+1) + ":", 8))
+          fh.write(std.pad(labels.get(efs.labels[cn]) + " [" + str(efs.labels[cn]) + "]", 20))
+          fh.write(std.pad('{:20.8e}'.format(float(efs.config_forces[n,nn,0])), 14))
+          fh.write(std.pad('{:20.8e}'.format(float(efs.config_forces[n,nn,1])), 14))
+          fh.write(std.pad('{:20.8e}'.format(float(efs.config_forces[n,nn,2])), 14))
+          fh.write('\n')    
+          nn = nn + 1
+      fh.close()
+
+
+
+    #################################
+    #  config_energy
+    #################################
+    plot_a0 = []
+    plot_e = []
+    fh = open(out_dir + '/config_energy.csv', 'w')
+    for n in range(efs.cc): 
+      nat = efs.key[n,1] - efs.key[n,0] + 1   
+      fh.write(str(n+1) + '  ')  
+      fh.write(str(nat) + '  ')   
+      fh.write(str(efs.alat[n]) + '  ')  
+      fh.write(str(efs.config_energy[n,0]) + '  ')  
+      fh.write(str(efs.config_energy[n,1]) + '  ')  
+      fh.write(str(efs.config_energy[n,2]) + '  ') 
+      fh.write('\n') 
+      plot_a0.append(efs.alat[n])
+      plot_e.append(efs.config_energy[n,2] / nat)
+    fh.close()
+
+
+
+    #################################
+    #  z_energy
+    #################################
+    plot_z = []
+    plot_e = []
+    fh = open(out_dir + '/surface_energy.csv', 'w')
+    for n in range(efs.cc): 
+      nat = efs.key[n,1] - efs.key[n,0] + 1   
+      fh.write(str(n+1) + '  ')  
+      fh.write(str(nat) + '  ')   
+      fh.write(str(efs.uv[3 * n + 2, 2]) + '  ')  
+      fh.write(str(efs.config_energy[n,0]) + '  ')  
+      fh.write(str(efs.config_energy[n,1]) + '  ')  
+      fh.write(str(efs.config_energy[n,2]) + '  ') 
+      fh.write('\n') 
+      plot_z.append(efs.uv[3 * n + 2, 2])
+      plot_e.append(efs.config_energy[n,2] / nat)
+    fh.close()
+
+
+    #################################
+    #  optional plots
+    #################################
+
+    plt.figure(figsize=(8,6))
+    plt.rc('font', family='serif')
+    plt.rc('xtick', labelsize='x-small')
+    plt.rc('ytick', labelsize='x-small')   
+    plt.title('Cohesive Energy Plot')
+    plt.plot(plot_a0, plot_e, 'k+')
+    plt.xlabel("a0 of supercell (angs)")
+    plt.ylabel("energy per atom (eV)")
+    plt.axhline(y=0.0, color='b', linestyle='dotted')
+    plt.savefig(plot_dir + '/cohesive_energy.eps', type='efs')
+    plt.close('all') 
+ 
+    plt.figure(figsize=(8,6))
+    plt.rc('font', family='serif')
+    plt.rc('xtick', labelsize='x-small')
+    plt.rc('ytick', labelsize='x-small')   
+    plt.title('Cohesive Energy Plot')
+    plt.plot(plot_a0, plot_e, 'k+')
+    plt.ylim(-5.0,0.2)
+    plt.axhline(y=0.0, color='b', linestyle='dotted')
+    plt.xlabel("a0 of supercell (angs)")
+    plt.ylabel("energy per atom (eV)")
+    plt.savefig(plot_dir + '/cohesive_energy_zoom.eps', type='efs')
+    plt.close('all') 
+
+    plt.figure(figsize=(8,6))
+    plt.rc('font', family='serif')
+    plt.rc('xtick', labelsize='x-small')
+    plt.rc('ytick', labelsize='x-small')   
+    plt.title('Surface Energy Plot')
+    plt.plot(plot_z, plot_e, 'k+')
+    plt.axhline(y=min(plot_e), color='b', linestyle='dotted')
+    plt.axhline(y=max(plot_e), color='g', linestyle='dotted')
+    plt.savefig(plot_dir + '/surface_energy.eps', type='efs')
+    plt.close('all') 
+
+
+
+
+
+
 
 
 
@@ -324,10 +472,13 @@ class efs_calc:
 
   def set_weights():
     # READ INPUT DATA
-    efs.set_weights(g.rss_weights['config'], g.rss_weights['energy'], g.rss_weights['force'], g.rss_weights['stress'])
-  
-  
-  
+    #efs.set_weights(g.rss_weights['config'], g.rss_weights['energy'], g.rss_weights['force'], g.rss_weights['stress'])
+    efs.rss_weights[0] = g.rss_weights['config']
+    efs.rss_weights[1] = g.rss_weights['energy']
+    efs.rss_weights[2] = g.rss_weights['force']
+    efs.rss_weights[3] = g.rss_weights['stress']
+
+
   
   def get_results():
     efs_calc.get_known()    
@@ -372,7 +523,7 @@ class efs_calc:
       f = 1.0 + (g.rss_max_density['scale_factor'] * (bp.max_density - 0.8))**g.rss_max_density['scale_exponent']
     """
     f = 1.0  
-    if(bp.max_density == 0.0):
+    if(efs.max_density == 0.0):
       f = g.rss_max_density['zero_density_factor']  
     
     g.rss['residual'] = []

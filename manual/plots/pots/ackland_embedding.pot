@@ -1,0 +1,7 @@
+#TYPE ackland_embedding
+#P   -0.8 0.05 -0.00001
+#PF  0.0
+#TITLE Ackland Embedding
+#X Density
+#Y Energy/eV
+#PLOT ackland_embedding.eps

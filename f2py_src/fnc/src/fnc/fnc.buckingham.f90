@@ -15,7 +15,6 @@ END SUBROUTINE buckingham
 
 
 
-
 SUBROUTINE buckingham_v(r, p, p_fixed, y)
 !############################################################
 ! BUCKINGHAM POTENTIAL

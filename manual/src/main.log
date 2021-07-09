@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2019.11.14)  21 MAR 2021 01:22
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2019.11.14)  25 APR 2021 19:31
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -2378,31 +2378,40 @@ LaTeX Warning: Label `eq:eqMurnachanEquationofStateVolume' multiply defined.
 LaTeX Warning: Label `eq:eqLennardJones' multiply defined.
 
 
+LaTeX Warning: Label `graph:graph1' multiply defined.
+
+
+LaTeX Warning: Label `graph:graph1' multiply defined.
+
+
+LaTeX Warning: Label `graph:graph1' multiply defined.
+
+
+LaTeX Warning: Label `graph:graph1' multiply defined.
+
+
+LaTeX Warning: Label `graph:graph1' multiply defined.
+
+
+LaTeX Warning: Label `graph:graph1' multiply defined.
+
+
+LaTeX Warning: Label `graph:graph1' multiply defined.
+
+
+LaTeX Warning: Label `graph:graph1' multiply defined.
+
+
+LaTeX Warning: Label `graph:graph1' multiply defined.
+
+
+LaTeX Warning: Label `graph:graph1' multiply defined.
+
+
+LaTeX Warning: Label `graph:graph1' multiply defined.
+
+
 LaTeX Warning: Label `eq:eqLennardJones' multiply defined.
-
-
-LaTeX Warning: Label `graph:graph1' multiply defined.
-
-
-LaTeX Warning: Label `graph:graph1' multiply defined.
-
-
-LaTeX Warning: Label `graph:graph1' multiply defined.
-
-
-LaTeX Warning: Label `graph:graph1' multiply defined.
-
-
-LaTeX Warning: Label `graph:graph1' multiply defined.
-
-
-LaTeX Warning: Label `graph:graph1' multiply defined.
-
-
-LaTeX Warning: Label `graph:graph1' multiply defined.
-
-
-LaTeX Warning: Label `graph:graph1' multiply defined.
 
 
 LaTeX Warning: Label `graph:graph1' multiply defined.
@@ -2643,385 +2652,418 @@ Overfull \hbox (83.3359pt too wide) detected at line 954
 
 [15]
 Chapter 3.
+
+Overfull \hbox (40.23746pt too wide) in paragraph at lines 1007--1008
+[]\OT1/cmr/m/n/10 The li-brary files will have been com-piled and copied to a s
+ub-di-rec-tory in your home di-rec-tory, /home-/user/pylib/eampa[]lib
+ []
+
 [16
 
 ]
 Chapter 4.
 [17
 
-] [18
+] [18]
+Overfull \hbox (503.81665pt too wide) in paragraph at lines 1173--1174
+[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
+ []
+
+[19] [20] [21
 
 
 ]
 Appendix A.
-Package epstopdf Info: Source file: <img/plots/lennard_jones.eps>
-(epstopdf)                    date: 2020-06-02 04:53:43
-(epstopdf)                    size: 22964 bytes
-(epstopdf)             Output file: <img/plots/lennard_jones-eps-converted-to.p
-df>
-(epstopdf)                    date: 2021-03-21 00:57:16
-(epstopdf)                    size: 12199 bytes
-(epstopdf)             Command: <repstopdf --outfile=img/plots/lennard_jones-ep
-s-converted-to.pdf img/plots/lennard_jones.eps>
-(epstopdf)             \includegraphics on input line 1044.
+Package epstopdf Info: Source file: <img/plots/ackland_mendelev_pair.eps>
+(epstopdf)                    date: 2021-04-25 17:47:31
+(epstopdf)                    size: 22722 bytes
+(epstopdf)             Output file: <img/plots/ackland_mendelev_pair-eps-conver
+ted-to.pdf>
+(epstopdf)                    date: 2021-04-25 18:13:37
+(epstopdf)                    size: 13920 bytes
+(epstopdf)             Command: <repstopdf --outfile=img/plots/ackland_mendelev
+_pair-eps-converted-to.pdf img/plots/ackland_mendelev_pair.eps>
+(epstopdf)             \includegraphics on input line 1294.
 Package epstopdf Info: Output file is already uptodate.
 
 
-pdfTeX warning: pdflatex (file ./img/plots/lennard_jones-eps-converted-to.pdf):
- PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<img/plots/lennard_jones-eps-converted-to.pdf, id=137, 505.89pt x 361.35pt>
-File: img/plots/lennard_jones-eps-converted-to.pdf Graphic file (type pdf)
-<use img/plots/lennard_jones-eps-converted-to.pdf>
-Package pdftex.def Info: img/plots/lennard_jones-eps-converted-to.pdf  used on 
-input line 1044.
-(pdftex.def)             Requested size: 505.88875pt x 361.34912pt.
-
-Overfull \hbox (68.9142pt too wide) in paragraph at lines 1044--1045
- []\OT1/cmr/m/n/10 [scale=0.6] 
- []
-
+pdfTeX warning: pdflatex (file ./img/plots/ackland_mendelev_pair-eps-converted-
+to.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allo
+wed
+<img/plots/ackland_mendelev_pair-eps-converted-to.pdf, id=146, 578.16pt x 433.6
+2pt>
+File: img/plots/ackland_mendelev_pair-eps-converted-to.pdf Graphic file (type p
+df)
+<use img/plots/ackland_mendelev_pair-eps-converted-to.pdf>
+Package pdftex.def Info: img/plots/ackland_mendelev_pair-eps-converted-to.pdf  
+used on input line 1294.
+(pdftex.def)             Requested size: 289.07928pt x 216.80946pt.
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-Package epstopdf Info: Source file: <img/plots/morse.eps>
-(epstopdf)                    date: 2020-06-02 04:53:43
-(epstopdf)                    size: 19242 bytes
-(epstopdf)             Output file: <img/plots/morse-eps-converted-to.pdf>
-(epstopdf)                    date: 2021-03-21 00:58:33
-(epstopdf)                    size: 10975 bytes
-(epstopdf)             Command: <repstopdf --outfile=img/plots/morse-eps-conver
-ted-to.pdf img/plots/morse.eps>
-(epstopdf)             \includegraphics on input line 1074.
-Package epstopdf Info: Output file is already uptodate.
+[22
 
-
-pdfTeX warning: pdflatex (file ./img/plots/morse-eps-converted-to.pdf): PDF inc
-lusion: found PDF version <1.7>, but at most version <1.5> allowed
-<img/plots/morse-eps-converted-to.pdf, id=138, 505.89pt x 361.35pt>
-File: img/plots/morse-eps-converted-to.pdf Graphic file (type pdf)
-<use img/plots/morse-eps-converted-to.pdf>
-Package pdftex.def Info: img/plots/morse-eps-converted-to.pdf  used on input li
-ne 1074.
-(pdftex.def)             Requested size: 505.88875pt x 361.34912pt.
-
-Overfull \hbox (68.9142pt too wide) in paragraph at lines 1074--1075
- []\OT1/cmr/m/n/10 [scale=0.6] 
- []
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
+]
 Package epstopdf Info: Source file: <img/plots/buckingham.eps>
-(epstopdf)                    date: 2020-06-02 04:53:43
-(epstopdf)                    size: 22073 bytes
+(epstopdf)                    date: 2021-04-25 18:17:15
+(epstopdf)                    size: 24008 bytes
 (epstopdf)             Output file: <img/plots/buckingham-eps-converted-to.pdf>
 
-(epstopdf)                    date: 2021-03-21 00:58:33
-(epstopdf)                    size: 13699 bytes
+(epstopdf)                    date: 2021-04-25 18:20:02
+(epstopdf)                    size: 14886 bytes
 (epstopdf)             Command: <repstopdf --outfile=img/plots/buckingham-eps-c
 onverted-to.pdf img/plots/buckingham.eps>
-(epstopdf)             \includegraphics on input line 1103.
+(epstopdf)             \includegraphics on input line 1330.
 Package epstopdf Info: Output file is already uptodate.
 
 
 pdfTeX warning: pdflatex (file ./img/plots/buckingham-eps-converted-to.pdf): PD
 F inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<img/plots/buckingham-eps-converted-to.pdf, id=139, 505.89pt x 361.35pt>
+<img/plots/buckingham-eps-converted-to.pdf, id=150, 578.16pt x 433.62pt>
 File: img/plots/buckingham-eps-converted-to.pdf Graphic file (type pdf)
 <use img/plots/buckingham-eps-converted-to.pdf>
 Package pdftex.def Info: img/plots/buckingham-eps-converted-to.pdf  used on inp
-ut line 1103.
-(pdftex.def)             Requested size: 505.88875pt x 361.34912pt.
-
-Overfull \hbox (68.9142pt too wide) in paragraph at lines 1103--1104
- []\OT1/cmr/m/n/10 [scale=0.6] 
- []
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-[19
-
-]
-Package epstopdf Info: Source file: <img/plots/quartic_poly_rep.eps>
-(epstopdf)                    date: 2020-06-02 04:53:43
-(epstopdf)                    size: 19950 bytes
-(epstopdf)             Output file: <img/plots/quartic_poly_rep-eps-converted-t
-o.pdf>
-(epstopdf)                    date: 2021-03-21 00:58:33
-(epstopdf)                    size: 11613 bytes
-(epstopdf)             Command: <repstopdf --outfile=img/plots/quartic_poly_rep
--eps-converted-to.pdf img/plots/quartic_poly_rep.eps>
-(epstopdf)             \includegraphics on input line 1148.
-Package epstopdf Info: Output file is already uptodate.
-
-
-pdfTeX warning: pdflatex (file ./img/plots/quartic_poly_rep-eps-converted-to.pd
-f): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<img/plots/quartic_poly_rep-eps-converted-to.pdf, id=143, 505.89pt x 361.35pt>
-File: img/plots/quartic_poly_rep-eps-converted-to.pdf Graphic file (type pdf)
-<use img/plots/quartic_poly_rep-eps-converted-to.pdf>
-Package pdftex.def Info: img/plots/quartic_poly_rep-eps-converted-to.pdf  used 
-on input line 1148.
-(pdftex.def)             Requested size: 505.88875pt x 361.34912pt.
-
-Overfull \hbox (68.9142pt too wide) in paragraph at lines 1148--1149
- []\OT1/cmr/m/n/10 [scale=0.6] 
- []
-
-[20 <./img/plots/lennard_jones-eps-converted-to.pdf>]
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-Package epstopdf Info: Source file: <img/plots/quadratic_density.eps>
-(epstopdf)                    date: 2020-06-02 04:53:43
-(epstopdf)                    size: 23273 bytes
-(epstopdf)             Output file: <img/plots/quadratic_density-eps-converted-
+ut line 1330.
+(pdftex.def)             Requested size: 289.07928pt x 216.80946pt.
+[23 <./img/plots/ackland_mendelev_pair-eps-converted-to.pdf> <./img/plots/bucki
+ngham-eps-converted-to.pdf>]
+Package epstopdf Info: Source file: <img/plots/cubic_knot_spline.eps>
+(epstopdf)                    date: 2021-04-25 17:47:32
+(epstopdf)                    size: 28923 bytes
+(epstopdf)             Output file: <img/plots/cubic_knot_spline-eps-converted-
 to.pdf>
-(epstopdf)                    date: 2021-03-21 00:58:33
-(epstopdf)                    size: 13567 bytes
-(epstopdf)             Command: <repstopdf --outfile=img/plots/quadratic_densit
-y-eps-converted-to.pdf img/plots/quadratic_density.eps>
-(epstopdf)             \includegraphics on input line 1181.
+(epstopdf)                    date: 2021-04-25 18:13:37
+(epstopdf)                    size: 16578 bytes
+(epstopdf)             Command: <repstopdf --outfile=img/plots/cubic_knot_splin
+e-eps-converted-to.pdf img/plots/cubic_knot_spline.eps>
+(epstopdf)             \includegraphics on input line 1367.
 Package epstopdf Info: Output file is already uptodate.
 
 
-pdfTeX warning: pdflatex (file ./img/plots/quadratic_density-eps-converted-to.p
+pdfTeX warning: pdflatex (file ./img/plots/cubic_knot_spline-eps-converted-to.p
 df): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<img/plots/quadratic_density-eps-converted-to.pdf, id=174, 505.89pt x 361.35pt>
+<img/plots/cubic_knot_spline-eps-converted-to.pdf, id=227, 578.16pt x 433.62pt>
 
-File: img/plots/quadratic_density-eps-converted-to.pdf Graphic file (type pdf)
-<use img/plots/quadratic_density-eps-converted-to.pdf>
-Package pdftex.def Info: img/plots/quadratic_density-eps-converted-to.pdf  used
- on input line 1181.
-(pdftex.def)             Requested size: 505.88875pt x 361.34912pt.
+File: img/plots/cubic_knot_spline-eps-converted-to.pdf Graphic file (type pdf)
+<use img/plots/cubic_knot_spline-eps-converted-to.pdf>
+Package pdftex.def Info: img/plots/cubic_knot_spline-eps-converted-to.pdf  used
+ on input line 1367.
+(pdftex.def)             Requested size: 289.07928pt x 216.80946pt.
+Package epstopdf Info: Source file: <img/plots/cubic_knot_spline_fixed_end.eps>
 
-Overfull \hbox (68.9142pt too wide) in paragraph at lines 1181--1182
- []\OT1/cmr/m/n/10 [scale=0.6] 
- []
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-[21 <./img/plots/morse-eps-converted-to.pdf>]
-Package epstopdf Info: Source file: <img/plots/slater_4s.eps>
-(epstopdf)                    date: 2020-06-02 04:53:44
-(epstopdf)                    size: 19818 bytes
-(epstopdf)             Output file: <img/plots/slater_4s-eps-converted-to.pdf>
-(epstopdf)                    date: 2021-03-21 00:58:33
-(epstopdf)                    size: 11923 bytes
-(epstopdf)             Command: <repstopdf --outfile=img/plots/slater_4s-eps-co
-nverted-to.pdf img/plots/slater_4s.eps>
-(epstopdf)             \includegraphics on input line 1207.
+(epstopdf)                    date: 2021-04-25 17:47:32
+(epstopdf)                    size: 28981 bytes
+(epstopdf)             Output file: <img/plots/cubic_knot_spline_fixed_end-eps-
+converted-to.pdf>
+(epstopdf)                    date: 2021-04-25 18:13:37
+(epstopdf)                    size: 17129 bytes
+(epstopdf)             Command: <repstopdf --outfile=img/plots/cubic_knot_splin
+e_fixed_end-eps-converted-to.pdf img/plots/cubic_knot_spline_fixed_end.eps>
+(epstopdf)             \includegraphics on input line 1402.
 Package epstopdf Info: Output file is already uptodate.
 
 
-pdfTeX warning: pdflatex (file ./img/plots/slater_4s-eps-converted-to.pdf): PDF
- inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<img/plots/slater_4s-eps-converted-to.pdf, id=201, 505.89pt x 361.35pt>
-File: img/plots/slater_4s-eps-converted-to.pdf Graphic file (type pdf)
-<use img/plots/slater_4s-eps-converted-to.pdf>
-Package pdftex.def Info: img/plots/slater_4s-eps-converted-to.pdf  used on inpu
-t line 1207.
-(pdftex.def)             Requested size: 505.88875pt x 361.34912pt.
-
-Overfull \hbox (68.9142pt too wide) in paragraph at lines 1207--1208
- []\OT1/cmr/m/n/10 [scale=0.6] 
- []
-
+pdfTeX warning: pdflatex (file ./img/plots/cubic_knot_spline_fixed_end-eps-conv
+erted-to.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5
+> allowed
+<img/plots/cubic_knot_spline_fixed_end-eps-converted-to.pdf, id=228, 578.16pt x
+ 433.62pt>
+File: img/plots/cubic_knot_spline_fixed_end-eps-converted-to.pdf Graphic file (
+type pdf)
+<use img/plots/cubic_knot_spline_fixed_end-eps-converted-to.pdf>
+Package pdftex.def Info: img/plots/cubic_knot_spline_fixed_end-eps-converted-to
+.pdf  used on input line 1402.
+(pdftex.def)             Requested size: 289.07928pt x 216.80946pt.
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-Package epstopdf Info: Source file: <img/plots/fs_embedding.eps>
-(epstopdf)                    date: 2020-06-02 04:53:44
-(epstopdf)                    size: 23556 bytes
-(epstopdf)             Output file: <img/plots/fs_embedding-eps-converted-to.pd
-f>
-(epstopdf)                    date: 2021-03-21 00:58:34
-(epstopdf)                    size: 14940 bytes
-(epstopdf)             Command: <repstopdf --outfile=img/plots/fs_embedding-eps
--converted-to.pdf img/plots/fs_embedding.eps>
-(epstopdf)             \includegraphics on input line 1241.
+[24 <./img/plots/cubic_knot_spline-eps-converted-to.pdf>]
+Package epstopdf Info: Source file: <img/plots/cubic_knot_spline_fixed_end_pair
+.eps>
+(epstopdf)                    date: 2021-04-25 17:47:31
+(epstopdf)                    size: 26795 bytes
+(epstopdf)             Output file: <img/plots/cubic_knot_spline_fixed_end_pair
+-eps-converted-to.pdf>
+(epstopdf)                    date: 2021-04-25 18:13:38
+(epstopdf)                    size: 16341 bytes
+(epstopdf)             Command: <repstopdf --outfile=img/plots/cubic_knot_splin
+e_fixed_end_pair-eps-converted-to.pdf img/plots/cubic_knot_spline_fixed_end_pai
+r.eps>
+(epstopdf)             \includegraphics on input line 1438.
 Package epstopdf Info: Output file is already uptodate.
 
 
-pdfTeX warning: pdflatex (file ./img/plots/fs_embedding-eps-converted-to.pdf): 
-PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<img/plots/fs_embedding-eps-converted-to.pdf, id=202, 505.89pt x 361.35pt>
-File: img/plots/fs_embedding-eps-converted-to.pdf Graphic file (type pdf)
-<use img/plots/fs_embedding-eps-converted-to.pdf>
-Package pdftex.def Info: img/plots/fs_embedding-eps-converted-to.pdf  used on i
-nput line 1241.
-(pdftex.def)             Requested size: 505.88875pt x 361.34912pt.
-
-Overfull \hbox (68.9142pt too wide) in paragraph at lines 1241--1242
- []\OT1/cmr/m/n/10 [scale=0.6] 
- []
-
-[22 <./img/plots/buckingham-eps-converted-to.pdf>]
+pdfTeX warning: pdflatex (file ./img/plots/cubic_knot_spline_fixed_end_pair-eps
+-converted-to.pdf): PDF inclusion: found PDF version <1.7>, but at most version
+ <1.5> allowed
+<img/plots/cubic_knot_spline_fixed_end_pair-eps-converted-to.pdf, id=271, 578.1
+6pt x 433.62pt>
+File: img/plots/cubic_knot_spline_fixed_end_pair-eps-converted-to.pdf Graphic f
+ile (type pdf)
+<use img/plots/cubic_knot_spline_fixed_end_pair-eps-converted-to.pdf>
+Package pdftex.def Info: img/plots/cubic_knot_spline_fixed_end_pair-eps-convert
+ed-to.pdf  used on input line 1438.
+(pdftex.def)             Requested size: 289.07928pt x 216.80946pt.
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-Package epstopdf Info: Source file: <img/plots/mendelev_embedding.eps>
-(epstopdf)                    date: 2020-06-02 04:53:44
-(epstopdf)                    size: 20427 bytes
-(epstopdf)             Output file: <img/plots/mendelev_embedding-eps-converted
--to.pdf>
-(epstopdf)                    date: 2021-03-21 00:58:34
-(epstopdf)                    size: 12236 bytes
-(epstopdf)             Command: <repstopdf --outfile=img/plots/mendelev_embeddi
-ng-eps-converted-to.pdf img/plots/mendelev_embedding.eps>
-(epstopdf)             \includegraphics on input line 1267.
-Package epstopdf Info: Output file is already uptodate.
-
-
-pdfTeX warning: pdflatex (file ./img/plots/mendelev_embedding-eps-converted-to.
-pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-
-<img/plots/mendelev_embedding-eps-converted-to.pdf, id=236, 505.89pt x 361.35pt
->
-File: img/plots/mendelev_embedding-eps-converted-to.pdf Graphic file (type pdf)
-
-<use img/plots/mendelev_embedding-eps-converted-to.pdf>
-Package pdftex.def Info: img/plots/mendelev_embedding-eps-converted-to.pdf  use
-d on input line 1267.
-(pdftex.def)             Requested size: 505.88875pt x 361.34912pt.
-
-Overfull \hbox (68.9142pt too wide) in paragraph at lines 1267--1268
- []\OT1/cmr/m/n/10 [scale=0.6] 
- []
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-[23 <./img/plots/quartic_poly_rep-eps-converted-to.pdf>]
-Package epstopdf Info: Source file: <img/plots/triple_embedding.eps>
-(epstopdf)                    date: 2020-06-02 04:53:44
-(epstopdf)                    size: 22890 bytes
-(epstopdf)             Output file: <img/plots/triple_embedding-eps-converted-t
-o.pdf>
-(epstopdf)                    date: 2021-03-21 00:58:34
-(epstopdf)                    size: 13214 bytes
-(epstopdf)             Command: <repstopdf --outfile=img/plots/triple_embedding
--eps-converted-to.pdf img/plots/triple_embedding.eps>
-(epstopdf)             \includegraphics on input line 1293.
-Package epstopdf Info: Output file is already uptodate.
-
-
-pdfTeX warning: pdflatex (file ./img/plots/triple_embedding-eps-converted-to.pd
-f): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<img/plots/triple_embedding-eps-converted-to.pdf, id=267, 505.89pt x 361.35pt>
-File: img/plots/triple_embedding-eps-converted-to.pdf Graphic file (type pdf)
-<use img/plots/triple_embedding-eps-converted-to.pdf>
-Package pdftex.def Info: img/plots/triple_embedding-eps-converted-to.pdf  used 
-on input line 1293.
-(pdftex.def)             Requested size: 505.88875pt x 361.34912pt.
-
-Overfull \hbox (68.9142pt too wide) in paragraph at lines 1293--1294
- []\OT1/cmr/m/n/10 [scale=0.6] 
- []
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-Package epstopdf Info: Source file: <img/plots/ackland_embedding.eps>
-(epstopdf)                    date: 2020-06-02 04:53:44
-(epstopdf)                    size: 23380 bytes
-(epstopdf)             Output file: <img/plots/ackland_embedding-eps-converted-
-to.pdf>
-(epstopdf)                    date: 2021-03-21 00:58:34
-(epstopdf)                    size: 13598 bytes
-(epstopdf)             Command: <repstopdf --outfile=img/plots/ackland_embeddin
-g-eps-converted-to.pdf img/plots/ackland_embedding.eps>
-(epstopdf)             \includegraphics on input line 1320.
-Package epstopdf Info: Output file is already uptodate.
-
-
-pdfTeX warning: pdflatex (file ./img/plots/ackland_embedding-eps-converted-to.p
-df): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<img/plots/ackland_embedding-eps-converted-to.pdf, id=268, 505.89pt x 361.35pt>
-
-File: img/plots/ackland_embedding-eps-converted-to.pdf Graphic file (type pdf)
-<use img/plots/ackland_embedding-eps-converted-to.pdf>
-Package pdftex.def Info: img/plots/ackland_embedding-eps-converted-to.pdf  used
- on input line 1320.
-(pdftex.def)             Requested size: 505.88875pt x 361.34912pt.
-
-Overfull \hbox (68.9142pt too wide) in paragraph at lines 1320--1321
- []\OT1/cmr/m/n/10 [scale=0.6] 
- []
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-[24 <./img/plots/quadratic_density-eps-converted-to.pdf>]
+[25 <./img/plots/cubic_knot_spline_fixed_end-eps-converted-to.pdf>]
 Package epstopdf Info: Source file: <img/plots/cubic_spline.eps>
-(epstopdf)                    date: 2020-06-02 04:53:44
-(epstopdf)                    size: 21515 bytes
+(epstopdf)                    date: 2021-04-25 17:47:31
+(epstopdf)                    size: 25455 bytes
 (epstopdf)             Output file: <img/plots/cubic_spline-eps-converted-to.pd
 f>
-(epstopdf)                    date: 2021-03-21 00:58:34
-(epstopdf)                    size: 11910 bytes
+(epstopdf)                    date: 2021-04-25 18:13:38
+(epstopdf)                    size: 14557 bytes
 (epstopdf)             Command: <repstopdf --outfile=img/plots/cubic_spline-eps
 -converted-to.pdf img/plots/cubic_spline.eps>
-(epstopdf)             \includegraphics on input line 1358.
+(epstopdf)             \includegraphics on input line 1475.
 Package epstopdf Info: Output file is already uptodate.
 
 
 pdfTeX warning: pdflatex (file ./img/plots/cubic_spline-eps-converted-to.pdf): 
 PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<img/plots/cubic_spline-eps-converted-to.pdf, id=302, 505.89pt x 361.35pt>
+<img/plots/cubic_spline-eps-converted-to.pdf, id=317, 578.16pt x 433.62pt>
 File: img/plots/cubic_spline-eps-converted-to.pdf Graphic file (type pdf)
 <use img/plots/cubic_spline-eps-converted-to.pdf>
 Package pdftex.def Info: img/plots/cubic_spline-eps-converted-to.pdf  used on i
-nput line 1358.
-(pdftex.def)             Requested size: 505.88875pt x 361.34912pt.
-
-Overfull \hbox (68.9142pt too wide) in paragraph at lines 1358--1359
- []\OT1/cmr/m/n/10 [scale=0.6] 
- []
-
+nput line 1475.
+(pdftex.def)             Requested size: 289.07928pt x 216.80946pt.
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-[25 <./img/plots/slater_4s-eps-converted-to.pdf>] [26 <./img/plots/fs_embedding
--eps-converted-to.pdf>]
-Package epstopdf Info: Source file: <img/plots/quintic_spline.eps>
-(epstopdf)                    date: 2020-06-02 04:53:44
-(epstopdf)                    size: 20103 bytes
-(epstopdf)             Output file: <img/plots/quintic_spline-eps-converted-to.
-pdf>
-(epstopdf)                    date: 2021-03-21 00:59:10
-(epstopdf)                    size: 11479 bytes
-(epstopdf)             Command: <repstopdf --outfile=img/plots/quintic_spline-e
-ps-converted-to.pdf img/plots/quintic_spline.eps>
-(epstopdf)             \includegraphics on input line 1392.
+[26 <./img/plots/cubic_knot_spline_fixed_end_pair-eps-converted-to.pdf>]
+Package epstopdf Info: Source file: <img/plots/embedding_a.eps>
+(epstopdf)                    date: 2021-04-25 17:47:31
+(epstopdf)                    size: 23437 bytes
+(epstopdf)             Output file: <img/plots/embedding_a-eps-converted-to.pdf
+>
+(epstopdf)                    date: 2021-04-25 18:13:38
+(epstopdf)                    size: 14845 bytes
+(epstopdf)             Command: <repstopdf --outfile=img/plots/embedding_a-eps-
+converted-to.pdf img/plots/embedding_a.eps>
+(epstopdf)             \includegraphics on input line 1511.
 Package epstopdf Info: Output file is already uptodate.
 
 
-pdfTeX warning: pdflatex (file ./img/plots/quintic_spline-eps-converted-to.pdf)
-: PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<img/plots/quintic_spline-eps-converted-to.pdf, id=369, 505.89pt x 361.35pt>
-File: img/plots/quintic_spline-eps-converted-to.pdf Graphic file (type pdf)
-<use img/plots/quintic_spline-eps-converted-to.pdf>
-Package pdftex.def Info: img/plots/quintic_spline-eps-converted-to.pdf  used on
- input line 1392.
-(pdftex.def)             Requested size: 505.88875pt x 361.34912pt.
+pdfTeX warning: pdflatex (file ./img/plots/embedding_a-eps-converted-to.pdf): P
+DF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
+<img/plots/embedding_a-eps-converted-to.pdf, id=361, 578.16pt x 433.62pt>
+File: img/plots/embedding_a-eps-converted-to.pdf Graphic file (type pdf)
+<use img/plots/embedding_a-eps-converted-to.pdf>
+Package pdftex.def Info: img/plots/embedding_a-eps-converted-to.pdf  used on in
+put line 1511.
+(pdftex.def)             Requested size: 289.07928pt x 216.80946pt.
+[27 <./img/plots/cubic_spline-eps-converted-to.pdf> <./img/plots/embedding_a-ep
+s-converted-to.pdf>]
+Package epstopdf Info: Source file: <img/plots/embedding_b.eps>
+(epstopdf)                    date: 2021-04-25 17:47:32
+(epstopdf)                    size: 24021 bytes
+(epstopdf)             Output file: <img/plots/embedding_b-eps-converted-to.pdf
+>
+(epstopdf)                    date: 2021-04-25 18:13:38
+(epstopdf)                    size: 14747 bytes
+(epstopdf)             Command: <repstopdf --outfile=img/plots/embedding_b-eps-
+converted-to.pdf img/plots/embedding_b.eps>
+(epstopdf)             \includegraphics on input line 1548.
+Package epstopdf Info: Output file is already uptodate.
 
-Overfull \hbox (68.9142pt too wide) in paragraph at lines 1392--1393
- []\OT1/cmr/m/n/10 [scale=0.6] 
- []
 
+pdfTeX warning: pdflatex (file ./img/plots/embedding_b-eps-converted-to.pdf): P
+DF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
+<img/plots/embedding_b-eps-converted-to.pdf, id=439, 578.16pt x 433.62pt>
+File: img/plots/embedding_b-eps-converted-to.pdf Graphic file (type pdf)
+<use img/plots/embedding_b-eps-converted-to.pdf>
+Package pdftex.def Info: img/plots/embedding_b-eps-converted-to.pdf  used on in
+put line 1548.
+(pdftex.def)             Requested size: 289.07928pt x 216.80946pt.
+Package epstopdf Info: Source file: <img/plots/embedding_c.eps>
+(epstopdf)                    date: 2021-04-25 17:47:31
+(epstopdf)                    size: 20810 bytes
+(epstopdf)             Output file: <img/plots/embedding_c-eps-converted-to.pdf
+>
+(epstopdf)                    date: 2021-04-25 18:13:38
+(epstopdf)                    size: 12227 bytes
+(epstopdf)             Command: <repstopdf --outfile=img/plots/embedding_c-eps-
+converted-to.pdf img/plots/embedding_c.eps>
+(epstopdf)             \includegraphics on input line 1584.
+Package epstopdf Info: Output file is already uptodate.
+
+
+pdfTeX warning: pdflatex (file ./img/plots/embedding_c-eps-converted-to.pdf): P
+DF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
+<img/plots/embedding_c-eps-converted-to.pdf, id=440, 578.16pt x 433.62pt>
+File: img/plots/embedding_c-eps-converted-to.pdf Graphic file (type pdf)
+<use img/plots/embedding_c-eps-converted-to.pdf>
+Package pdftex.def Info: img/plots/embedding_c-eps-converted-to.pdf  used on in
+put line 1584.
+(pdftex.def)             Requested size: 289.07928pt x 216.80946pt.
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
+[28 <./img/plots/embedding_b-eps-converted-to.pdf>]
+Missing character: There is no Î in font cmr10!
+Missing character: There is no ± in font cmr10!
+Package epstopdf Info: Source file: <img/plots/embedding_d.eps>
+(epstopdf)                    date: 2021-04-25 17:47:31
+(epstopdf)                    size: 23996 bytes
+(epstopdf)             Output file: <img/plots/embedding_d-eps-converted-to.pdf
+>
+(epstopdf)                    date: 2021-04-25 18:13:39
+(epstopdf)                    size: 13666 bytes
+(epstopdf)             Command: <repstopdf --outfile=img/plots/embedding_d-eps-
+converted-to.pdf img/plots/embedding_d.eps>
+(epstopdf)             \includegraphics on input line 1622.
+Package epstopdf Info: Output file is already uptodate.
 
-LaTeX Warning: Empty bibliography on input line 1448.
 
-[27 <./img/plots/mendelev_embedding-eps-converted-to.pdf>] [28 <./img/plots/tri
-ple_embedding-eps-converted-to.pdf>] [29 <./img/plots/ackland_embedding-eps-con
-verted-to.pdf>] [30 <./img/plots/cubic_spline-eps-converted-to.pdf>] [31 <./img
-/plots/quintic_spline-eps-converted-to.pdf>] (./main.aux)
+pdfTeX warning: pdflatex (file ./img/plots/embedding_d-eps-converted-to.pdf): P
+DF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
+<img/plots/embedding_d-eps-converted-to.pdf, id=482, 578.16pt x 433.62pt>
+File: img/plots/embedding_d-eps-converted-to.pdf Graphic file (type pdf)
+<use img/plots/embedding_d-eps-converted-to.pdf>
+Package pdftex.def Info: img/plots/embedding_d-eps-converted-to.pdf  used on in
+put line 1622.
+(pdftex.def)             Requested size: 289.07928pt x 216.80946pt.
+[29 <./img/plots/embedding_c-eps-converted-to.pdf> <./img/plots/embedding_d-eps
+-converted-to.pdf>]
+Package epstopdf Info: Source file: <img/plots/embedding_e.eps>
+(epstopdf)                    date: 2021-04-25 17:47:32
+(epstopdf)                    size: 23550 bytes
+(epstopdf)             Output file: <img/plots/embedding_e-eps-converted-to.pdf
+>
+(epstopdf)                    date: 2021-04-25 18:13:39
+(epstopdf)                    size: 13648 bytes
+(epstopdf)             Command: <repstopdf --outfile=img/plots/embedding_e-eps-
+converted-to.pdf img/plots/embedding_e.eps>
+(epstopdf)             \includegraphics on input line 1656.
+Package epstopdf Info: Output file is already uptodate.
+
+
+pdfTeX warning: pdflatex (file ./img/plots/embedding_e-eps-converted-to.pdf): P
+DF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
+<img/plots/embedding_e-eps-converted-to.pdf, id=546, 578.16pt x 433.62pt>
+File: img/plots/embedding_e-eps-converted-to.pdf Graphic file (type pdf)
+<use img/plots/embedding_e-eps-converted-to.pdf>
+Package pdftex.def Info: img/plots/embedding_e-eps-converted-to.pdf  used on in
+put line 1656.
+(pdftex.def)             Requested size: 289.07928pt x 216.80946pt.
+Package epstopdf Info: Source file: <img/plots/lennard_jones.eps>
+(epstopdf)                    date: 2021-04-25 17:47:32
+(epstopdf)                    size: 23990 bytes
+(epstopdf)             Output file: <img/plots/lennard_jones-eps-converted-to.p
+df>
+(epstopdf)                    date: 2021-04-25 18:13:39
+(epstopdf)                    size: 13518 bytes
+(epstopdf)             Command: <repstopdf --outfile=img/plots/lennard_jones-ep
+s-converted-to.pdf img/plots/lennard_jones.eps>
+(epstopdf)             \includegraphics on input line 1691.
+Package epstopdf Info: Output file is already uptodate.
+
+
+pdfTeX warning: pdflatex (file ./img/plots/lennard_jones-eps-converted-to.pdf):
+ PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
+<img/plots/lennard_jones-eps-converted-to.pdf, id=547, 578.16pt x 433.62pt>
+File: img/plots/lennard_jones-eps-converted-to.pdf Graphic file (type pdf)
+<use img/plots/lennard_jones-eps-converted-to.pdf>
+Package pdftex.def Info: img/plots/lennard_jones-eps-converted-to.pdf  used on 
+input line 1691.
+(pdftex.def)             Requested size: 289.07928pt x 216.80946pt.
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+[30 <./img/plots/embedding_e-eps-converted-to.pdf>]
+Package epstopdf Info: Source file: <img/plots/morse.eps>
+(epstopdf)                    date: 2021-04-25 17:47:31
+(epstopdf)                    size: 21464 bytes
+(epstopdf)             Output file: <img/plots/morse-eps-converted-to.pdf>
+(epstopdf)                    date: 2021-04-25 18:13:39
+(epstopdf)                    size: 12113 bytes
+(epstopdf)             Command: <repstopdf --outfile=img/plots/morse-eps-conver
+ted-to.pdf img/plots/morse.eps>
+(epstopdf)             \includegraphics on input line 1725.
+Package epstopdf Info: Output file is already uptodate.
+
+
+pdfTeX warning: pdflatex (file ./img/plots/morse-eps-converted-to.pdf): PDF inc
+lusion: found PDF version <1.7>, but at most version <1.5> allowed
+<img/plots/morse-eps-converted-to.pdf, id=582, 578.16pt x 433.62pt>
+File: img/plots/morse-eps-converted-to.pdf Graphic file (type pdf)
+<use img/plots/morse-eps-converted-to.pdf>
+Package pdftex.def Info: img/plots/morse-eps-converted-to.pdf  used on input li
+ne 1725.
+(pdftex.def)             Requested size: 289.07928pt x 216.80946pt.
+[31 <./img/plots/lennard_jones-eps-converted-to.pdf> <./img/plots/morse-eps-con
+verted-to.pdf>]
+Package epstopdf Info: Source file: <img/plots/slater_4s.eps>
+(epstopdf)                    date: 2021-04-25 17:47:31
+(epstopdf)                    size: 25000 bytes
+(epstopdf)             Output file: <img/plots/slater_4s-eps-converted-to.pdf>
+(epstopdf)                    date: 2021-04-25 18:13:40
+(epstopdf)                    size: 14650 bytes
+(epstopdf)             Command: <repstopdf --outfile=img/plots/slater_4s-eps-co
+nverted-to.pdf img/plots/slater_4s.eps>
+(epstopdf)             \includegraphics on input line 1758.
+Package epstopdf Info: Output file is already uptodate.
+
+
+pdfTeX warning: pdflatex (file ./img/plots/slater_4s-eps-converted-to.pdf): PDF
+ inclusion: found PDF version <1.7>, but at most version <1.5> allowed
+<img/plots/slater_4s-eps-converted-to.pdf, id=647, 578.16pt x 433.62pt>
+File: img/plots/slater_4s-eps-converted-to.pdf Graphic file (type pdf)
+<use img/plots/slater_4s-eps-converted-to.pdf>
+Package pdftex.def Info: img/plots/slater_4s-eps-converted-to.pdf  used on inpu
+t line 1758.
+(pdftex.def)             Requested size: 289.07928pt x 216.80946pt.
+Package epstopdf Info: Source file: <img/plots/zbl.eps>
+(epstopdf)                    date: 2021-04-25 17:47:31
+(epstopdf)                    size: 20953 bytes
+(epstopdf)             Output file: <img/plots/zbl-eps-converted-to.pdf>
+(epstopdf)                    date: 2021-04-25 18:13:40
+(epstopdf)                    size: 12803 bytes
+(epstopdf)             Command: <repstopdf --outfile=img/plots/zbl-eps-converte
+d-to.pdf img/plots/zbl.eps>
+(epstopdf)             \includegraphics on input line 1793.
+Package epstopdf Info: Output file is already uptodate.
+
+
+pdfTeX warning: pdflatex (file ./img/plots/zbl-eps-converted-to.pdf): PDF inclu
+sion: found PDF version <1.7>, but at most version <1.5> allowed
+<img/plots/zbl-eps-converted-to.pdf, id=648, 578.16pt x 433.62pt>
+File: img/plots/zbl-eps-converted-to.pdf Graphic file (type pdf)
+<use img/plots/zbl-eps-converted-to.pdf>
+Package pdftex.def Info: img/plots/zbl-eps-converted-to.pdf  used on input line
+ 1793.
+(pdftex.def)             Requested size: 289.07928pt x 216.80946pt.
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+[32 <./img/plots/slater_4s-eps-converted-to.pdf>]
+Package epstopdf Info: Source file: <img/plots/zero.eps>
+(epstopdf)                    date: 2021-04-25 17:47:32
+(epstopdf)                    size: 20256 bytes
+(epstopdf)             Output file: <img/plots/zero-eps-converted-to.pdf>
+(epstopdf)                    date: 2021-04-25 18:13:40
+(epstopdf)                    size: 12523 bytes
+(epstopdf)             Command: <repstopdf --outfile=img/plots/zero-eps-convert
+ed-to.pdf img/plots/zero.eps>
+(epstopdf)             \includegraphics on input line 1826.
+Package epstopdf Info: Output file is already uptodate.
+
+
+pdfTeX warning: pdflatex (file ./img/plots/zero-eps-converted-to.pdf): PDF incl
+usion: found PDF version <1.7>, but at most version <1.5> allowed
+<img/plots/zero-eps-converted-to.pdf, id=685, 578.16pt x 433.62pt>
+File: img/plots/zero-eps-converted-to.pdf Graphic file (type pdf)
+<use img/plots/zero-eps-converted-to.pdf>
+Package pdftex.def Info: img/plots/zero-eps-converted-to.pdf  used on input lin
+e 1826.
+(pdftex.def)             Requested size: 289.07928pt x 216.80946pt.
+
+LaTeX Warning: Empty bibliography on input line 1875.
+
+[33 <./img/plots/zbl-eps-converted-to.pdf> <./img/plots/zero-eps-converted-to.p
+df>] (./main.aux)
 
 LaTeX Warning: There were undefined references.
 
@@ -3038,13 +3080,13 @@ Package logreq Info: Writing requests to 'main.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 38383 strings out of 492982
- 761409 string characters out of 6134895
- 1143171 words of memory out of 5000000
- 41338 multiletter control sequences out of 15000+600000
+ 38408 strings out of 492982
+ 762428 string characters out of 6134895
+ 1143172 words of memory out of 5000000
+ 41359 multiletter control sequences out of 15000+600000
  535485 words of font info for 44 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 71i,23n,69p,10368b,1622s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 71i,23n,69p,10368b,1514s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></us
 r/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/shar
 e/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texl
@@ -3057,10 +3099,10 @@ sfonts/cm/cmr9.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/c
 m/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy
 5.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb><
 /usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt9.pfb>
-Output written on main.pdf (33 pages, 665397 bytes).
+Output written on main.pdf (35 pages, 736537 bytes).
 PDF statistics:
- 566 PDF objects out of 1000 (max. 8388607)
- 174 compressed objects within 2 object streams
+ 793 PDF objects out of 1000 (max. 8388607)
+ 200 compressed objects within 2 object streams
  0 named destinations out of 1000 (max. 500000)
- 127 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 147 words of extra memory for PDF output out of 10000 (max. 10000000)
 

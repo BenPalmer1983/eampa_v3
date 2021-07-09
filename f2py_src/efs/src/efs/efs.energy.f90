@@ -39,7 +39,7 @@ REAL(kind=DoubleReal) :: c_r(:,:)
 !###########################################################
 INTEGER(KIND=StandardInteger) :: n, f, fn, dn
 INTEGER(KIND=StandardInteger) :: cc, nc
-REAL(kind=DoubleReal) :: fx
+REAL(kind=DoubleReal) :: fx, dfxdx
 REAL(kind=DoubleReal) :: fx_arr(1:2)
 REAL(kind=DoubleReal), ALLOCATABLE :: density(:,:)
 !###########################################################
@@ -56,35 +56,30 @@ config_energy(cn, :) = 0.0D0
 density = 0.0D0
 DO n = 1, nc
   ! PAIR ENERGY
-  CALL pot_search_pair(nl_l(n, 2), nl_l(n, 4), nl_r(n, 1), fx)
+  CALL search_f(1, nl_l(n, 2), nl_l(n, 4), 0, nl_r(n, 1), fx)
   config_energy(cn, 1) = config_energy(cn, 1) + fx
-    
-  ! A DENSITY AT B
-  f = 1
-  DO WHILE(fgroups_dens(nl_l(n, 2), f) .NE. 0)
-    fn = fgroups_dens(nl_l(n, 2), f)
-    CALL pot_search_dens(nl_l(n, 2), fn, nl_r(n, 1), fx)  
+  ! LOOP THROUGH DENSITY GROUPS
+  DO fn = 1, fgroup_max
+    ! DENSITY OF ATOM B AT A (B with any atom)
+    CALL search_f(2, nl_l(n, 2), 0, fn, nl_r(n, 1), fx)
+    density(nl_l(n, 1), fn) = density(nl_l(n, 1), fn) + fx 
+    ! DENSITY OF ATOM B AT A (B with only atom A)
+    CALL search_f(2, nl_l(n, 2), nl_l(n, 4), fn, nl_r(n, 1), fx)
+    density(nl_l(n, 1), fn) = density(nl_l(n, 1), fn) + fx 
+    ! DENSITY OF ATOM A AT B (A with any atom)
+    CALL search_f(2, nl_l(n, 4), 0, fn, nl_r(n, 1), fx)
+    density(nl_l(n, 3), fn) = density(nl_l(n, 3), fn) + fx 
+    ! DENSITY OF ATOM A AT B (A with only atom B)
+    CALL search_f(2, nl_l(n, 4), nl_l(n, 2), fn, nl_r(n, 1), fx)
     density(nl_l(n, 3), fn) = density(nl_l(n, 3), fn) + fx    
-    f = f + 1
-  END DO 
-  
-  ! B DENSITY AT A
-  f = 1
-  DO WHILE(fgroups_dens(nl_l(n, 4), f) .NE. 0)
-    fn = fgroups_dens(nl_l(n, 4), f)
-    CALL pot_search_dens(nl_l(n, 4), fn, nl_r(n, 1), fx)
-    density(nl_l(n, 1), fn) = density(nl_l(n, 1), fn) + fx
-    f = f + 1
-  END DO 
+  END DO
 END DO
 ! EMBED ENERGY
 DO n = 1, cc
-  f = 1
-  DO WHILE(fgroups_embe(nl_l(n, 4), f) .NE. 0)
-    fn = fgroups_dens(nl_l(n, 2), f)
-    CALL pot_search_embe(c_l(n), fn, density(n, fn), fx)
+  ! LOOP THROUGH DENSITY GROUPS
+  DO fn = 1, fgroup_max    
+    CALL search_f(3, nl_l(n, 4), 0, fn, density(n, fn), fx)
     config_energy(cn, 2) = config_energy(cn, 2) + fx
-    f = f + 1
   END DO
 END DO
 max_density = MAX(max_density, MAXVAL(density))

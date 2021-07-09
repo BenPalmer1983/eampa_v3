@@ -1,0 +1,11 @@
+# Bulk Properties File
+
+units pressure=GPA length=ang energy=ev
+
+
+PDFCC1 potlabel=PD b0=180 alat=3.89 uv=1.0 e0=-3.91 ec=234,176,71.2 type=fcc expansion=4 rcut=6.5 amu_per_crystal=425.68
+
+
+# ORTHORHOMBIC  C11 C22 C33 C44 C55 C66 C12 C13 C23  
+#FEFCC1 potlabel=FE b0=222 alat=3.42 uv=1.0,1.05,1.0 e0=-4.27 ec=365.6,298.7,364.6,186.3,266.8,186.3,141.6,233.8,130.4 type=fcc expansion=4 rcut=6.5 amu_per_crystal=224.00
+#FEFCC1 potlabel=FE b0=222 alat=3.42 uv=1.0 e0=-4.27 ec=365,137,186 type=fcc expansion=4 rcut=6.5 amu_per_crystal=224.00

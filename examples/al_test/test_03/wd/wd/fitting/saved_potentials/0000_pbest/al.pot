@@ -1,0 +1,25 @@
+POTNAME al_pot
+
+START
+F_ON true
+FILE al_pair.pot
+LABEL AL AL
+F_TYPE PAIR
+END
+
+START
+F_ON true
+FILE al_dens_slater_4s.pot
+LABEL AL
+F_TYPE DENS
+F_GROUP D1
+END
+
+START
+F_ON true
+FILE al_embe.pot
+LABEL AL
+F_TYPE EMBE
+F_GROUP D1
+END
+

@@ -29,24 +29,44 @@ class pf_random:
   count = 0
   time_spent = 0.0
 
-  def run():
+
+  def run(fit):
     t_start = time.time()
     start_best_rss = g.pfdata['rss']['best'] 
     pf_random.count = pf_random.count + 1
     g.pfdata['stage'] = 'RANDOM ' + str(pf_random.count)
     g.pfdata['stage_brief'] = 'R' + str(pf_random.count)
 
+
+    p = g.pfdata['p']['best']
+    potential.update(p)
+    rss = pf.get_rss(False)
+    rss_best = rss
+    rss_plot = []
+    rss_plot.append([time.time()-t_start, rss_best])
+
+
+    #pgrad = pf_pgradient.run(g.pfdata['p']['best'], g.pfdata['params_var'], True)
+    #pgrad = 2.0 * abs(pgrad)
+
+
     # START PARAMETER
     # Try randomly generated parameters
     for n in range(pf.fit['random_size']):
-      p = pf_parameters.random_p(0.0)
-      pf_potential.update(p)
-      rss = pf.get_rss()
+      #potential.random(g.pfdata['p']['best'], 1.0, fit['oversized_parameters'], pgrad)
+      potential.random(g.pfdata['p']['best'], 1.0, fit['oversized_parameters'])
+      rss_new = pf.get_rss()
+      if(rss_new < rss_best):
+        rss_best = rss_new
+        rss_plot.append([time.time()-t_start, rss_best])
+    rss_plot.append([time.time()-t_start, rss_best])
+        
 
     pf_random.time_spent = pf_random.time_spent + (time.time() - t_start)
 
     pf.summary_line("RANDOM SEARCH " + str(pf_random.count), t_start, time.time(), start_best_rss,  g.pfdata['rss']['best'])
-   
     pf_save.top("RANDOM_SEARCH_" + str(pf_random.count))
+    pf_save.rss_plot("RANDOM_SEARCH_" + str(pf_random.count), rss_plot)
+    pf.save_rss_plot_data(t_start, "RANDOM_SEARCH_" + str(pf_random.count), rss_plot)
 
 

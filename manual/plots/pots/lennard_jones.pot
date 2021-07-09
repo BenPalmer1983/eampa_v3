@@ -1,0 +1,6 @@
+#TYPE lennard_jones
+#P 2.3 3.5
+#TITLE Lennard-Jones
+#X Distance/Angs
+#Y Energy/eV
+#PLOT lennard_jones.eps

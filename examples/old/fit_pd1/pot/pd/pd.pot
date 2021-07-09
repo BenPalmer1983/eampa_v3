@@ -1,0 +1,51 @@
+POTNAME fe_pot
+
+/* comment block */
+""" comment block """
+
+
+
+!###########################
+!# PAIR
+!###########################
+
+! Pair PD PD
+START
+F_ON true
+FILE              pd_pair.pot
+LABEL             PD PD
+F_TYPE            PAIR            ! PAIR DENS EMBE
+F_GROUP
+END
+
+
+
+!###########################
+!# DENSITY
+!###########################
+
+! FE Density
+START
+F_ON true
+FILE              pd_dens.pot
+LABEL             PD
+F_TYPE            DENS            ! PAIR DENS EMBE
+F_GROUP           Group1
+END
+
+
+
+!###########################
+!# EMBEDDING
+!###########################
+
+! FE Embedding
+START
+F_ON true
+FILE              pd_embe.pot
+LABEL             PD
+F_TYPE            EMBE            ! PAIR DENS EMBE
+F_GROUP           Group1
+END
+
+

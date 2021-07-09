@@ -25,15 +25,7 @@ class g:
           'end' : 0.0,
           'duration' : 0.0,
           }
-          
-  pot_functions = {
-                  'pot_name': '',
-                  'pot_dir': '',
-                  'zbl_file': '',
-                  'functions': [],
-                  'zbl': [],
-                  'functions_original': [],
-                  }
+
   pot_labels = []
 
   pot_fn = {}
@@ -44,6 +36,10 @@ class g:
             'config_results': [],
             }  
             
+  random = {
+  'seed': 100,
+  }
+
   mask = {}
             
       
@@ -81,8 +77,8 @@ class g:
   bp_results = {'ok': False,}
   bp_results_best = {'ok': False,}
   
-  benchmark = {'configs': 0, 'total_atoms': 0, 'total_interactions': 0, 'total_time': 0.0, 'configspersec': 0.0, 'atomspersec': 0.0, 'interationspersec': 0.0,}
-  
+  benchmark = {'dt': 0.0, 'configs': 0, 'total_atoms': 0, 'total_interactions': 0, 'total_time': 0.0, 'configspersec': 0.0, 'atomspersec': 0.0, 'interationspersec': 0.0,}
+
 
   #RSS
   rss = {'current': None, 'best': None, 'counter': None, 'since_improvement': None, 'log': [], 'efs': {'ok': False, 'cc': 0,}, 'bp': {'ok': False, 'cc': 0,}, 'residual': []}

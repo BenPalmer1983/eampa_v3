@@ -11,7 +11,11 @@ REAL(kind=DoubleReal), INTENT(IN) :: p_fixed(1:1)
 REAL(kind=DoubleReal), INTENT(OUT) :: y
 !############################################################
 !############################################################
-y = -1.0D0 * p(1) * sqrt(r)
+IF(r .LT. 0.0D0)THEN
+  y = 0.0D0
+ELSE
+  y = -1.0D0 * p(1) * sqrt(r)
+END IF
 END SUBROUTINE fs_embedding
 
 

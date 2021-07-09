@@ -15,21 +15,15 @@ REAL(kind=DoubleReal), INTENT(IN) :: p(:)
 REAL(kind=DoubleReal), INTENT(IN) :: p_fixed(:)
 REAL(kind=DoubleReal), INTENT(OUT) :: y
 !############################################################
-REAL(kind=DoubleReal) :: H
+REAL(kind=DoubleReal) :: H, rk
 INTEGER(kind=StandardInteger) :: n
 !############################################################
 y = 0.0D0
 DO n = 1, SIZE(p,1)
-  CALL heaviside((p_fixed(n) - r), H)
-  y = y + p(n) * (p_fixed(n) - r)**3 * H
+  rk = p_fixed(n)
+  CALL heaviside((rk - r), H)
+  y = y + H * p(n) * (r - rk)**3
 END DO
-IF(SIZE(p,1) + 1 .EQ. SIZE(p_fixed,1))THEN
-  IF(r .GE. p_fixed(SIZE(p_fixed,1)))THEN
-    y = 0.0D0
-  ELSE
-    y = y * ( p_fixed(SIZE(p_fixed,1) - r))**3
-  END IF
-END IF
 END SUBROUTINE cubic_spline
 
 ! VECTOR SUBROUTINE

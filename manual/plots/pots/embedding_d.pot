@@ -1,0 +1,6 @@
+#TYPE embedding_d
+#P 0.05 -0.00001
+#TITLE Embedding D
+#X Density
+#Y Energy/eV
+#PLOT embedding_d.eps

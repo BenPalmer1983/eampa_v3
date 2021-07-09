@@ -11,7 +11,6 @@ from rescale_density import rescale_density
 from pot_fit_data import pf_data
 from pot_fit_cycle import pf_cycle
 from pot_fit_potential import pf_potential
-from pot_fit_generation import pf_generation
 from pot_fit_extinction import pf_extinction
 from pot_fit_enhance import pf_enhance
 from pot_fit_parameters import pf_parameters
@@ -27,30 +26,31 @@ class pf_genetic:
   start_time = 0
   variation_factor = 1.0
 
-  def run():    
-    if(pf.fit['gens'] == 0):
+  def run(fit):    
+    if(fit['gens'] == 0):
       return 0
     
-
+    #
+    t_start = time.time()
+    start_best_rss = g.pfdata['rss']['best']  
+    pf_genetic.start_time = time.time()
+    pf_genetic.count = pf_genetic.count + 1
+    pf_genetic.rss_plot = []
+    pf_genetic.rss_plot.append([time.time() - pf_genetic.start_time, start_best_rss])
+    pf_genetic.rss_best = start_best_rss
 
     g.pfdata['stage'] = 'Genetic Algorithm ' + str(pf_genetic.count)
     g.pfdata['stage_brief'] = 'GA' + str(pf_genetic.count)
-
-    #
-    t_start = time.time()
-    start_best_rss = g.pfdata['rss']['best'] 
-    pf_genetic.start_time = time.time()
-    pf_genetic.count = pf_genetic.count + 1
   
     main.log_title("Genetic Fit")   
     
     # Load from input
     pf_genetic.width = g.pfdata['psize']
-    pf_genetic.pop_size = pf.fit['pop_size']
-    pf_genetic.fresh_size = pf.fit['fresh_size']
-    pf_genetic.generations = pf.fit['gens']
-    pf_genetic.no_clone_var = pf.fit['no_clone_var']
-    pf_genetic.gen_variation_multiplier = pf.fit['gen_variation_multiplier']
+    pf_genetic.pop_size = fit['pop_size']
+    pf_genetic.fresh_size = fit['fresh_size']
+    pf_genetic.generations = fit['gens']
+    pf_genetic.no_clone_var = fit['no_clone_var']
+    pf_genetic.gen_variation_multiplier = fit['gen_variation_multiplier']
 
 
  
@@ -100,10 +100,9 @@ class pf_genetic:
         if(n <= len(start_parameters)):
           pf_genetic.pop[pn, :] = start_parameters[n-1][:]
         else:
-          pf_genetic.pop[pn, :] = pf_parameters.random_p()
-        
+          pf_genetic.pop[pn, :] = potential.random(g.pfdata['p']['best'], 1.0, False)        
         # Try - if it fails or rss == None, try next
-        pf_potential.update(pf_genetic.pop[pn, :])
+        potential.update(pf_genetic.pop[pn, :])
         try:
           # Update
           rss = pf.get_rss()
@@ -112,21 +111,26 @@ class pf_genetic:
             pf_genetic.pop_rss[pn] = rss
         except:
           pass
+        if(rss < pf_genetic.rss_best):
+          pf_genetic.rss_best = rss
+          pf_genetic.rss_plot.append([time.time() - pf_genetic.start_time, pf_genetic.rss_best])
 
     ###################################
     # LOOP THROUGH GENERATIONS
     ###################################
-
 
     pf_genetic.generation = 0
     for gen in range(pf_genetic.generations):
       pf_genetic.generation = pf_genetic.generation + 1
       pf_genetic.run_gen()
 
+    pf_genetic.rss_plot.append([time.time() - pf_genetic.start_time, pf_genetic.rss_best])
 
     # End
     pf.summary_line("GENETIC ALGORITHM " + str(pf_genetic.count), t_start, time.time(), start_best_rss,  g.pfdata['rss']['best'])
-    pf_save.top("GENETIC_ALGORITHM_" + str(pf_sa.count))
+    pf_save.top("GENETIC_ALGORITHM_" + str(pf_genetic.count))
+    pf_save.rss_plot("GENETIC_ALGORITHM_" + str(pf_genetic.count), pf_genetic.rss_plot)
+    pf.save_rss_plot_data(t_start, "GENETIC_ALGORITHM_" + str(pf_genetic.count), pf_genetic.rss_plot)
   
 
 
@@ -145,7 +149,6 @@ class pf_genetic:
       while(loop):
         loop = pf_genetic.breed_event(p, c, 'p+p')      
       c = c + 2
-
 
     # Make Fresh  
     g.pfdata['stage'] = ss + 'Initialising Fresh Population'   
@@ -231,22 +234,30 @@ class pf_genetic:
 
     # Check the children actually give valid parameters
     loop = False     
-    pf_potential.update(pf_genetic.children[ca, :])
-    rss = pf.get_rss()
-    if(rss is None):
-      loop = True
+    potential.update(pf_genetic.children[ca, :])
+    rss_a = pf.get_rss()
+    if(rss_a is None):
+      loop = True 
       
-    pf_potential.update(pf_genetic.children[cb, :])
-    rss = pf.get_rss()
-    if(rss is None):
+    potential.update(pf_genetic.children[cb, :])
+    rss_b = pf.get_rss()
+    if(rss_b is None):
       loop = True
       
      
     if(loop == False):
-      pf_genetic.children_rss[ca] = rss
-      pf_genetic.children_rss[cb] = rss
+      pf_genetic.children_rss[ca] = rss_a
+      pf_genetic.children_rss[cb] = rss_b
       
-      
+    if(rss_a != None and rss_b != None):
+      if(rss_a < pf_genetic.rss_best):
+        pf_genetic.rss_best = rss_a
+        pf_genetic.rss_plot.append([time.time() - pf_genetic.start_time, pf_genetic.rss_best])
+      if(rss_b < pf_genetic.rss_best):
+        pf_genetic.rss_best = rss_b
+        pf_genetic.rss_plot.append([time.time() - pf_genetic.start_time, pf_genetic.rss_best])
+
+
     # Loop again or not
     return loop
     
@@ -266,24 +277,26 @@ class pf_genetic:
 
 
   def make_fresh():    
-
-    for p in range(pf_genetic.fresh_size):
+    for pn in range(pf_genetic.fresh_size):
       loop = True
+      pbest = numpy.copy(g.top_parameters[0][1])
       while(loop):
         try:
-          rn = min(len(g.top_parameters) - 1, numpy.floor((len(g.top_parameters) + 1) * random.uniform(0.0, 1.0)**3))
-          pbest = numpy.copy(g.top_parameters[0][1])
-          pf_genetic.fresh[p, :] = pf_parameters.random_p(pbest, pf_genetic.variation_factor)
-
-          #pf_genetic.fresh[p, :] = numpy.copy(g.top_parameters[0][1])
-
-          pf_potential.update(pf_genetic.fresh[p, :])
+          rn = int(min(len(g.top_parameters) - 1, numpy.floor((len(g.top_parameters) + 1) * random.uniform(0.0, 1.0)**3)))
+          p_trial = numpy.copy(g.top_parameters[rn][1])
+          p_new = potential.random(p_trial, pf_genetic.variation_factor, False)
           rss = pf.get_rss()
           if(rss is not None):
             loop = False
-            pf_genetic.fresh_rss[p] = rss
         except:
           pass 
+      pf_genetic.fresh[pn, :] = p_new
+      pf_genetic.fresh_rss[pn] = rss
+
+      if(rss < pf_genetic.rss_best):
+        pf_genetic.rss_best = rss
+        pf_genetic.rss_plot.append([time.time() - pf_genetic.start_time, pf_genetic.rss_best])
+
 
   # Used to merge parents, fresh and all children into ordered array      
   def merge():

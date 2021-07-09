@@ -17,12 +17,15 @@ import sys
 import shutil
 import numpy
 import matplotlib.pyplot as plt
-import copy
+from scipy.optimize import minimize
+from scipy.optimize import basinhopping
 import random
 import hashlib
 from eampa_lib.f_es import es
 from eampa_lib.f_efs import efs
+from eampa_lib.f_efs import potential as efs_potential
 from eampa_lib.f_bp import bp
+from eampa_lib.f_bp import potential as bp_potential
 from eampa_lib.f_sorting import sort
 from eampa_lib.f_interp import interp
 from eampa_lib.f_spline import spline
@@ -55,15 +58,7 @@ class g:
           'end' : 0.0,
           'duration' : 0.0,
           }
-          
-  pot_functions = {
-                  'pot_name': '',
-                  'pot_dir': '',
-                  'zbl_file': '',
-                  'functions': [],
-                  'zbl': [],
-                  'functions_original': [],
-                  }
+
   pot_labels = []
 
   pot_fn = {}
@@ -74,6 +69,10 @@ class g:
             'config_results': [],
             }  
             
+  random = {
+  'seed': 100,
+  }
+
   mask = {}
             
   dft_energy_adjustments = {}  
@@ -108,8 +107,8 @@ class g:
   bp_results = {'ok': False,}
   bp_results_best = {'ok': False,}
   
-  benchmark = {'configs': 0, 'total_atoms': 0, 'total_interactions': 0, 'total_time': 0.0, 'configspersec': 0.0, 'atomspersec': 0.0, 'interationspersec': 0.0,}
-  
+  benchmark = {'dt': 0.0, 'configs': 0, 'total_atoms': 0, 'total_interactions': 0, 'total_time': 0.0, 'configspersec': 0.0, 'atomspersec': 0.0, 'interationspersec': 0.0,}
+
 #RSS
   rss = {'current': None, 'best': None, 'counter': None, 'since_improvement': None, 'log': [], 'efs': {'ok': False, 'cc': 0,}, 'bp': {'ok': False, 'cc': 0,}, 'residual': []}
   
@@ -754,19 +753,22 @@ class read_config:
 #  CLASS eamp
 ###########################################
 class eampa:
+
+  start_time = 0.0
  
   def run():
+    eampa.start_time = time.time()
     print("RUNNING")
-        
+ 
 # Read Input
     read_input.run()    
     
+# set seed
+    numpy.random.seed(int(g.random['seed']))
+
 # Setup Dirs
     setup_dirs.run()
-    
-# Copy Input
-#eampa.copy_input()
-    
+        
 # Set memory
     memory.run() 
         
@@ -811,41 +813,17 @@ class eampa:
       trial.run()
     elif(g.run_type == 'relax'): 
       relax_calc.run()
+    elif(g.run_type == 'pgrad'): 
+      pgrad.run()
     else: 
       trial.run()
       
-  def copy_input():
-    try: 
-      std.copy(g.inp['potential']['dir'], g.dirs['input'])
-    except:
-      pass
-    try: 
-      std.copy(g.inp['configs']['dir'], g.dirs['input'])
-    except:
-      pass
-    try: 
-      std.copy(g.inp['dft']['dir'], g.dirs['input'])
-    except:
-      pass
-    try: 
-      std.copy(g.inp['bp']['dir'], g.dirs['input'])
-    except:
-      pass
+    eampa.exit()
     
-  """  
-  def run_type():
-# Types
-# config       just calculate energy/forces/stress of configs
-# bp           calculate bulk properties (bulk modulus, elastic constants etc)
-# rss
-# fit
-  
-# Default
-    g.run_type = g.inp['run']['type'].lower().strip()
-  """
-  
   def exit():
+    eampa.end_time = time.time() - eampa.start_time
     print("End of Program")
+    print("Run time: ", eampa.end_time)
     exit()
   
 ###########################################
@@ -857,6 +835,7 @@ class read_input:
     main.log_title("Read Input")
   
     read_input.run_type()
+    read_input.random()
     read_input.wd()
     read_input.rss_weights()
     read_input.rss_max_density()
@@ -891,6 +870,18 @@ class read_input:
     for k in g.wd_type.keys():
       try:
         g.wd_type[k] = float(g.inp['wd'][k])
+      except:
+        pass
+
+# READ TYPE
+  def random():
+    g.random = {
+    'seed': 100,
+    }    
+# TRY READING
+    for k in g.random.keys():
+      try:
+        g.random[k] = float(g.inp['random'][k])
       except:
         pass
 
@@ -978,6 +969,7 @@ class read_input:
     
     fit_data = {
     'type': None,
+    'repeat': 1,
     'random_size': 100,
     'cycles': 0,
     'gens': 0,
@@ -997,6 +989,7 @@ class read_input:
     'mutate_scale': 1.0,
     'no_clones': True,
     'no_clone_var': 0.05,
+    'oversized_parameters': False,
     'fresh_ws': 0.1,
     'fresh_we': 1.5,
     'enhance_every': 10,
@@ -1010,14 +1003,25 @@ class read_input:
     'sa_loops_i': 100,
     'sa_temp_start': 10,
     'sa_temp_end': 0.1,
-    'sa_step': 0.01,
-    'sa_step_factor': 0.3,
+    'sa_var': 0.01,
+    'sa_var_factor': 0.3,
+    'fit_params_that_change': True,
+    'nm_maxiter': 100,
+    'nm_xatol': 1.0E-8,
+    'bfgs_maxiter': 100,
+    'bfgs_gtol': 1.0E-8,
+    'bh_niter': 10,
     }
 
 # TRY READING
     for k in fit_data.keys():
       try:
-        fit_data[k] = g.inp[inp_key][k]
+        if(type(fit_data[k]) == bool):
+          fit_data[k] = False
+          if(g.inp[inp_key][k].upper()[0] == 'T'):
+            fit_data[k] = True
+        else:
+          fit_data[k] = g.inp[inp_key][k]
       except:
         pass
         
@@ -1160,10 +1164,8 @@ class setup_dirs:
     for sd in g.sub_dirs.keys():
       g.dirs[sd] = g.dirs['wd'] + '/' + g.sub_dirs[sd]
   
-# MAKE DIRS
-    for d in g.dirs.keys():
-      std.make_dir(g.dirs[d])
-      main.log(str(d) + "   " + str(g.dirs[d]))
+# For copies of all data to be stored in (potential etc)
+    std.make_dir(g.dirs['wd'] + '/data')
     
 ###########################################
 #  CLASS memor
@@ -1236,7 +1238,7 @@ class labels:
   @staticmethod
   def output(): 
     if(g.outputs):     
-      fh = open(g.dirs['output'] + '/' + 'labels.dat', 'w')   
+      fh = open(g.dirs['wd'] + '/data/' + 'labels.dat', 'w')   
       for k in g.labels.keys():
         fh.write(str(k) + '  ' + str(g.labels[k]) + '\n')
       fh.close()  
@@ -1273,18 +1275,28 @@ class labels:
 ###########################################
 class potential:
 
-  rescale_density_on = False
-  rescale_embedding_on = False
-  parameters = None
-
-  def run():
+  fgroup_max = 0
+  label_max = 0
+            
+  pot = {
+        'pot_name': '',
+        'pot_dir': '',
+        'index_file': '',
+        'functions': [],
+        'p_count': 0,
+        'p': None,
+        'p_loaded': None,
+        'p_var': None,
+        'p_lower': None,
+        'p_upper': None,
+        'oversized': None,
+        }
   
-    efs.init()                           # Initialise (allocate arrays)
-    potential.efs_add_potentials()       # Load potentials
-    potential.plot_fortran_potentials()
-    potential.plot_python_potentials()
-    
   def load():
+    print("Load Potential")   
+
+    potential.pot['pot_name'] = ''
+
     main.log_title("Potential Load")
     
     if(g.inp['potential']['dir'].strip() == ""):
@@ -1297,200 +1309,38 @@ class potential:
       return False
     main.log("Potential file: " + str(pot_file))
 
-    if('rescale_density' in g.inp['potential'].keys() and g.inp['potential']['rescale_density'].upper().strip() == "TRUE"):
-      potential.rescale_density_on = True
-
-    if('rescale_embedding' in g.inp['potential'].keys() and g.inp['potential']['rescale_embedding'].upper().strip() == "TRUE"):
-      potential.rescale_embedding_on = True
-
+    potential.pot['index_file'] = g.inp['potential']['index_file']
+      
 # Read potential index
     potential.read_potential(pot_file)
-    potential.make_find_fn()
-    potential.load_tabulated()
-    potential.make_tabulated_points()
-    potential.load_analytic()
-    potential.make_analytic_points()    
-    potential.load_spline()
-    potential.make_spline_points()
-    potential.load_fit_data()
-    potential.rescale_embedding()
-    potential.pf_output()
-    potential.make_copies()
-    potential.parameters = numpy.copy(potential.get_parameters())
-
-    potential.plot_python_potentials(g.dirs['plots'] + "/starting_potential")   
-    potential.pf_output_file(g.dirs['input'] + '/start.pot')
-#main.end()
-       
-    return True
-  
-  @staticmethod
-  def make_find_fn():
-    for fn in range(len(g.pot_functions['functions'])): 
-      t_id = g.pot_functions['functions'][fn]['f_type_id']
-      if(g.pot_functions['functions'][fn]['f_type_id'] == 1):
-        a_id = g.pot_functions['functions'][fn]['a']
-        b_id = g.pot_functions['functions'][fn]['b']
-      elif(g.pot_functions['functions'][fn]['f_type_id'] == 2):
-        a_id = g.pot_functions['functions'][fn]['a']
-        b_id = g.pot_functions['functions'][fn]['f_group']
-      elif(g.pot_functions['functions'][fn]['f_type_id'] == 3):
-        a_id = g.pot_functions['functions'][fn]['a']
-        b_id = g.pot_functions['functions'][fn]['f_group']
-      if(t_id not in g.pot_fn.keys()):
-        g.pot_fn[t_id] = {}
-      if(a_id not in g.pot_fn[t_id].keys()):
-        g.pot_fn[t_id][a_id] = {}
-      g.pot_fn[t_id][a_id][b_id] = fn
-  
-  @staticmethod
-  def find_fn(t_id, a_id, b_id): 
-    if(t_id not in g.pot_fn.keys()):
-      return -1
-    if(a_id not in g.pot_fn[t_id].keys()):
-      return -1
-    if(b_id not in g.pot_fn[t_id][a_id].keys()):
-      return -1
-    return g.pot_fn[t_id][a_id][b_id]
-
-  @staticmethod
-  def pot_function():
-    return {      
-    'f_on': 1,  
-    'a_text': '',
-    'b_text': '',
-    'a': 0,
-    'b': 0,
-    'f_type': '',             # PAIR, EMBE, DENS
-    'f_type_id': 0,           # 1=PAIR, 2=EMBE, 3=DENS
-    'f_group': 1,
-    'f_group_label': None,
-    'r_cut': 6.5,
-    'file': None,
-    'function_type': 0,       # 1 tab, 2 analytic
-    'f_points': None,         # READ IN TO PYTHON
-    'f': None,
-    'a_params': None,
-    'a_params_fixed': None,
-    'a_l': 0.0,
-    'a_u': 10.0,
-    'a_type': '',
-    's_type': '',
-    's_nodes': None,
-    'zoor': 1,
-    'points': numpy.zeros((g.tab_size,g.tab_width,),),           # THESE ARE USED BY FORTRAN
-    'points_original': numpy.zeros((g.tab_size,g.tab_width,),), 
-    'fit_file': None,
-    'fit_type': None,         # 1 spline, 2 analytic
-    'fit_spline_type': None,  # 1 poly3, 2 poly5
-    'fit_parameters': None,
-    'fit_parameters_start': None,
-    'fit_size': None,
-    'fit_mult': None,
-    'function_file_name': '',
-    }
-
-  @staticmethod
-  def rescale_density():
-# NOT WORKING YET
-    if(potential.rescale_density_on):
-      print("Rescale")
-      m = {}
-      for fn in range(len(g.pot_functions['functions'])): 
-        if(g.pot_functions['functions'][fn]['f_type_id'] == 2):
-          a_id = g.pot_functions['functions'][fn]['a']
-          f_id = g.pot_functions['functions'][fn]['f_group']
-          m_rho = rescale_density.estimate_density(fn)
-          m[fn] = 1.0 / m_rho
-          fn_emb = potential.find_fn(3, a_id, f_id)
-          m[fn_emb] = 1.0 / m_rho
-          print(m_rho)
-# Get parameters
-      p = potential.get_parameters()
-
-# Update potential
-      a = 0
-      for fn in range(len(g.pot_functions['functions'])): 
-        multf = 1.0
-#if(fn in m.keys()):
-#  multf = m[fn]
-
-        b = a + g.pot_functions['functions'][fn]['fit_size'] 
-        if(g.pot_functions['functions'][fn]['fit_type'] == 1):     # NODE SPLINE   
-# Calc b
-          g.pot_functions['functions'][fn]['s_nodes'][:,1] = multf * p[a:b]
-          potential.make_spline_points_inner(fn)  
-        
-        elif(g.pot_functions['functions'][fn]['fit_type'] == 2):   # ANALYTIC  
-# Make Analytic Points
-          g.pot_functions['functions'][fn]['a_params'][:] = multf * p[a:b]
-          potential.make_analytic_points_inner(fn)
-
-# Update a
-        a = b    
-
-# Where the embedding function is analytic, rescale the tab points to range
-# from 0.0 up to predicted max density
-  @staticmethod
-  def rescale_embedding():
-    if(potential.rescale_embedding_on):
-      m = {}
-      for fn in range(len(g.pot_functions['functions'])):         
-        if(g.pot_functions['functions'][fn]['f_type_id'] == 2):  # Density function
-          a_id = g.pot_functions['functions'][fn]['a']
-          f_id = g.pot_functions['functions'][fn]['f_group']
-          fn_emb = potential.find_fn(3, a_id, f_id)
-          m_rho = rescale_density.estimate_density(fn)
-          if(fn_emb >= 0):
-            m[fn_emb] = m_rho
-
-      for fn in m.keys():
-        if(g.pot_functions['functions'][fn]['fit_type'] == 2):   # ANALYTIC  
-          g.pot_functions['functions'][fn]['a_u'] = m[fn_emb]
-          potential.make_analytic_points_inner(fn)
-
-  @staticmethod
-  def estimate_density(fn):
-# Symetric simple cubic used as test case
-    sc = {0.86602539999999995: 8, 0.80039053000000004: 24, 0.75: 24, 0.71807032999999998: 24, 0.70710678000000005: 12, 0.72886899000000005: 24, 0.67314560000000001: 48, 0.63737743999999996: 48, 0.625: 24, 0.61237244000000002: 24, 0.57282195999999996: 48, 0.55901699000000005: 24, 0.53033008999999998: 36, 0.51538819999999996: 48, 0.5: 6, 0.64951904999999999: 8, 0.58630196999999995: 24, 0.54486237000000004: 24, 0.46770717000000001: 48, 0.45069390999999998: 24, 0.4145781: 24, 0.39528470999999998: 24, 0.375: 30, 0.43301269999999997: 8, 0.35355339000000002: 12, 0.30618622000000001: 24, 0.27950849999999999: 24, 0.25: 6, 0.21650634999999999: 8, 0.17677670000000001: 12, 0.125: 7}
-    a_prim = 0.125
-    a = [2.0,3.0,4.0,5.0] 
-    m_rho = 0.0
-    for a0 in a:
-      a0 = (1 / a_prim) * a0
-      rho = 0.0    
-      for k in sc.keys():
-        y = interp.search_x(a0 * k, g.pot_functions['functions'][fn]['points'][:,0], g.pot_functions['functions'][fn]['points'][:,1])
-        rho = rho + sc[k] * y
-      m_rho = max(m_rho, rho)
-    return m_rho
 
 # LOAD FROM FILE
   @staticmethod
   def read_potential(file_name):
-    g.pot_functions['pot_dir'] = ''
+    potential.pot['pot_dir'] = ''
     if('/' in file_name):
       lst = file_name.split('/')
       for i in range(len(lst) - 1):
         if(i > 0):
-          g.pot_functions['pot_dir'] += '/'
-        g.pot_functions['pot_dir'] += lst[i]
+          potential.pot['pot_dir'] += '/'
+        potential.pot['pot_dir'] += lst[i]
     main.log("Loading: " + str(file_name))        
 
     index = std.config_file_to_list(file_name)  
+    potential.pot['pot_file_name'] = file_name
     pot = potential.pot_function()
-    g.pot_functions['pot_file_name'] = file_name
+
     for row in index:    
       if(len(row) > 1 and row[0].upper() == "POTNAME"):
-        g.pot_functions['pot_name'] = row[1]
-      elif(len(row) > 1 and row[0].upper() == "ZBLFILE"):
-        g.pot_functions['zbl_file'] = row[1]
+        potential.pot['pot_name'] = row[1]
       elif(len(row) > 1 and row[0].upper() == "F_ON"):
         value = row[1].upper()
         if(value[0].upper() == "N"):
           pot['f_on'] = 0
         if(value[0].upper() == "F"):
           pot['f_on'] = 0
+      elif(len(row) > 1 and row[0].upper() == "FILE"):
+        pot['file'] = row[1]
       elif(len(row) > 1 and row[0].upper() == "LABEL"):
         label_str, label_id = labels.add(row[1])
         if(label_str not in g.pot_labels):
@@ -1503,10 +1353,9 @@ class potential:
             g.pot_labels.append(label_str)  # Record potential labels
           pot['b_text'] = label_str
           pot['b'] = label_id
-      elif(len(row) > 1 and row[0].upper() == "FILE"):
-        pot['file'] = row[1]
-      elif(len(row) > 1 and row[0].upper() == "FIT"):
-        pot['fit_file'] = row[1]
+        else:
+          pot['b_text'] = '##ANY##'
+          pot['b'] = 0
       elif(len(row) > 1 and row[0].upper() == "F_TYPE"):
         value = row[1].upper()
         if(value[0] == "P"):
@@ -1524,11 +1373,6 @@ class potential:
         pot['f_group_label'] = row[1].strip() 
       elif(len(row) == 1 and row[0].upper() == "F_GROUP"):
         pot['f_group_label'] = "DEFAULT"
-      elif(len(row) > 1 and row[0].upper() == "ZOOR"):
-        val = row[1].upper() 
-        pot['zoor'] = 0  
-        if(val[0] == "T" or val[0] == "1" or val[0] == "Y"):
-          pot['zoor'] = 1  
       elif(len(row) > 0 and row[0].upper() == "END"):
 # END OF POTENTIAL READ
         if(pot['f_type_id'] == 1):
@@ -1543,841 +1387,528 @@ class potential:
               id = len(g.fgroups) + 1
               g.fgroups[pot['f_group_label']] = id
               pot['f_group'] = id
-
-        g.pot_functions['functions'].append(pot)
+        potential.pot['functions'].append(pot)
         pot = potential.pot_function()
-    
-# READ ZBL DATA
-    main.log("Load zbl")
-    
-    read_zbl = False
-    for row in index:  
-      if(read_zbl == False and row[0].upper() == "ZBLSTART"):  
-        read_zbl = True
-      elif(read_zbl == True and row[0].upper() == "ZBLEND"):  
-        read_zbl = False
-      elif(read_zbl):
-        label_str, id_1 = labels.add(row[0])
-        label_str, id_2 = labels.add(row[1])
-        on = True
-        if(row[2].upper()[0:1] == "N" or row[2].upper()[0:1] == "F" or row[2].upper()[0:3] == "OFF"):
-          on = False
-        z1 = float(row[3])
-        z2 = float(row[4])
-        ra = float(row[5])
-        rb = float(row[6])
-        
-        spline_type = 1
-        if(row[7].upper()[0:5] == 'POLY3'):
-          spline_type = 1  
-        elif(row[7].upper()[0:5] == 'POLY5'):
-          spline_type = 2      
-        elif(row[7].upper()[0:4] == 'EXP3'):
-          spline_type = 3       
-        elif(row[7].upper()[0:4] == 'EXP5'):
-          spline_type = 4        
-        z = {
-            'id_1': id_1,
-            'id_2': id_2,
-            'on': on ,
-            'z1': z1 ,
-            'z2': z2 ,
-            'ra': ra ,
-            'rb': rb ,
-            'spline_type': spline_type ,
-            }
-        g.pot_functions['zbl'].append(z)
-        main.log("--zbl---")
-        main.log(std.dict_to_str(z))
 
-###################
-# TABULATED
-###################
-        
-  @staticmethod
-  def load_tabulated():      
-    for i in range(len(g.pot_functions['functions'])): 
-      pf_file = g.pot_functions['pot_dir'] + '/' + g.pot_functions['functions'][i]['file']      
-      if(pf_file is not None and os.path.isfile(pf_file) and potential.pf_file_type(pf_file) == 'T'):
-        g.pot_functions['functions'][i]['f_points'] = std.read_csv_array(pf_file, ' ')
-        g.pot_functions['functions'][i]['function_type'] = 1
-        
-# Fill in tabulated points using interp.fill
-  @staticmethod
-  def make_tabulated_points():  
-    for i in range(len(g.pot_functions['functions'])):    
-      if(g.pot_functions['functions'][i]['function_type'] == 1):
-        g.pot_functions['functions'][i]['points'] = interp.fill(g.pot_functions['functions'][i]['f_points'][:,0], g.pot_functions['functions'][i]['f_points'][:,1], g.tab_size, g.tab_width)   
+# Read in files
+    for i in range(len(potential.pot['functions'])):
+      pf_file = potential.pot['pot_dir'] + '/' + potential.pot['functions'][i]['file']   
+      fd = std.config_file_to_list(pf_file)  
+      for l in fd:
+        if(l[0].upper() == '#TYPE'):
+          potential.pot['functions'][i]['f_name'] = l[1].lower().strip()
+        elif(l[0].upper().strip() == '#P'):          
+          potential.pot['functions'][i]['params'] = numpy.zeros((len(l[1:]),), dtype='float64',)
+          for j in range(len(l[1:])):
+            potential.pot['functions'][i]['params'][j] = float(l[j+1])
+        elif(l[0].upper().strip() == '#PU'):          
+          potential.pot['functions'][i]['params_upper'] = numpy.zeros((len(l[1:]),), dtype='float64',)
+          for j in range(len(l[1:])):
+            potential.pot['functions'][i]['params_upper'][j] = float(l[j+1])
+        elif(l[0].upper().strip() == '#PL'):          
+          potential.pot['functions'][i]['params_lower'] = numpy.zeros((len(l[1:]),), dtype='float64',)
+          for j in range(len(l[1:])):
+            potential.pot['functions'][i]['params_lower'][j] = float(l[j+1])
+        elif(l[0].upper().strip() == '#PF'):          
+          potential.pot['functions'][i]['params_fixed'] = numpy.zeros((len(l[1:]),), dtype='float64',)
+          for j in range(len(l[1:])):
+            potential.pot['functions'][i]['params_fixed'][j] = float(l[j+1])
+        elif(l[0].upper().strip() == '#VR'):       
+          try:   
+            potential.pot['functions'][i]['vr'] = float(l[1])
+          except:
+            pass
 
-# Spline and vary accordingly
-  @staticmethod
-  def vary_tabulated_points(fn, yvar=None):  
-    if(type(yvar) != numpy.ndarray):
-      yvar = numpy.zeros((10,),)      
-    g.pot_functions['functions'][fn]['points'] = spline.vary(g.pot_functions['functions'][fn]['points'][:,0], 
-                                                             g.pot_functions['functions'][fn]['points'][:,1], yvar)
-                                                             
-###################
-# SPLINE
-###################
-  
-  @staticmethod
-  def load_spline():
-    for i in range(len(g.pot_functions['functions'])): 
-      pf_file = g.pot_functions['pot_dir'] + '/' + g.pot_functions['functions'][i]['file']   
-      if(pf_file is None):
-        print("Error fn " + str(i) + " no file set")
-      elif(not os.path.isfile(pf_file)):
-        print("Error fn " + str(i) + " file does not exist (" + pf_file + ")")
-      elif(pf_file is not None and os.path.isfile(pf_file) and potential.pf_file_type(pf_file) == 'S'):
-        g.pot_functions['functions'][i]['function_type'] = 3
+      if(potential.pot['functions'][i]['vr'] != None and potential.pot['functions'][i]['params_lower'] == None):
+        potential.pot['functions'][i]['params_lower'] = potential.pot['functions'][i]['params'] - potential.pot['functions'][i]['vr'] * abs(potential.pot['functions'][i]['params'])
+      if(potential.pot['functions'][i]['vr'] != None and potential.pot['functions'][i]['params_upper'] == None):
+        potential.pot['functions'][i]['params_upper'] = potential.pot['functions'][i]['params'] + potential.pot['functions'][i]['vr'] * abs(potential.pot['functions'][i]['params'])
 
-        fd = std.config_file_to_list(pf_file)  
-#print(fd)
-        spline_x = [] 
-        spline_y = []
-        for l in fd:
-          if(l[0].upper() == '#TYPE'):
-            g.pot_functions['functions'][i]['s_type'] = l[1].lower()
-          elif(l[0].upper().strip() == '#X'):
-            for ln in range(1, len(l)):
-              p = l[ln].strip()
-              if(p != ""):
-                try:
-                  p = float(p)
-                  spline_x.append(p)
-                except:
-                  pass
-          elif(l[0].upper().strip() == '#Y'):
-            for ln in range(1, len(l)):
-              p = l[ln].strip()
-              if(p != ""):
-                try:
-                  p = float(p)
-                  spline_y.append(p)
-                except:
-                  pass
-# Always give a 1 length for param_f even if they aren't used
-        g.pot_functions['functions'][i]['s_nodes'] = numpy.zeros((len(spline_x),2,),)
+# Integers used by keys
+    potential.pot_count = len(potential.pot['functions'])
+    potential.label_max = len(g.labels)
+    potential.fgroup_max = len(g.fgroups)
+    potential.pair_max = potential.key(1, potential.label_max, potential.label_max)
+    potential.dens_key_offset = potential.pair_max 
+    potential.embe_key_offset = potential.key(2, potential.label_max, potential.label_max, potential.fgroup_max)
+    potential.key_max = potential.key(3, potential.label_max, potential.label_max, potential.fgroup_max)
 
-        for p in range(len(spline_x)):
-          g.pot_functions['functions'][i]['s_nodes'][p,0] = float(spline_x[p])
-          g.pot_functions['functions'][i]['s_nodes'][p,1] = float(spline_y[p])
-  
-  @staticmethod
-  def make_spline_points():  
-    for i in range(len(g.pot_functions['functions'])):    
-      if(g.pot_functions['functions'][i]['function_type'] == 3):
-        potential.make_spline_points_inner(i)
-        
-  def make_spline_points_inner(fn):  
-    st = 1   # poly3
-    if(g.pot_functions['functions'][fn]['s_type'] == 'poly5'):
-      st = 2
-    
-    splined = spline.spline_nodes(st, g.pot_functions['functions'][fn]['s_nodes'][:,:], 100)
-    g.pot_functions['functions'][fn]['points'] = interp.fill(splined[:,0], splined[:,1], g.tab_size, g.tab_width)
-        
-# ZBL (if pair)
-    potential.make_zbl(fn)
+# Keys
+    for i in range(len(potential.pot['functions'])):
+      f_type = potential.pot['functions'][i]['f_type_id']
+      a = potential.pot['functions'][i]['a']
+      b = potential.pot['functions'][i]['b']
+      f_group = potential.pot['functions'][i]['f_group']
+      potential.pot['functions'][i]['key'] = potential.key(f_type, a, b, f_group)
 
-# Now treat as tabulated
-    g.pot_functions['functions'][fn]['function_type'] = 1
-        
-###################
-# ANALYTIC
-###################
-  
-  @staticmethod
-  def load_analytic():  
-    for i in range(len(g.pot_functions['functions'])): 
-      pf_file = g.pot_functions['pot_dir'] + '/' + g.pot_functions['functions'][i]['file']   
-      if(pf_file is None):
-        print("Error fn " + str(i) + " no file set")
-      elif(not os.path.isfile(pf_file)):
-        print("Error fn " + str(i) + " file does not exist (" + pf_file + ")")
-      elif(pf_file is not None and os.path.isfile(pf_file) and potential.pf_file_type(pf_file) == 'A'):
-        g.pot_functions['functions'][i]['function_type'] = 2
-        fd = std.config_file_to_list(pf_file)  
-#print(fd)
-        param = [] 
-        param_f = []
-        for l in fd:
-          if(l[0].upper() == '#TYPE'):
-            g.pot_functions['functions'][i]['a_type'] = l[1].lower()
-          elif(l[0].upper().strip() == '#P'):
-            for ln in range(1, len(l)):
-              p = l[ln].strip()
-              if(p != ""):
-                try:
-                  p = float(p)
-                  param.append(p)
-                except:
-                  pass
-          elif(l[0].upper().strip() == '#PF'):
-            for ln in range(1, len(l)):
-              p = l[ln].strip()
-              if(p != ""):
-                try:
-                  p = float(p)
-                  param_f.append(p)
-                except:
-                  pass
-          elif(l[0].upper()[0:2] == '#L'):
-            g.pot_functions['functions'][i]['a_l'] = float(l[1])
-          elif(l[0].upper()[0:2] == '#U'):
-            g.pot_functions['functions'][i]['a_u'] = float(l[1])
-        g.pot_functions['functions'][i]['a_params'] = numpy.zeros((len(param),),)
-        
-# Always give a 1 length for param_f even if they aren't used
-        if(len(param_f) == 0):
-          g.pot_functions['functions'][i]['a_params_fixed'] = numpy.zeros((1,),)
+# fgroups per label
+    potential.f_groups = numpy.zeros((potential.label_max, potential.fgroup_max,), dtype='int32')
+    for i in range(len(potential.pot['functions'])):
+      if(f_type > 1):
+        a = potential.pot['functions'][i]['a'] - 1           # Adjust key Py->Fort
+        f_group = potential.pot['functions'][i]['f_group']
+        n = 0
+        while(True):
+          if(potential.f_groups[a,n] == 0):
+            potential.f_groups[a,n] = f_group
+            break
+          elif(potential.f_groups[a,n] == f_group):
+            break
+          n = n + 1
+#print(potential.f_groups)
+
+# Count parameters and make parameter array
+# Only "ON" functions
+    potential.pot['p_count'] = 0
+    for fn in range(len(potential.pot['functions'])):
+      if(potential.pot['functions'][fn]['f_on'] == 1):
+        potential.pot['p_count'] = potential.pot['p_count'] + len(potential.pot['functions'][fn]['params'])
+
+    potential.pot['p'] = numpy.zeros((potential.pot['p_count'],), dtype='float64',)
+    potential.pot['p_loaded'] = numpy.zeros((potential.pot['p_count'],), dtype='float64',)
+    potential.pot['p_var'] = numpy.zeros((potential.pot['p_count'],), dtype='float64',)
+    potential.pot['p_lower'] = numpy.zeros((potential.pot['p_count'],), dtype='float64',)
+    potential.pot['p_upper'] = numpy.zeros((potential.pot['p_count'],), dtype='float64',)
+
+    a = 0
+    for fn in range(len(potential.pot['functions'])):
+      if(potential.pot['functions'][fn]['f_on'] == 1):
+        b = a + len(potential.pot['functions'][fn]['params'])
+        potential.pot['p'][a:b] = numpy.copy(potential.pot['functions'][fn]['params'][:])
+        potential.pot['p_loaded'][a:b] = numpy.copy(potential.pot['functions'][fn]['params'][:])
+        if(potential.pot['functions'][fn]['params_upper'] is None or potential.pot['functions'][fn]['params_lower'] is None):
+          potential.pot['p_var'][a:b] = numpy.zeros((len(potential.pot['p'][a:b]),), dtype='float64',)
+          potential.pot['p_lower'][a:b] = numpy.copy(potential.pot['p'][a:b])
+          potential.pot['p_upper'][a:b] = numpy.copy(potential.pot['p'][a:b])
         else:
-          g.pot_functions['functions'][i]['a_params_fixed'] = numpy.zeros((len(param_f),),)
+          potential.pot['p_var'][a:b] = numpy.copy((potential.pot['functions'][fn]['params_upper'][:] - potential.pot['functions'][fn]['params_lower'][:]))
+          potential.pot['p_lower'][a:b] = numpy.copy(potential.pot['functions'][fn]['params_lower'][:])
+          potential.pot['p_upper'][a:b] = numpy.copy(potential.pot['functions'][fn]['params_upper'][:])
+        a = b
 
-        for p in range(len(param)):
-          g.pot_functions['functions'][i]['a_params'][p] = float(param[p])
-        for p in range(len(param_f)):
-          g.pot_functions['functions'][i]['a_params_fixed'][p] = float(param_f[p])
+    potential.pot['oversized'] = None
+    if('oversized_parameters' in g.fitting.keys()):
+      try:
+        potential.pot['oversized'] = numpy.asarray(g.fitting['oversized_parameters'])
+      except:
+        pass
 
-# Save function
-        g.pot_functions['functions'][i]['f'] = getattr(potential_functions, g.pot_functions['functions'][i]['a_type'])  
-        
+    potential.print_keys()
+
   @staticmethod
-  def make_analytic_points():  
-    for fn in range(len(g.pot_functions['functions'])):  
-      if(g.pot_functions['functions'][fn]['function_type'] == 2):  
-        potential.make_analytic_points_inner(fn)
-        
-  @staticmethod
-  def make_analytic_points_inner(fn):  
-# Temp x,y array
-    temp = numpy.zeros((g.tab_size,2,),)
-    temp[:,0] = numpy.linspace(g.pot_functions['functions'][fn]['a_l'], g.pot_functions['functions'][fn]['a_u'], g.tab_size)
-    temp[:,1] = g.pot_functions['functions'][fn]['f'](temp[:,0],  
-                                                      g.pot_functions['functions'][fn]['a_params'],  
-                                                      g.pot_functions['functions'][fn]['a_params_fixed'])
-       
-# Interpfill
-    g.pot_functions['functions'][fn]['points'] = interp.fill(temp[:,0],temp[:,1], g.tab_size, g.tab_width)
-    
-# ZBL (if pair)
-    potential.make_zbl(fn)
-    
-  @staticmethod
-  def load_fit_data(): 
-# READ FIT DATA
-    for fn in range(len(g.pot_functions['functions'])): 
-      if(g.pot_functions['functions'][fn]['fit_file'] != None):
-        params = None
-        fit_file = g.pot_functions['pot_dir'] + '/' + g.pot_functions['functions'][fn]['fit_file']
-        if(os.path.isfile(fit_file)):
-# Read File
-          params_start = None
-          fh = open(fit_file, 'r')
-          for line in fh:
-            line = std.one_space(line.strip().upper())
-            f = line.split(" ")
-            if(line[0:4] == "#FIT"):
-              if(f[-1] == 'S'):
-                g.pot_functions['functions'][fn]['fit_type'] = 1
-              elif(f[-1] == 'A'):
-                g.pot_functions['functions'][fn]['fit_type'] = 2                
-            if(line[0:3] == "#PL"):
-              params_lower = f[1:]                     
-            if(line[0:3] == "#PU"):
-              params_upper = f[1:]                     
-            if(line[0:3] == "#PS"):
-              params_start = f[1:]                      
-            if(line[0:2] == "#N"):
-              spline_nodes = f[1:]                      
-            if(line[0:3] == "#ST"):
-              spline_type = 1
-              if(f[1].upper().strip() == "POLY5"):
-                spline_type = 2
-              
-          fh.close()
-      
-          if(g.pot_functions['functions'][fn]['fit_type'] != None and type(params_lower) == list):
+  def key(f_type, a, b, g=0):
+# PAIR
+    if(f_type == 1):
+      if(a > potential.label_max or b > potential.label_max):
+        return 0
+      else:
+        min_key = a
+        max_key = b
+        if(a > b):
+          min_key = b
+          max_key = a
+        return int((max_key*(max_key-1))/2 + min_key)
+# DENS
+    elif(f_type == 2):
+      if(a > potential.label_max or b > potential.label_max or g > potential.fgroup_max):
+        return 0
+      else:
+        if(b == 0):
+          return potential.dens_key_offset + (g-1) * (potential.label_max + potential.pair_max) + a
+        elif(b>0):
+          min_key = a
+          max_key = b
+          if(a > b):
+            min_key = b
+            max_key = a
+          return potential.dens_key_offset + (g-1) * (potential.label_max + potential.pair_max) + potential.label_max + int((max_key*(max_key-1))/2 + min_key)
           
-# g.pot_functions['functions'][fn]['fit_type']       1 = Spline  2 = Analytic
-# g.pot_functions['functions'][fn]['function_type']  1 = Tab     2 = Analytic
+#return potential.dens_key_offset + b + (a - 1) * potential.fgroup_max
+# EMBE
+    elif(f_type == 3):
+      if(a > potential.label_max or b > potential.label_max or g > potential.fgroup_max):
+        return 0
+      else:
+        return potential.embe_key_offset + (g-1) * (potential.label_max + potential.pair_max) + a
         
-# TAB DATA BUT WRONG FITTING
-            if(g.pot_functions['functions'][fn]['fit_type'] == 2 and
-               g.pot_functions['functions'][fn]['function_type'] == 1):
-              g.pot_functions['functions'][fn]['fit_type'] = 1
-              g.pot_functions['functions'][fn]['fit_size'] = 15
-              g.pot_functions['functions'][fn]['fit_parameters'] = numpy.zeros((3,15,),)  
-              for i in range(g.pot_functions['functions'][fn]['fit_size']):
-                g.pot_functions['functions'][fn]['fit_parameters'][0,i] = float(-1.0)
-                g.pot_functions['functions'][fn]['fit_parameters'][1,i] = float(1.0)
-                
-# Analytic fitting
-            elif(g.pot_functions['functions'][fn]['fit_type'] == 2 and
-               g.pot_functions['functions'][fn]['function_type'] == 2):
-              g.pot_functions['functions'][fn]['fit_size'] = len(g.pot_functions['functions'][fn]['a_params'])
-              g.pot_functions['functions'][fn]['fit_parameters'] = numpy.zeros((3,len(g.pot_functions['functions'][fn]['a_params']),),) 
-              g.pot_functions['functions'][fn]['fit_parameters_start'] = numpy.zeros((len(g.pot_functions['functions'][fn]['a_params']),),)    
-            
-              for i in range(g.pot_functions['functions'][fn]['fit_size']):
-                g.pot_functions['functions'][fn]['fit_parameters'][0,i] = float(params_lower[i])
-                g.pot_functions['functions'][fn]['fit_parameters'][1,i] = float(params_upper[i])
-#g.pot_functions['functions'][fn]['fit_parameters_start'][i] = float(params_start[i])
-                
-                if(params_start is None):
-                  g.pot_functions['functions'][fn]['fit_parameters_start'][i] = 0.5 * (float(params_lower[i]) + float(params_upper[i]))
-                else:
-                  g.pot_functions['functions'][fn]['fit_parameters_start'][i] = float(params_start[i])
-              
-# Spline fitting
-            elif(g.pot_functions['functions'][fn]['fit_type'] == 1):
-              g.pot_functions['functions'][fn]['fit_size'] = len(params_lower)
-              g.pot_functions['functions'][fn]['fit_parameters'] = numpy.zeros((3,len(params_lower),),)
-              g.pot_functions['functions'][fn]['fit_spline_type'] = spline_type  
-              for i in range(g.pot_functions['functions'][fn]['fit_size']):
-                g.pot_functions['functions'][fn]['fit_parameters'][0,i] = float(params_lower[i])
-                g.pot_functions['functions'][fn]['fit_parameters'][1,i] = float(params_upper[i])
-                g.pot_functions['functions'][fn]['fit_parameters'][2,i] = float(spline_nodes[i])
-
   @staticmethod
-  def make_copies(): 
-    for fn in range(len(g.pot_functions['functions'])): 
-      g.pot_functions['functions'][fn]['points_original'] = numpy.copy(g.pot_functions['functions'][fn]['points'])
+  def print_keys():
+    print("")
+    print("DATA")
+    print("################################")
+    print("Function Count:    ", potential.pot_count)
+    print("Label max:         ", potential.label_max)
+    print("Fgroup max:        ", potential.fgroup_max)
+    print("Pair max:          ", potential.pair_max)
+    print("Dens Offset:       ", potential.dens_key_offset)
+    print("Embe Offset:       ", potential.embe_key_offset)
+    print("Key Max:           ", potential.key_max)
+
+    print("")
+    print("Pair")
+    print("################################")
+    for ka in g.labels.keys():
+      kai = g.labels[ka]
+      for kb in g.labels.keys():
+        kbi = g.labels[kb]
+        k = potential.key(1, kai, kbi)
+        print(k, ka, kb)
+    
+    print("")
+    print("Density")
+    print("################################")
+    for kg in g.fgroups.keys():
+      kgi = g.fgroups[kg]
+      for ka in g.labels.keys():
+        kai = g.labels[ka]
+        k = potential.key(2, kai, 0, kgi)
+        print(k, kg, ka, "Any")
+      for ka in g.labels.keys():
+        kai = g.labels[ka]
+        for kb in g.labels.keys():
+          kbi = g.labels[kb]
+          k = potential.key(2, kai, kbi, kgi)
+          print(k, kg, ka, kb)
+
+    print("")
+    print("Embedding")
+    print("################################")
+    for kg in g.fgroups.keys():
+      kgi = g.fgroups[kg]
+      for ka in g.labels.keys():
+        kai = g.labels[ka]
+        k = potential.key(3, kai, 0, kgi)
+        print(k, kg, ka)
+
+    print("")
   
-    g.pot_functions['functions_original'] = copy.deepcopy(g.pot_functions['functions'])
+  @staticmethod
+  def update(p):
+    if(potential.pot['p_count'] == len(p)):
+      potential.pot['p'] = p
+      a = 0
+      for fn in range(len(potential.pot['functions'])):
+        if(potential.pot['functions'][fn]['f_on'] == 1):
+          b = a + len(potential.pot['functions'][fn]['params'])
+          potential.pot['functions'][fn]['params'][:] = potential.pot['p'][a:b]
+          a = b
+      try:
+        potential.load_to_efs()
+      except:
+        pass
+      try:
+        potential.load_to_bp()
+      except:
+        pass
 
   @staticmethod
-  def spline_prep(): 
-    for fn in range(len(g.pot_functions['functions'])): 
-      if(g.pot_functions['functions'][fn]['fit_type'] == 2):   # If spline fit
-        yvar = numpy.zeros((len(g.pot_functions['functions'][fn]['fit_parameters']),),)
-        potential.vary_tabulated_points(fn, yvar)
-    
-  @staticmethod
-  def pf_file_type(file): 
-    fh = open(file, 'r')
-    for row in fh:
-      fh.close()
-      if(row.strip().upper()[0:2] == '#A'):
-        return 'A'
-      elif(row.strip().upper()[0:2] == '#S'):
-        return 'S'
-      return 'T'
-      
-  @staticmethod
-  def pf_output(): 
-    if(g.outputs):     
-      potential.pf_output_file(g.dirs['output'] + '/' + 'pot.dat')
-    
-  @staticmethod
-  def pf_output_file(file_path): 
+  def random(p=None, m=None, oversized=False, direction=None):
+# Multiply the range
+    if(m == None):
+      m = 1.0
 
-      fh = open(file_path, 'w')
-      
-      n = 0
-      for pf in g.pot_functions['functions']:
-        n = n + 1
-        fh.write('#############################################################\n')
-        fh.write('#############################################################\n')
-        fh.write('POTENTIAL ' + str(n) + '\n')
-        fh.write('#############################################################\n')
-        fh.write('#############################################################\n')
-        fh.write('f_on: ' + str(pf['f_on']) + '\n')
-        fh.write('a_text: ' + str(pf['a_text']) + '\n')
-        fh.write('b_text: ' + str(pf['b_text']) + '\n')
-        fh.write('a: ' + str(pf['a']) + '\n')
-        fh.write('b: ' + str(pf['b']) + '\n')
-        fh.write('f_type: ' + str(pf['f_type']) + '\n')
-        fh.write('f_group: ' + str(pf['f_group']) + '\n')
-        fh.write('f_group_label: ' + str(pf['f_group_label']) + '\n')
-        fh.write('r_cut: ' + str(pf['r_cut']) + '\n')
-        fh.write('file: ' + str(pf['file']) + '\n')
-        fh.write('function_type: ' + str(pf['function_type']) + '\n')
-        fh.write('a_type: ' + str(pf['a_type']) + '\n')
-        fh.write('f: ' + str(pf['f']) + '\n')
-        fh.write('a_l: ' + str(pf['a_l']) + '\n')
-        fh.write('a_u: ' + str(pf['a_u']) + '\n')
-        fh.write('zoor: ' + str(pf['zoor']) + '\n')
-        fh.write('a_params: \n')
-        try:
-          for i in range(len(pf['a_params'])):
-            fh.write(str(pf['a_params'][i]) + '\n')    
-        except:
-          fh.write(str('None\n')) 
-          
-        fh.write('f_points: \n')
-        try:
-          for i in range(len(pf['f_points'])):
-            for j in range(len(pf['f_points'][i])):
-              fh.write(str(pf['f_points'][i, j]) + ' ')  
-            fh.write('\n')  
-        except:
-          fh.write(str('None\n')) 
-          
-        fh.write('points: \n')
-        try:
-          for i in range(len(pf['points'])):
-            for j in range(len(pf['points'][i])):
-              fh.write(str(pf['points'][i, j]) + ' ')  
-            fh.write('\n') 
-        except:
-          fh.write(str('None\n'))         
-      fh.close()
-      
-  @staticmethod
-  def get_parameters():  
-    w = 0
-    for fn in range(len(g.pot_functions['functions'])): 
-      if(g.pot_functions['functions'][fn]['fit_size'] != None):
-        w = w + g.pot_functions['functions'][fn]['fit_size']
-    p = numpy.zeros((w,),)  
-      
-# Update potential
-    a = 0
-    for fn in range(len(g.pot_functions['functions'])): 
-      if(g.pot_functions['functions'][fn]['fit_size'] != None):
-        b = a + g.pot_functions['functions'][fn]['fit_size']  
-        if(g.pot_functions['functions'][fn]['fit_type'] == 1):     # NODE SPLINE   
-          p[a:b] = g.pot_functions['functions'][fn]['s_nodes'][:,1]
-        elif(g.pot_functions['functions'][fn]['fit_type'] == 2):   # ANALYTIC  
-          p[a:b] = g.pot_functions['functions'][fn]['a_params'][:]
-# Update a
-        a = b    
-    
-    return p
+# Randomly pick over sized parameters (defined in input file)
+    if(oversized):
+      rn = numpy.random.uniform()    
+      b = potential.pot['oversized'][0]
+      prb = 1.0
+      for i in range(1, len(potential.pot['oversized']),1):
+        prb = prb * potential.pot['oversized'][i]
+        if(rn<prb):
+          m = m * b
+        else:
+          break
+
+# If none, use the original parameters
+    if(p.any() == None):
+      p = numpy.copy(potential.pot['p_loaded'])
+
+# Get random array
+    r = 0.5 - numpy.random.rand(potential.pot['p_count'])
+
+# New parameters
+    dp = r * m * potential.pot['p_var']
+
+# Force direction -1, 0, 1
+    try:
+      if(direction.any() != None):
+        if(len(direction) == len(p)):
+          for i in range(len(dp)):
+            if(direction[i] == 0.0):
+              dp[i] = 0
+            elif(direction[i] == 1.0 or direction[i] == -1.0):
+              dp[i] = -1.0 * abs(dp[i]) * direction[i]
+            elif(direction[i] == 2.0):
+              dp[i] = dp[i]
+    except:
+      pass
+    p_new = p + dp
+
+# Update
+    potential.update(p_new)
+
+# Return
+    return p_new
     
   @staticmethod
-  def get_start_parameters():   
-    w = 0
-    for fn in range(len(g.pot_functions['functions'])): 
-      w = w + g.pot_functions['functions'][fn]['fit_size']
-    p = numpy.zeros((w,),)  
-      
-# Update potential
-    a = 0
-    for fn in range(len(g.pot_functions['functions'])): 
-      b = a + g.pot_functions['functions'][fn]['fit_size']  
-      if(g.pot_functions['functions'][fn]['fit_type'] == 1):     # NODE SPLINE   
-        p[a:b] = g.pot_functions['functions'][fn]['fit_parameters_start'][:,1]
-      elif(g.pot_functions['functions'][fn]['fit_type'] == 2):   # ANALYTIC  
-        p[a:b] = g.pot_functions['functions'][fn]['fit_parameters_start'][:]
-# Update a
-      a = b    
-      
-    return p
-    
+  def get_p_var():
+    return potential.pot['p_var']
+
   @staticmethod
-  def save_potential(dir_out=None, name_out=None):
-    potential_output.eampa(dir_out, name_out)
-      
-  """
   def pot_function():
     return {      
     'f_on': 1,  
+    'key': 0,
+    'file': None,
     'a_text': '',
     'b_text': '',
     'a': 0,
     'b': 0,
     'f_type': '',             # PAIR, EMBE, DENS
-    'f_type_id': 0,           # 1=PAIR, 2=EMBE, 3=DENS
+    'f_type_id': 0,           # 1=PAIR, 2=DENS, 3=EMBE
     'f_group': 1,
-    'r_cut': 6.5,
-    'file': None,
-    'function_type': 0,       # 1 tab, 2 analytic
-    'f_points': None,         # READ IN TO PYTHON
-    'a_type': '',
-    'f': None,
-    'a_params': None,
-    'a_l': 0.0,
-    'a_u': 10.0,
-    'zoor': 1,
-    'points': numpy.zeros((g.tab_size,g.tab_width,),),         # THESE ARE USED BY FORTRAN
+    'f_group_label': None,
+    'f_name': '',
+    'params': None,
+    'params_fixed': None,
+    'vr': None,
+    'params_lower': None,
+    'params_upper': None,
     }
-  """    
-      
-  def plot_python_potentials(dir = None):  
-  
+
+  @staticmethod
+  def save(dir_out, p_in=None):
+
+    p = numpy.copy(potential.pot['p'])
     try:
-      if(dir == None):
-        dir = g.dirs['pots']
-      std.make_dir(dir)
-      print(dir)
-      
-      for i in range(len(g.pot_functions['functions'])): 
-        pot_name = 'py_pot'
-        pot_count = i + 1
-      
-        pot_type = g.pot_functions['functions'][i]['f_type_id']
-        label_a = g.pot_functions['functions'][i]['a']
-      
-        if(pot_type == 1):
-          label_b = g.pot_functions['functions'][i]['b']
+      if(p_in is not None):
+        if(len(p_in) == len(p)):
+          p = numpy.copy(p_in)
+    except:
+      pass
+
+# Make output directory
+    std.make_dir(dir_out)
+ 
+    fh = open(dir_out +  potential.pot['index_file'], 'w')
+    fh.write("POTNAME " + potential.pot['pot_name'] + "\n")
+    fh.write("\n")
+    for fn in range(len(potential.pot['functions'])):
+      if(potential.pot['functions'][fn]['f_on'] == 1):
+        fh.write("START\n")
+        fh.write("F_ON true\n")
+        fh.write("FILE " + potential.pot['functions'][fn]['file'] + "\n")
+        if(potential.pot['functions'][fn]['f_type_id'] == 1):
+          fh.write("LABEL " + potential.pot['functions'][fn]['a_text'] + " " + potential.pot['functions'][fn]['b_text'] + "\n")
         else:
-          label_b = g.pot_functions['functions'][i]['f_group']
+          fh.write("LABEL " + potential.pot['functions'][fn]['a_text'] + "\n")
+        fh.write("F_TYPE " + potential.pot['functions'][fn]['f_type'] + "\n")
+        if(potential.pot['functions'][fn]['f_type_id'] > 1):
+          fh.write("F_GROUP " + potential.pot['functions'][fn]['f_group_label'] + "\n")
+        fh.write("END\n")
+        fh.write("\n")
+    fh.close()
+
+    a = 0
+    for fn in range(len(potential.pot['functions'])):
+      if(potential.pot['functions'][fn]['f_on'] == 1):
+        b = a + len(potential.pot['functions'][fn]['params'])
+        fh = open(dir_out + potential.pot['functions'][fn]['file'], 'w')
+        fh.write('#TYPE ' + str(potential.pot['functions'][fn]['f_name']) + '\n') 
+        fh.write('#P ')
+        for n in range(a,b,1):
+          fh.write(str(p[n]) + ' ')
+        fh.write('\n')
+        fh.write('#PF ')
+        for n in range(len(potential.pot['functions'][fn]['params_fixed'])):
+          fh.write(str(potential.pot['functions'][fn]['params_fixed'][n]) + ' ')
+        fh.write('\n')
+        fh.write('#VR ' + str(potential.pot['functions'][fn]['vr']) + '\n') 
+        fh.close()
+        a = b
+    
+  @staticmethod
+  def plot(dir_out):
+
+# Make output directory
+    std.make_dir(dir_out)
+    if(dir_out.strip()[-1] != "/"):
+      dir_out = dir_out + "/"
+
+    a = 0
+    for fn in range(len(potential.pot['functions'])):
+      if(potential.pot['functions'][fn]['f_on'] == 1):
+        fname = potential.pot['functions'][fn]['file']
+        fname = fname.split('.')
+        fname = fname[0]
+
+        b = a + len(potential.pot['functions'][fn]['params'])
+        x = numpy.linspace(0.0,10.0,201)
+        y = fnc.fv(potential.pot['functions'][fn]['f_name'], x, potential.pot['functions'][fn]['params'], potential.pot['functions'][fn]['params_fixed'])
+        a = b
+
+        plt.figure(figsize=(8,6))
+        plt.rc('font', family='serif')
+        plt.rc('xtick', labelsize='x-small')
+        plt.rc('ytick', labelsize='x-small')   
+        plt.title(fname)
+        plt.plot(x, y, 'k')
+        plt.savefig(dir_out + fname + '.eps', type='efs')
+        plt.close('all') 
         
-        potential.plot_potential(dir, pot_name, pot_count, pot_type, label_a, label_b, 
-                                 g.pot_functions['functions'][i]['points'][:,0], 
-                                 g.pot_functions['functions'][i]['points'][:,1], 
-                                 g.pot_functions['functions'][i]['points'][:,2], 
-                                 g.pot_functions['functions'][i]['points'][:,3])
-      return True
-    except:
-      return False  
+        if(potential.pot['functions'][fn]['f_type_id'] == 1):
+          plt.figure(figsize=(8,6))
+          plt.rc('font', family='serif')
+          plt.rc('xtick', labelsize='x-small')
+          plt.rc('ytick', labelsize='x-small')   
+          plt.plot(x, y, 'k')
+          plt.ylim(-5.0,5.0)
+          plt.savefig(dir_out + fname + '_zoom.eps', type='efs')
+          plt.close('all') 
       
-  def plot_fortran_potentials(dir = None):  
-    
-    try:
-    
-      if(dir == None):
-        dir = g.dirs['pots']
-      std.make_dir(dir)
-      print(dir)
-    
-      if(efs.pc > 0):
-        for i in range(efs.pc):
-    
-          a = efs.pkey[i,0] - 1
-          b = efs.pkey[i,1]
-      
-          pot_name = 'fort_pot'
-          pot_count = i + 1
-       
-          pot_type = efs.pkey[i,2]
-          label_a = efs.pkey[i,3]
-          label_b = efs.pkey[i,4]
-      
-          potential.plot_potential(dir, pot_name, pot_count, pot_type, label_a, label_b, 
-                                   efs.pot[a:b,0], efs.pot[a:b,1], 
-                                   efs.pot[a:b,2], efs.pot[a:b,3])
-    
-      elif(bp.pc > 0):
-        for i in range(bp.pc):
-    
-          a = bp.pkey[i,0] - 1
-          b = bp.pkey[i,1]
-      
-          pot_name = 'fort_pot'
-          pot_count = i + 1
-       
-          pot_type = bp.pkey[i,2]
-          label_a = bp.pkey[i,3]
-          label_b = bp.pkey[i,4]
-      
-          potential.plot_potential(dir, pot_name, pot_count, pot_type, label_a, label_b, 
-                                   bp.pot[a:b,0], bp.pot[a:b,1], 
-                                   bp.pot[a:b,2], bp.pot[a:b,3])
-      return True
-    except:
-      return False                                  
-                                 
-  def plot_potential(dir, pot_name, pot_count, pot_type, label_a, label_b, x, y, yp, ypp):  
-      
-      if(pot_type == 1):
-        plot_title = "Pair - " + labels.get(label_a) + ' ' + labels.get(label_b)    
-        x_axis = "Seperation (Ang)"
-        y_axis = "Potential Energy (eV)"
-      elif(pot_type == 2):   
-        plot_title = "Density - " + labels.get(label_a) + ' Group ' + str(label_b)    
-        x_axis = "Seperation (Ang)"
-        y_axis = "Electron Density"   
-      elif(pot_type == 3):
-        plot_title = "Embedding - " + labels.get(label_a) + ' Group ' + str(label_b)     
-        x_axis = "Electron Density"
-        y_axis = "Potential Energy (eV)"
-      
-      file_name = str(pot_count)
-      while(len(file_name)<3):
-        file_name = '0' + file_name
-      file_name = pot_name + '_' + file_name + '.eps'
-      
-      plt.clf()    
-      plt.rc('font', family='serif')
-      plt.rc('xtick', labelsize='x-small')
-      plt.rc('ytick', labelsize='x-small')
-      fig, axs = plt.subplots(1, 1, figsize=(12,9))
-      fig.tight_layout(pad=5.0)   
-      
-      fig.suptitle(plot_title)
-      axs.plot(x, y, color='k', ls='solid')
-      axs.plot(x, yp, color='k', ls='dashed')
-      axs.plot(x, ypp, color='k', ls='dotted')
-      axs.set_title('')
-      axs.set_xlabel(x_axis)
-      axs.set_ylabel(y_axis)
-      
-      min_y = min(y)
-      max_y = max(y)
-      r = max_y - min_y
-      
-      min_y = min_y - 0.05 * r
-      max_y = max_y + 0.05 * r
-      
-      if(min_y < -1.0E03):
-        min_y = -1.0E03
-      if(max_y > 1.0E04):
-        max_y = 1.0E04
-         
-      axs.set_ylim(min_y, max_y)
-      axs.set_yscale('symlog', linthreshy=10)
-      plt.savefig(dir + '/' + file_name, format='eps')
-      plt.close('all') 
-      
-  def print_parameters():  
-    for fn in range(len(g.pot_functions['functions'])):          
-      if(g.pot_functions['functions'][fn]['fit_type'] == 1):     # SPLINE
-        print("fn: " + str(fn))
-        print("type: spline")
-        for i in range(g.pot_functions['functions'][fn]['fit_size']):
-          print("Parameter " + str(i) + ": ", end='')
-          print(g.pot_functions['functions'][fn]['fit_parameters'][0,i], end='')
-          print(", ", end='')
-          print(g.pot_functions['functions'][fn]['fit_parameters'][1,i], end='')
-          print()
-      elif(g.pot_functions['functions'][fn]['fit_type'] == 2):   # ANALYTIC
-        print("fn: " + str(fn))
-        print("type: analytic")
-        for i in range(g.pot_functions['functions'][fn]['fit_size']):
-          print("Parameter " + str(i) + ": ", end='')
-          print(g.pot_functions['functions'][fn]['a_params'][i], end='')
-          print(", ", end='')
-          print(g.pot_functions['functions'][fn]['fit_parameters'][0,i], end='')
-          print(", ", end='')
-          print(g.pot_functions['functions'][fn]['fit_parameters'][1,i], end='')
-          print()
-      else:
-        print("fn: " + str(fn))
-        print("type: no variance")      
-      
-  def parameter_count():
-# Find width
-    p_count = 0
-    for fn in range(len(g.pot_functions['functions'])):          
-      if(g.pot_functions['functions'][fn]['fit_type'] == 1):     # SPLINE
-        p_count = p_count + g.pot_functions['functions'][fn]['fit_size'] 
-      elif(g.pot_functions['functions'][fn]['fit_type'] == 2):   # ANALYTIC
-        p_count = p_count + g.pot_functions['functions'][fn]['fit_size']
-    return p_count  
-      
-###########################################################
-# ZBL
-###########################################################
-      
-  def make_zbl(fn):
-    
-    if(g.pot_functions['functions'][fn]['f_type_id'] == 1):
-      zbl_n = -1
-      if(len(g.pot_functions['zbl'])>0):
-        for i in range(len(g.pot_functions['zbl'])): 
-          if((g.pot_functions['functions'][fn]['a'] == g.pot_functions['zbl'][i]['id_1'] 
-             and g.pot_functions['functions'][fn]['b'] == g.pot_functions['zbl'][i]['id_2'])
-             or (g.pot_functions['functions'][fn]['a'] == g.pot_functions['zbl'][i]['id_2'] 
-             and g.pot_functions['functions'][fn]['b'] == g.pot_functions['zbl'][i]['id_1'])):
-            zbl_n = i
-            break
-      
-      if(zbl_n>=0):
-        ra = g.pot_functions['zbl'][zbl_n]['ra']
-        rb = g.pot_functions['zbl'][zbl_n]['rb']
-        qa = g.pot_functions['zbl'][zbl_n]['z1']
-        qb = g.pot_functions['zbl'][zbl_n]['z2']
-        spline_type = g.pot_functions['zbl'][zbl_n]['spline_type']
-        
-# Find the point that need replacing
-        ra_n = -1
-        for n in range(len(g.pot_functions['functions'][fn]['points'])):
-          if(g.pot_functions['functions'][fn]['points'][n,0] <= ra):
-            ra_n = n
-          elif(g.pot_functions['functions'][fn]['points'][n,0] <= rb):
-            rb_n = n
-            
-# Get node values
-        ya = fnc.zbl(ra, [qa, qb], [0.0])  
-        yap = fnc.zbl_dydr(ra, [qa, qb], [0.0]) 
-        yb = interp.interpolate(rb, g.pot_functions['functions'][fn]['points'][:,0], g.pot_functions['functions'][fn]['points'][:,1], 4)
-        ybp = interp.interpolate_dydxn(rb, g.pot_functions['functions'][fn]['points'][:,0], g.pot_functions['functions'][fn]['points'][:,1], 1, 4)
+#######################################################################################
+#######################################################################################
+#######################################################################################
+#######################################################################################
 
-# Get spline coeffs
-        coeffs = spline.spline_ab(spline_type, [ra, ya, yap], [rb, yb, ybp])
+# LOAD INTO MODULES
 
-# Replace with ZBL and SPLINE
-        g.pot_functions['functions'][fn]['points'][:ra_n,1] = fnc.zbl_v(g.pot_functions['functions'][fn]['points'][:ra_n,0], [qa, qb], [0.0])        
-        g.pot_functions['functions'][fn]['points'][ra_n:rb_n,1] = potential.poly(g.pot_functions['functions'][fn]['points'][ra_n:rb_n,0], coeffs)
-        
-# Recalculate derivatives etc
-        g.pot_functions['functions'][fn]['points'] = interp.fill(g.pot_functions['functions'][fn]['points'][:,0],g.pot_functions['functions'][fn]['points'][:,1], g.tab_size, g.tab_width)
-    
-  def poly(x, c):
-    y = 0.0
-    for i in range(len(c)):
-      y = y + c[i] * x**i
-    return y
-      
-###########################################################
-# F2PY functions
-###########################################################
+  @staticmethod
+  def load_to_efs():
+#print("Loading")
+    efs_potential.pot_count = potential.pot_count
+    efs_potential.label_max = potential.label_max
+    efs_potential.fgroup_max = potential.fgroup_max
+    efs_potential.pair_max = potential.pair_max
+    efs_potential.dens_key_offset = potential.dens_key_offset
+    efs_potential.embe_key_offset = potential.embe_key_offset
+    efs_potential.key_max = potential.key_max
+    efs_potential.f_groups[0:potential.label_max,0:potential.fgroup_max] = potential.f_groups[:,:]
+    efs_potential.setup()
+#print(efs_potential.f_groups)
+    for i in range(potential.pot_count):
+      if(potential.pot['functions'][i]['f_on'] == 1):
+        key = potential.pot['functions'][i]['key'] - 1   # Adjustment for Python to Fortran
+        efs_potential.pot_f_type[key] = potential.pot['functions'][i]['f_type_id']
+        efs_potential.pot_option_a[key] = potential.pot['functions'][i]['a']
+        efs_potential.pot_option_b[key] = potential.pot['functions'][i]['b']
+        efs_potential.pot_f_group[key] = potential.pot['functions'][i]['f_group']
+        efs_potential.pot_f_name[key] = potential.pot['functions'][i]['f_name']
 
-  def efs_add_potentials():
-  
-# Clear
-    efs.clear_potentials()
+        efs_potential.p_count[key] = len(potential.pot['functions'][i]['params'])
+        efs_potential.pf_count[key] = len(potential.pot['functions'][i]['params_fixed'])
+        pl = len(potential.pot['functions'][i]['params'])
+        pfl = len(potential.pot['functions'][i]['params_fixed'])
+        efs_potential.params[key,0:pl] = potential.pot['functions'][i]['params'][0:pl]
+        efs_potential.paramsfixed[key,0:pfl] = potential.pot['functions'][i]['params_fixed'][0:pfl]
+ 
+        f_type_id = potential.pot['functions'][i]['f_type_id']
+        a = potential.pot['functions'][i]['a']
+        if(f_type_id == 1):
+          b = potential.pot['functions'][i]['b']
+        else:
+          b = potential.pot['functions'][i]['f_group']
+
+    """
+    print("")
+    print("Pair")
+    print("################################")
+    for ka in g.labels.keys():
+      kai = g.labels[ka]
+      for kb in g.labels.keys():
+        kbi = g.labels[kb]
+        k = efs_potential.get_pot_key(1, kai, kbi, 0)
+        print(k, ka, kb)
     
-# ADD POTENTIALS
+    print("")
+    print("Density")
+    print("################################")
+    for kg in g.fgroups.keys():
+      kgi = g.fgroups[kg]
+      for ka in g.labels.keys():
+        kai = g.labels[ka]
+        k = potential.key(2, kai, 0, kgi)
+        print(k, kg, ka, "Any")
+      for ka in g.labels.keys():
+        kai = g.labels[ka]
+        for kb in g.labels.keys():
+          kbi = g.labels[kb]
+          k = efs_potential.get_pot_key(2, kai, kbi, kgi)
+          print(k, kg, ka, kb)
+
+    print("")
+    print("Embedding")
+    print("################################")
+    for kg in g.fgroups.keys():
+      kgi = g.fgroups[kg]
+      for ka in g.labels.keys():
+        kai = g.labels[ka]
+        k = potential.key(3, kai, 0, kgi)
+        print(k, kg, ka, "Any")
+      for ka in g.labels.keys():
+        kai = g.labels[ka]
+        for kb in g.labels.keys():
+          kbi = g.labels[kb]
+          k = efs_potential.get_pot_key(3, kai, kbi, kgi)
+          print(k, kg, ka, kb)
+
+    print("")
+    """
+
+  @staticmethod
+  def load_to_bp():
+#print("Loading")
+    bp_potential.pot_count = potential.pot_count
+    bp_potential.label_max = potential.label_max
+    bp_potential.fgroup_max = potential.fgroup_max
+    bp_potential.pair_max = potential.pair_max
+    bp_potential.dens_key_offset = potential.dens_key_offset
+    bp_potential.embe_key_offset = potential.embe_key_offset
+    bp_potential.key_max = potential.key_max
+    bp_potential.f_groups[0:potential.label_max,0:potential.fgroup_max] = potential.f_groups[:,:]
+    bp_potential.setup()
+#print(bp_potential.f_groups)
+    for i in range(potential.pot_count):
+      if(potential.pot['functions'][i]['f_on'] == 1):
+        key = potential.pot['functions'][i]['key'] - 1   # Adjustment for Python to Fortran
+        bp_potential.pot_f_type[key] = potential.pot['functions'][i]['f_type_id']
+        bp_potential.pot_option_a[key] = potential.pot['functions'][i]['a']
+        bp_potential.pot_option_b[key] = potential.pot['functions'][i]['b']
+        bp_potential.pot_f_group[key] = potential.pot['functions'][i]['f_group']
+        bp_potential.pot_f_name[key] = potential.pot['functions'][i]['f_name']
+
+        bp_potential.p_count[key] = len(potential.pot['functions'][i]['params'])
+        bp_potential.pf_count[key] = len(potential.pot['functions'][i]['params_fixed'])
+        pl = len(potential.pot['functions'][i]['params'])
+        pfl = len(potential.pot['functions'][i]['params_fixed'])
+        bp_potential.params[key,0:pl] = potential.pot['functions'][i]['params'][0:pl]
+        bp_potential.paramsfixed[key,0:pfl] = potential.pot['functions'][i]['params_fixed'][0:pfl]
+ 
+        f_type_id = potential.pot['functions'][i]['f_type_id']
+        a = potential.pot['functions'][i]['a']
+        if(f_type_id == 1):
+          b = potential.pot['functions'][i]['b']
+        else:
+          b = potential.pot['functions'][i]['f_group']
+
+###########################################
+#  CLASS potential_var
+###########################################
+class potential_vary:
+ 
+  def vary_all():
     for pn in range(len(g.pot_functions['functions'])):
-      pf = g.pot_functions['functions'][pn]
-#print(pf['f_type_id'], pf['a'], pf['f_group'])
-      if(pf['f_on']):
-        if(pf['f_type_id'] == 1):
-          fortran_id = efs.add_potential(
-                            pf['f_type_id'],
-                            pf['a'], 
-                            pf['b'],  
-                            pf['r_cut'], 
-                            pf['points'] ,
-                            pn
-                           )
-          g.pot_functions['functions'][pn]['fortran_id'] = fortran_id
-        elif(pf['f_type_id'] > 1):
-          fortran_id = efs.add_potential(
-                            pf['f_type_id'],
-                            pf['a'], 
-                            pf['f_group'],  
-                            pf['r_cut'], 
-                            pf['points'],
-                            pn
-                           )   
-          g.pot_functions['functions'][pn]['fortran_id'] = fortran_id
-    
-# SET POTENTIALS
-    efs.set_potentials() 
-#exit()
-    
-  def es_add_potentials():
+      if(g.pot_functions['functions'][pn]['function_type'] == 1):
+        potential_vary.vary_tabulated(pn)
+      elif(g.pot_functions['functions'][pn]['function_type'] == 2):
+        potential_vary.vary_analytic(pn)
   
-# Clear
-    es.clear_potentials()
-    
-# ADD POTENTIALS
-    for pn in range(len(g.pot_functions['functions'])):
-      pf = g.pot_functions['functions'][pn]
-      if(pf['f_on']):
-        if(pf['f_type_id'] == 1):
-          es.add_potential(
-                            pf['f_type_id'],
-                            pf['a'], 
-                            pf['b'],  
-                            pf['r_cut'], 
-                            pf['points'] 
-                           )
-        elif(pf['f_type_id'] > 1):
-          es.add_potential(
-                            pf['f_type_id'],
-                            pf['a'], 
-                            pf['f_group'],  
-                            pf['r_cut'], 
-                            pf['points'] 
-                           )    
-# ADD ZBL
-    for zbl in g.pot_functions['zbl']:
-      es.add_zbl(
-                  zbl['id_1'],
-                  zbl['id_2'], 
-                  zbl['on'],  
-                  zbl['z1'], 
-                  zbl['z2'] , 
-                  zbl['ra'] , 
-                  zbl['rb'] , 
-                  zbl['spline_type'] 
-                 )    
-
-# SET POTENTIALS
-    es.set_potentials()     
-
-  def bp_add_potentials():
+  def vary_tabulated(pn):
+    pass
   
-# Clear
-    bp.clear_potentials()
+  def vary_analytic(pn):
+    print(g.pot_functions['functions'][pn])
     
-# ADD POTENTIALS
-    for pn in range(len(g.pot_functions['functions'])):
-      pf = g.pot_functions['functions'][pn]
-      if(pf['f_on']):
-        if(pf['f_type_id'] == 1):
-          fortran_id = bp.add_potential(
-                            pf['f_type_id'],
-                            pf['a'], 
-                            pf['b'],  
-                            pf['r_cut'], 
-                            pf['points'],
-                            pn
-                           )
-        elif(pf['f_type_id'] > 1):
-          fortran_id = bp.add_potential(
-                            pf['f_type_id'],
-                            pf['a'], 
-                            pf['f_group'],  
-                            pf['r_cut'], 
-                            pf['points'],
-                            pn 
-                           )    
-      
-# ADD ZBL
-    for zbl in g.pot_functions['zbl']:
-      bp.add_zbl(
-                  zbl['id_1'],
-                  zbl['id_2'], 
-                  zbl['on'],  
-                  zbl['z1'], 
-                  zbl['z2'] , 
-                  zbl['ra'] , 
-                  zbl['rb'] , 
-                  zbl['spline_type'] 
-                 )    
-                                               
-# SET POTENTIALS
-    bp.set_potentials()
-      
-  def relax_add_potentials():
-  
-# Clear
-    relax.clear_potentials()
-    
-# ADD POTENTIALS
-    for pf in g.pot_functions['functions']:
-      if(pf['f_on']):
-        if(pf['f_type_id'] == 1):
-          relax.add_potential(
-                            pf['f_type_id'],
-                            pf['a'], 
-                            pf['b'],  
-                            pf['r_cut'], 
-                            pf['points'] 
-                           )
-        elif(pf['f_type_id'] > 1):
-          relax.add_potential(
-                            pf['f_type_id'],
-                            pf['a'], 
-                            pf['f_group'],  
-                            pf['r_cut'], 
-                            pf['points'] 
-                           )    
-      
-# ADD ZBL
-    for zbl in g.pot_functions['zbl']:
-      relax.add_zbl(
-                  zbl['id_1'],
-                  zbl['id_2'], 
-                  zbl['on'],  
-                  zbl['z1'], 
-                  zbl['z2'] , 
-                  zbl['ra'] , 
-                  zbl['rb'] , 
-                  zbl['spline_type'] 
-                 )    
-                                               
-# SET POTENTIALS
-    relax.set_potentials()
-      
 ###########################################
 #  CLASS potential_function
 ###########################################
@@ -2432,10 +1963,29 @@ class potential_functions:
 # DENSITY FUNCTIONS
 ##############################################
 
-# Embedding Finnis-Sinclair
+# Quadratic
+# y = a * (r - b)**2
   @staticmethod
   def quadratic_density(r, p, pf):
     return fnc.quadratic_density_v(r, p, pf)
+    
+# Slater 4S
+  @staticmethod
+  def slater_4s(r, p, pf):
+    return fnc.slater_4s_v(r, p, pf)
+
+# Double Slater 4S With Cutoff
+  @staticmethod
+  def double_slater_4s_cutoff(r, p, pf, rs=False):
+    if(rs == False):
+      return fnc.double_slater_4s_cutoff_v(r, p, pf)
+    else:    
+      p_out = []
+      for i in range(len(p)):
+        p_out.append(p[i])   
+      p_out[0] = r * p[0] 
+      p_out[2] = r * p[2]
+      return p_out
     
 ##############################################
 # EMBEDDING FUNCTIONS
@@ -2459,7 +2009,7 @@ class potential_functions:
   def triple_embedding(r, p, pf):
     return fnc.triple_embedding_v(r, p, pf)
 
-# Triple Embedding
+# 4 Term Embedding
 # f(x) = A + B * sqrt(r) + C * r**2 + D * r**4
   @staticmethod
   def quad_embedding(r, p, pf):
@@ -2499,325 +2049,10 @@ class potential_functions:
   def cubic_knot_spline_fixed_end(r, p, pf):
     return fnc.cubic_knot_spline_fixed_end_v(r, p, pf)
 
-###########################################
-#  CLASS potential_outpu
-###########################################
-class potential_output:
-
   @staticmethod
-  def full(dir_out = None):
-  
-    if(dir_out==None):  
-      dir_out = g.dirs['wd'] + '/' + g.fit_results['results_dir'] 
-  
-# Make output directory
-    std.make_dir(dir_out)
-    
-    potential_output.best_parameters(dir_out) 
-    potential_output.eampa(dir_out)
-    potential_output.data_file(dir_out)
-    potential_output.dl_poly(dir_out)
-    potential_output.plots(dir_out)
-    
-  def best_parameters(dir_out = None):
-    if(dir_out==None):  
-      dir_out = g.dirs['results'] + '/best_parameters'
-    std.make_dir(dir_out)
-    
-    fh = open(dir_out + '/best_parameters.txt', 'w')    
-    for fn in range(len(g.pot_functions['functions'])):          
-      if(g.pot_functions['functions'][fn]['fit_type'] == 1):     # SPLINE
-        fh.write("Fn: " + str(fn) + "[S]  ")
-        fh.write("\n")
-        for i in range(len(g.pot_functions['functions'][fn]['s_nodes'][:,1])):
-          fh.write("  [" + str(i) + "] " + display.pad_r(g.pot_functions['functions'][fn]['s_nodes'][i,0],8) + " ")
-        for i in range(len(g.pot_functions['functions'][fn]['s_nodes'][:,1])):
-          fh.write("  [" + str(i) + "] " + display.pad_r(g.pot_functions['functions'][fn]['s_nodes'][i,1],8) + " ")
-          
-        fh.write("\n")
-#for i in range(g.pot_functions['functions'][fn]['fit_size']):
-#  fh.write("[" + str(i) + "]" + display.pad_r(g.pot_functions['functions'][fn]['fit_parameters'][0,i],8))
-      elif(g.pot_functions['functions'][fn]['fit_type'] == 2):   # ANALYTIC
-        fh.write("Fn:" + str(fn) + "[A]  ")
-        fh.write("\n")
-        for i in range(g.pot_functions['functions'][fn]['fit_size']):
-          fh.write("  [" + str(i) + "] " + display.pad_r(g.pot_functions['functions'][fn]['a_params'][i],8) + " ")
-        fh.write("\n")
-    fh.close()
-       
-  @staticmethod
-  def eampa(dir_out = None):
-    if(dir_out==None):   
-      dir_out = g.dirs['results'] + '/pot_save'
-    std.make_dir(dir_out)
-    
-    fh = open(dir_out + '/out.pot', 'w')
-    fh.write('POTNAME ' + '\n')  
-    fh.write('\n')  
-    fh.write('\n')  
-    
-    for fn in range(len(g.pot_functions['functions'])): 
-      f = g.pot_functions['functions'][fn]
+  def cubic_knot_spline_fixed_end_pair(r, p, pf):
+    return fnc.cubic_knot_spline_fixed_end_pair_v(r, p, pf)
 
-# File Name
-#pf_name = f['f_type'] + '_' + f['a_text'].strip()
-#if(f['b_text'].strip() != ''):
-#  pf_name += '_' + f['b_text'].strip()
-#if(str(f['f_group']).strip() != ''):
-#  pf_name += '_' + str(f['f_group'])
-#pf_name = pf_name.lower() + '.pot'
-      pf_name = f['file']
-      
-      a = labels.get(f['a'])
-      b = labels.get(f['b'])
-      fh.write('! ' + f['f_type'] + '  ' + f['a_text'] + '  ' + f['b_text'] + '\n')
-      fh.write('START\n')
-      if(f['f_on'] == 1):
-        fh.write('F_ON true\n')
-      else:
-        fh.write('F_ON false\n')
-      fh.write('F_TYPE ' + f['f_type'] + '\n')
-      fh.write('FILE ' + pf_name + '\n')
-      fh.write('LABEL ' + f['a_text'] + '  ' + f['b_text'] + '\n')
-      fh.write('F_GROUP ' + str(f['f_group']) + '\n')
-      fh.write('R_CUT ' + str(f['r_cut']) + '\n')
-      fh.write('END\n')  
-      fh.write('\n')  
-      fh.write('\n')  
-      
-# Write Function File
-      fh_pf = open(dir_out + '/' + pf_name, 'w')
-      if(f['function_type'] == 1):
-        pass
-      elif(f['function_type'] == 2):
-        fh_pf.write('#A\n')
-        fh_pf.write('#TYPE ' + str(f['a_type']) + '\n')
-        fh_pf.write('#P')
-        if(f['a_params'] is not None):
-          for p in f['a_params']:        
-            fh_pf.write(' ' + str(p))
-          fh_pf.write('\n')
-        if(f['a_params_fixed'] is not None):
-          fh_pf.write('#PF')
-          for p in f['a_params_fixed']:        
-            fh_pf.write(' ' + str(p))
-          fh_pf.write('\n')
-        fh_pf.write('#L ' + str(f['a_l']) + '\n')
-        fh_pf.write('#U ' + str(f['a_u']) + '\n')
-      fh_pf.close()
-
-# Write Function File
-      if(f['function_type'] == 2):
-        fh_pfit = open(dir_out + '/' + f['fit_file'], 'w')
-        fh_pfit.write('#FIT A' + '\n')
-        fh_pfit.write('#PS ')
-        for p in f['a_params']:        
-          fh_pfit.write(' ' + str(p))
-        fh_pfit.write('\n')
-        fh_pfit.write('#PL ')
-        for i in range(len(f['a_params'])):    
-          fh_pfit.write(' ' + str(str(f['a_params'][i] - 0.5 * (f['fit_parameters'][1,i] - f['fit_parameters'][0,i]))))
-        fh_pfit.write('\n')
-        fh_pfit.write('#PU ')
-        for i in range(len(f['a_params'])):    
-          fh_pfit.write(' ' + str(str(f['a_params'][i] + 0.5 * (f['fit_parameters'][1,i] - f['fit_parameters'][0,i]))))
-        fh_pfit.write('\n')
-        fh_pfit.close()
-        
-    fh.close()
-  
-  @staticmethod
-  def data_file(dir_out = None):
-    if(dir_out==None):  
-      dir_out = g.dirs['results'] + '/pot_fortran'
-    std.make_dir(dir_out)
-    
-    fh = open(dir_out + '/data.pot', 'w')
-    if(efs.pc > 0):
-      for i in range(efs.pc):    
-        a = efs.pkey[i,0] - 1
-        b = efs.pkey[i,1]       
-        pot_type = efs.pkey[i,2]
-        label_a = efs.pkey[i,3]
-        label_b = efs.pkey[i,4]        
-        fh.write(str(pot_type) + " " + str(label_a) + " " + str(label_b) + "\n")
-        for n in range(a,b,1):
-          fh.write(potential_output.pad_r(efs.pot[n,0], 20) + " ")
-          fh.write(potential_output.pad_r(efs.pot[n,1], 20) + " ")
-          fh.write(potential_output.pad_r(efs.pot[n,2], 20) + " ")
-          fh.write(potential_output.pad_r(efs.pot[n,3], 20) + "\n")  
-    fh.close()
-    
-  @staticmethod
-  def dl_poly(dir_out = None):
-    if(dir_out==None):  
-      dir_out = g.dirs['results'] + '/dl_poly'
-    std.make_dir(dir_out)
-    
-    fh = open(dir_out + '/pot.eam', 'w')
-    fh.write('# EAMPA Output DL_POLY\n')
-    if(efs.pc > 0):
-      fh.write(str(efs.pc) + '\n')
-      for i in range(efs.pc):    
-        a = efs.pkey[i,0] - 1
-        b = efs.pkey[i,1]       
-        pot_type = efs.pkey[i,2]
-        label_a = labels.get(efs.pkey[i,3])
-        label_b = labels.get(efs.pkey[i,4]) 
-        pykey = efs.pkey_python[i]
-        pf = g.pot_functions['functions'][pykey]
-        if(pot_type == 1):
-          fh.write('pair ')   
-          fh.write(label_a + ' ')   
-          fh.write(label_b + ' ')  
-        elif(pot_type == 2):
-          if(pf['f_group_label'] == "1"):
-            fh.write('dden ')  
-          elif(pf['f_group_label'] == "2"):
-            fh.write('sden ')  
-          else:
-            fh.write('dens ')  
-          fh.write(label_a + ' ')  
-        elif(pot_type == 3):
-          if(pf['f_group_label'] == "1"):
-            fh.write('demb ')  
-          elif(pf['f_group_label'] == "2"):
-            fh.write('semb ')  
-          else:
-            fh.write('embe ')  
-          fh.write(label_a + ' ')   
-        fh.write(str(b - a) + ' ') 
-        fh.write(str(efs.pot[a,0]) + ' ') 
-        fh.write(str(efs.pot[b-1,0]) + ' ') 
-        fh.write('\n')
-        
-        ended = False
-        for n in range(a,b,1):
-          ended = False
-          fh.write(potential_output.pad_r("{:.14e}".format(efs.pot[n,1]), 20) + " ")
-          if(n % 4 == 3):
-            fh.write('\n')
-            ended = True
-            
-        if(not ended):
-          fh.write('\n')
-          
-    fh.close()
-    
-  @staticmethod
-  def plots(dir_out = None): 
-    if(dir_out==None):  
-      dir_out = g.dirs['results'] + '/plots'
-    std.make_dir(dir_out)    
-    potential.plot_python_potentials(dir_out)
-    potential.plot_fortran_potentials(dir_out)
-  
-  @staticmethod
-  def pad_r(inp, p=7):
-    if(inp == None):
-      return ""    
-    out = str(inp).strip()  
-    while(len(out)<p):
-      out = out + " "      
-    return out[0:p]
-
-###########################################
-#  CLASS rescale_densit
-###########################################
-class rescale_density:
-  
-  def run():
-    m = {}
-    for fn in range(len(g.pot_functions['functions'])): 
-      if(g.pot_functions['functions'][fn]['f_type_id'] == 2):
-        a_id = g.pot_functions['functions'][fn]['a']
-        f_id = g.pot_functions['functions'][fn]['f_group']
-        m_rho = rescale_density.estimate_density(fn)
-        m[fn] = 1.0 / m_rho
-        fn_emb = potential.find_fn(3, a_id, f_id)
-        m[fn_emb] = 1.0 / m_rho
-
-    """
-# Update potential
-    a = 0
-    for fn in range(len(g.pot_functions['functions'])): 
-      if(g.pot_functions['functions'][fn]['fit_type'] == 1):     # NODE SPLINE   
-# Calc b
-        b = a + g.pot_functions['functions'][fn]['fit_size']  
-        
-        g.pot_functions['functions'][fn]['s_nodes'][:,1] = p[a:b]
-        potential.make_spline_points_inner(fn)
-        
-# Make Analytic Points
-#g.pot_functions['functions'][fn]['s_params'][:] = p[a:b]
-# LOAD ORIGINAL
-#g.pot_functions['functions'][fn]['points'] = numpy.copy(g.pot_functions['functions'][fn]['points_original'])
-# VARY SPLINE
-#potential.vary_tabulated_points(fn, p[a:b])
-        
-# Update a
-        a = b   
-        
-      elif(g.pot_functions['functions'][fn]['fit_type'] == 2):   # ANALYTIC  
-# Calc b
-        b = a + g.pot_functions['functions'][fn]['fit_size'] 
-# Make Analytic Points
-        g.pot_functions['functions'][fn]['a_params'][:] = p[a:b]
-        potential.make_analytic_points_inner(fn)
-        a = b    
-    """
-
-  def estimate_densities():
-    out = []
-    for fn in range(len(g.pot_functions['functions'])): 
-      if(g.pot_functions['functions'][fn]['f_type_id'] == 2):
-        out.append([fn, rescale_density.estimate_density(fn)])
-    return out
-
-  def estimate_density(fn):
-# Symetric simple cubic used as test case
-    sc = {0.86602539999999995: 8, 0.80039053000000004: 24, 0.75: 24, 0.71807032999999998: 24, 0.70710678000000005: 12, 0.72886899000000005: 24, 0.67314560000000001: 48, 0.63737743999999996: 48, 0.625: 24, 0.61237244000000002: 24, 0.57282195999999996: 48, 0.55901699000000005: 24, 0.53033008999999998: 36, 0.51538819999999996: 48, 0.5: 6, 0.64951904999999999: 8, 0.58630196999999995: 24, 0.54486237000000004: 24, 0.46770717000000001: 48, 0.45069390999999998: 24, 0.4145781: 24, 0.39528470999999998: 24, 0.375: 30, 0.43301269999999997: 8, 0.35355339000000002: 12, 0.30618622000000001: 24, 0.27950849999999999: 24, 0.25: 6, 0.21650634999999999: 8, 0.17677670000000001: 12, 0.125: 7}
-    a_prim = 0.125
-    a = [2.0,3.0,4.0,5.0] 
-    m_rho = 0.0
-    for a0 in a:
-      a0 = (1 / a_prim) * a0
-      rho = 0.0    
-      for k in sc.keys():
-        y = interp.search_x(a0 * k, g.pot_functions['functions'][fn]['points'][:,0], g.pot_functions['functions'][fn]['points'][:,1])
-        rho = rho + sc[k] * y
-      m_rho = max(m_rho, rho)
-    return m_rho
-    
-  def max_densities():    
-    density_list = None
-    for fn in range(len(g.pot_functions['functions'])): 
-      if(g.pot_functions['functions'][fn]['f_type_id'] == 2):
-        rho = rescale_density.estimate_density(fn) 
-        if(density_list is None):
-          density_list = str(rho)
-        else:
-          density_list = density_list + "/" + str(rho)
-    return density_list
-        
-###########################################
-#  CLASS potential_var
-###########################################
-class potential_vary:
- 
-  def vary_all():
-    for pn in range(len(g.pot_functions['functions'])):
-      if(g.pot_functions['functions'][pn]['function_type'] == 1):
-        potential_vary.vary_tabulated(pn)
-      elif(g.pot_functions['functions'][pn]['function_type'] == 2):
-        potential_vary.vary_analytic(pn)
-  
-  def vary_tabulated(pn):
-    pass
-  
-  def vary_analytic(pn):
-    print(g.pot_functions['functions'][pn])
-    
 ###########################################
 #  CLASS config
 ###########################################
@@ -3249,7 +2484,7 @@ class configs:
   @staticmethod
   def output(): 
     if(g.outputs):     
-      fh = open(g.dirs['output'] + '/' + 'configs.dat', 'w')
+      fh = open(g.dirs['wd'] + '/data/' + 'configs.dat', 'w')
       
       n = 0
       for c in g.configs['configs']:
@@ -5670,17 +4905,16 @@ class efs_calc:
   
     print("Calc Energy") 
     efs_calc.output_dir()
-  
+
 # Setup EFS
     efs.init()                         # Initialise (allocate arrays)
-    potential.efs_add_potentials()     # Load potentials
+    potential.load_to_efs()
     configs.efs_add_config()           # Add configs
     efs.energy()
+    configs.efs_results()              # Load Results
     efs_calc.output()
     efs_calc.save_to_file()
-    potential.plot_fortran_potentials()
-    potential.plot_python_potentials()
-    
+
   def run_energy_force():
   
     print("Calc Energy and Forces") 
@@ -5688,14 +4922,13 @@ class efs_calc:
     
 # Setup EFS
     efs.init()                         # Initialise (allocate arrays)
-    potential.efs_add_potentials()     # Load potentials
+    potential.load_to_efs()
     configs.efs_add_config()           # Add configs
-    efs.energy_force() 
+    efs.energy_force()
+    configs.efs_results()              # Load Results
     efs_calc.output()
     efs_calc.save_to_file()
-    potential.plot_fortran_potentials()
-    potential.plot_python_potentials()
-  
+
   def run_energy_force_stress():
   
     print("Calc Energy, Forces and Stress") 
@@ -5703,19 +4936,15 @@ class efs_calc:
     
 # Setup EFS
     efs.init()                         # Initialise (allocate arrays)
-    potential.efs_add_potentials()     # Load potentials
+    potential.load_to_efs()
     configs.efs_add_config()           # Add configs
-    efs.energy_force_stress() 
+    efs.energy_force_stress()
     configs.efs_results()              # Load Results
     efs_calc.output()
     efs_calc.save_to_file()
-#efs_calc.output_rss()
-    potential.plot_fortran_potentials()
-    potential.plot_python_potentials()
-
-#efs.max_density_calc()
 
   def output_dir():
+# MAKE DIRS
     std.make_dir(g.dirs['wd'] + '/efs')
 
   def output():
@@ -5761,6 +4990,13 @@ class efs_calc:
 
     if(out_dir == None):
       out_dir = g.dirs['wd'] + '/efs'
+    plot_dir = out_dir + '/plots'
+    std.make_dir(out_dir)
+    std.make_dir(plot_dir)
+
+#################################
+#  efs_results
+#################################
   
     t_pad = 12
     f_pad = 18
@@ -5779,7 +5015,7 @@ class efs_calc:
 
 # Config calcs
       nat = efs.key[n,1] - efs.key[n,0] + 1
-      a = efs.key[n, 0]
+      a = efs.key[n, 0] - 1
       b = efs.key[n, 1]
 
       e_on = efs.key[n, 10]
@@ -5839,11 +5075,41 @@ class efs_calc:
       fh.write('\n')
       fh.write('\n')
 
+      if(efs.stresses_calculated[n] == 1):
+        fh.write('Stress (Known/Calculated):\n')        
+        fh.write(std.pad('{:10.5f}'.format(efs.stresses[n,0,0]), 14))
+        fh.write(std.pad('{:10.5f}'.format(efs.stresses[n,0,1]), 14))
+        fh.write(std.pad('{:10.5f}'.format(efs.stresses[n,0,2]), 14)) 
+        fh.write("          ")
+        fh.write(std.pad('{:10.5f}'.format(efs.config_stresses[n,0,0]), 14))
+        fh.write(std.pad('{:10.5f}'.format(efs.config_stresses[n,0,1]), 14))
+        fh.write(std.pad('{:10.5f}'.format(efs.config_stresses[n,0,2]), 14)) 
+        fh.write('\n') 
+        fh.write(std.pad('{:10.5f}'.format(efs.stresses[n,1,0]), 14))
+        fh.write(std.pad('{:10.5f}'.format(efs.stresses[n,1,1]), 14))
+        fh.write(std.pad('{:10.5f}'.format(efs.stresses[n,1,2]), 14)) 
+        fh.write("          ")
+        fh.write(std.pad('{:10.5f}'.format(efs.config_stresses[n,1,0]), 14))
+        fh.write(std.pad('{:10.5f}'.format(efs.config_stresses[n,1,1]), 14))
+        fh.write(std.pad('{:10.5f}'.format(efs.config_stresses[n,1,2]), 14)) 
+        fh.write('\n') 
+        fh.write(std.pad('{:10.5f}'.format(efs.stresses[n,2,0]), 14))
+        fh.write(std.pad('{:10.5f}'.format(efs.stresses[n,2,1]), 14))
+        fh.write(std.pad('{:10.5f}'.format(efs.stresses[n,2,2]), 14)) 
+        fh.write("          ")
+        fh.write(std.pad('{:10.5f}'.format(efs.config_stresses[n,2,0]), 14))
+        fh.write(std.pad('{:10.5f}'.format(efs.config_stresses[n,2,1]), 14))
+        fh.write(std.pad('{:10.5f}'.format(efs.config_stresses[n,2,2]), 14)) 
+        fh.write('\n') 
+
+        fh.write('\n')        
+        fh.write('\n')        
+
       fh.write(std.pad("Atom Coords:", margin))
       fh.write('\n')
       nn = 0
       for cn in range(a, b, 1):
-        fh.write(std.pad(str(nn) + ":", 8))
+        fh.write(std.pad(str(nn+1) + ":", 8))
         fh.write(std.pad(labels.get(efs.labels[cn]) + " [" + str(efs.labels[cn]) + "]", 20))
         fh.write(std.pad('{:6.3f}'.format(efs.coords[cn,0]), 14))
         fh.write(std.pad('{:6.3f}'.format(efs.coords[cn,1]), 14))
@@ -5867,6 +5133,111 @@ class efs_calc:
     fh.write('###############################################################')
     fh.write('###############################################################\n')
     fh.close()
+
+#################################
+#  forces_calculated
+#################################
+  
+    for n in range(efs.cc):
+      file_path_n = g.configs['configs'][n]['file_path']
+      file_name_n = file_path_n.split("/")
+      file_name_n = file_name_n[-1]
+      a = efs.key[n, 0] - 1
+      b = efs.key[n, 1] 
+      strn = str(n + 1)
+      while(len(strn)<5):
+        strn = "0" + strn
+      std.make_dir(out_dir + "/forces_calculated")
+      fh = open(out_dir + "/forces_calculated" + '/' + file_name_n + '.txt', 'w')
+      nn = 0
+      for cn in range(a, b, 1):
+        if(f_on == 1):
+          fh.write(std.pad(str(nn+1) + ":", 8))
+          fh.write(std.pad(labels.get(efs.labels[cn]) + " [" + str(efs.labels[cn]) + "]", 20))
+          fh.write(std.pad('{:20.8e}'.format(float(efs.config_forces[n,nn,0])), 14))
+          fh.write(std.pad('{:20.8e}'.format(float(efs.config_forces[n,nn,1])), 14))
+          fh.write(std.pad('{:20.8e}'.format(float(efs.config_forces[n,nn,2])), 14))
+          fh.write('\n')    
+          nn = nn + 1
+      fh.close()
+
+#################################
+#  config_energy
+#################################
+    plot_a0 = []
+    plot_e = []
+    fh = open(out_dir + '/config_energy.csv', 'w')
+    for n in range(efs.cc): 
+      nat = efs.key[n,1] - efs.key[n,0] + 1   
+      fh.write(str(n+1) + '  ')  
+      fh.write(str(nat) + '  ')   
+      fh.write(str(efs.alat[n]) + '  ')  
+      fh.write(str(efs.config_energy[n,0]) + '  ')  
+      fh.write(str(efs.config_energy[n,1]) + '  ')  
+      fh.write(str(efs.config_energy[n,2]) + '  ') 
+      fh.write('\n') 
+      plot_a0.append(efs.alat[n])
+      plot_e.append(efs.config_energy[n,2] / nat)
+    fh.close()
+
+#################################
+#  z_energy
+#################################
+    plot_z = []
+    plot_e = []
+    fh = open(out_dir + '/surface_energy.csv', 'w')
+    for n in range(efs.cc): 
+      nat = efs.key[n,1] - efs.key[n,0] + 1   
+      fh.write(str(n+1) + '  ')  
+      fh.write(str(nat) + '  ')   
+      fh.write(str(efs.uv[3 * n + 2, 2]) + '  ')  
+      fh.write(str(efs.config_energy[n,0]) + '  ')  
+      fh.write(str(efs.config_energy[n,1]) + '  ')  
+      fh.write(str(efs.config_energy[n,2]) + '  ') 
+      fh.write('\n') 
+      plot_z.append(efs.uv[3 * n + 2, 2])
+      plot_e.append(efs.config_energy[n,2] / nat)
+    fh.close()
+
+#################################
+#  optional plots
+#################################
+
+    plt.figure(figsize=(8,6))
+    plt.rc('font', family='serif')
+    plt.rc('xtick', labelsize='x-small')
+    plt.rc('ytick', labelsize='x-small')   
+    plt.title('Cohesive Energy Plot')
+    plt.plot(plot_a0, plot_e, 'k+')
+    plt.xlabel("a0 of supercell (angs)")
+    plt.ylabel("energy per atom (eV)")
+    plt.axhline(y=0.0, color='b', linestyle='dotted')
+    plt.savefig(plot_dir + '/cohesive_energy.eps', type='efs')
+    plt.close('all') 
+ 
+    plt.figure(figsize=(8,6))
+    plt.rc('font', family='serif')
+    plt.rc('xtick', labelsize='x-small')
+    plt.rc('ytick', labelsize='x-small')   
+    plt.title('Cohesive Energy Plot')
+    plt.plot(plot_a0, plot_e, 'k+')
+    plt.ylim(-5.0,0.2)
+    plt.axhline(y=0.0, color='b', linestyle='dotted')
+    plt.xlabel("a0 of supercell (angs)")
+    plt.ylabel("energy per atom (eV)")
+    plt.savefig(plot_dir + '/cohesive_energy_zoom.eps', type='efs')
+    plt.close('all') 
+
+    plt.figure(figsize=(8,6))
+    plt.rc('font', family='serif')
+    plt.rc('xtick', labelsize='x-small')
+    plt.rc('ytick', labelsize='x-small')   
+    plt.title('Surface Energy Plot')
+    plt.plot(plot_z, plot_e, 'k+')
+    plt.axhline(y=min(plot_e), color='b', linestyle='dotted')
+    plt.axhline(y=max(plot_e), color='g', linestyle='dotted')
+    plt.savefig(plot_dir + '/surface_energy.eps', type='efs')
+    plt.close('all') 
 
   def output_energy():
   
@@ -5957,8 +5328,12 @@ class efs_calc:
 
   def set_weights():
 # READ INPUT DATA
-    efs.set_weights(g.rss_weights['config'], g.rss_weights['energy'], g.rss_weights['force'], g.rss_weights['stress'])
-  
+#efs.set_weights(g.rss_weights['config'], g.rss_weights['energy'], g.rss_weights['force'], g.rss_weights['stress'])
+    efs.rss_weights[0] = g.rss_weights['config']
+    efs.rss_weights[1] = g.rss_weights['energy']
+    efs.rss_weights[2] = g.rss_weights['force']
+    efs.rss_weights[3] = g.rss_weights['stress']
+
   def get_results():
     efs_calc.get_known()    
 # SET UP DICTIONARY
@@ -5999,7 +5374,7 @@ class efs_calc:
       f = 1.0 + (g.rss_max_density['scale_factor'] * (bp.max_density - 0.8))**g.rss_max_density['scale_exponent']
     """
     f = 1.0  
-    if(bp.max_density == 0.0):
+    if(efs.max_density == 0.0):
       f = g.rss_max_density['zero_density_factor']  
     
     g.rss['residual'] = []
@@ -6039,41 +5414,16 @@ class bp_calc:
     
 # Setup BP
     bp_calc.init()
-    
-# Load potentials
-    potential.bp_add_potentials()
-    
-# Add required BP structures (add, make ghost configs, make NLs)
+    potential.load_to_bp()
     b_props.bp_add()
-        
-# Calculate energies of configurations for all structures
     bp.energy() 
-   
-#print(bp.cc)
-#print(bp.calc_count)
-#print(bp.cc_log[0,1)
-
-# Calculate BP
-    bp.calculate_bp()   
-    
-#print(bp.rss)
-    
-# Output to Terminal
+    bp.calculate_bp()  
     b_props.bp_output_terminal()
-    
-# Output to File
-#b_props.bp_output()
-
     b_props.bp_eos_plot(g.dirs['wd'] + '/bp')
-    
-# Plots
-#b_props.bp_eos_plot()
-#potential.plot_fortran_potentials()
-#potential.plot_python_potentials()
     
   def output_dir():
     std.make_dir(g.dirs['wd'] + '/bp')
-    
+
   def init():
 # Log
     main.log('BP Allocated Memory\n')
@@ -6169,8 +5519,19 @@ class bp_calc:
       bp_id = 0
       while(bp.bp_keys_i[bp_id,0] > -1):   
         g.bp_known['input'][bp_id] = g.bp_ids[bp_id+1]
-        g.bp_known['bp_calculations'][bp_id] = {'a0': None, 'e0': None, 'b0': None, 'ec': None, 'g': None, 'e': None, 'v': None,'b0_gpa': None,'ec_gpa': None,}
+        g.bp_known['bp_calculations'][bp_id] = {'a0': None, 'e0': None, 'b0': None, 
+                                                'ec': None, 'g': None, 'e': None, 'v': None, 
+                                                'b0_gpa': None,'ec_gpa': None,
+                                                'compliance': None, 'compliance_gpa': None,
+                                                'e_vec': None, 'g_vec': None, 'v_vec': None,
+                                                'GR': None, 'GV': None, 'G': None,
+                                                'BR': None, 'BV': None, 'B': None,
+                                                'vl': None, 'vt': None, 'vm': None,
+                                                'E': None, 'v': None, 
+                                                'debye': None, 'melting_point': None,
+                                               }
         
+        ec_set = False
         if(bp.known_set[bp_id, 0] == 1):
           g.bp_known['bp_calculations'][bp_id]['a0'] = float(bp.known_alat[bp_id])
         if(bp.known_set[bp_id, 1] == 1):
@@ -6179,6 +5540,7 @@ class bp_calc:
           g.bp_known['bp_calculations'][bp_id]['b0'] = float(bp.known_b0[bp_id])
           g.bp_known['bp_calculations'][bp_id]['b0_gpa'] = 160.230732254 * float(bp.known_b0[bp_id])
         if(bp.known_set[bp_id, 3] == 1):
+          ec_set = True
           g.bp_known['bp_calculations'][bp_id]['ec'] = numpy.zeros((6,6,),)
           g.bp_known['bp_calculations'][bp_id]['ec_gpa'] = numpy.zeros((6,6,),)
           for i in range(6):
@@ -6191,6 +5553,15 @@ class bp_calc:
           g.bp_known['bp_calculations'][bp_id]['e'] = float(bp.known_e[bp_id])
         if(bp.known_set[bp_id, 6] == 1):
           g.bp_known['bp_calculations'][bp_id]['v'] = float(bp.known_v[bp_id])
+
+# Calculated from ec
+        if(ec_set):
+          g.bp_known['bp_calculations'][bp_id]['compliance'] = numpy.linalg.inv(g.bp_known['bp_calculations'][bp_id]['ec'])
+          g.bp_known['bp_calculations'][bp_id]['compliance_gpa'] = numpy.linalg.inv(g.bp_known['bp_calculations'][bp_id]['ec_gpa'])
+
+          cavg = (g.bp_known['bp_calculations'][bp_id]['ec'][0,0] + g.bp_known['bp_calculations'][bp_id]['ec'][1,1] + g.bp_known['bp_calculations'][bp_id]['ec'][2,2]) / 3
+          g.bp_known['bp_calculations'][bp_id]['melting_point'] = 598 + 6.66 * cavg - 0.003 * cavg**2 
+  
         bp_id = bp_id + 1  
     except:
       g.bp_known['ok'] = False
@@ -6425,13 +5796,13 @@ class rss_calc:
 # Setup EFS
     efs.init()                         # Initialise (allocate arrays)
     efs_calc.set_weights()
-    potential.efs_add_potentials()     # Load potentials
+    potential.load_to_efs()
     configs.efs_add_config()           # Add configs
 
 # Setup BP
     bp_calc.init()
     bp_calc.set_weights()
-    potential.bp_add_potentials()
+    potential.load_to_bp()
     b_props.bp_add()
 
 # Run EFS and BP
@@ -6467,6 +5838,7 @@ class rss_calc:
     s_rss_w = sum(efs.config_rss[:,6])
     t_rss_w = e_rss_w + f_rss_w + s_rss_w
 
+    print()
     print('All configs:                   ' + str(t_rss))
     print('All configs (energy):          ' + str(e_rss))
     print('All configs (force):           ' + str(f_rss))
@@ -6480,8 +5852,11 @@ class rss_calc:
     for bp_id in range(bp.bp_configs_count):  
       print('')   
  
+      print('========================================================================================') 
+      print('========================================================================================') 
       print('BP  ' + str(bp_id)) 
-      print('================') 
+      print('========================================================================================') 
+      print('========================================================================================') 
 
       rss_calc.print_line('a0', bp.known_alat[bp_id], bp.calc_alat[bp_id])
       rss_calc.print_line('v0', None, bp.calc_v0[bp_id])
@@ -6500,7 +5875,50 @@ class rss_calc:
           print(str('{:14.6f}'.format(float(160.230732254e0 * bp.known_ec[bp_id,i,j]))), end="")
         print()
 #print(160.230732254e0 * bp.known_ec[bp_id,i,:])
-      
+
+      print('')   
+      print('Other calculated properties') 
+      print('===========================')     
+      print('{:30s}'.format('Bulk Modulus B0 (Reuss):'), end=" ")
+      print('{:14.6f}'.format(bp.calc_b0_r[bp_id]), end="    ")
+      print("(", '{:14.6f}'.format(bp.calc_b0_r_gpa[bp_id]),") GPA", sep="")
+      print('{:30s}'.format('Bulk Modulus B0 (Voigt):'), end=" ")
+      print('{:14.6f}'.format(bp.calc_b0_v[bp_id]), end="    ")
+      print("(", '{:14.6f}'.format(bp.calc_b0_v_gpa[bp_id]),") GPA", sep="")
+
+      print('{:30s}'.format('Tetragonal Shear:'), end=" ")
+      print('{:14.6f}'.format(bp.calc_cubic_tetragonal_shear[bp_id]), end="    ")
+      print("(", '{:14.6f}'.format(bp.calc_cubic_tetragonal_shear[bp_id]),") GPA", sep="")
+
+      print('{:30s}'.format('Shear Modulus G:'), end=" ")
+      print('{:14.6f}'.format(bp.calc_cubic_shear_modulus[bp_id]), end="    ")
+      print("(", '{:14.6f}'.format(bp.calc_cubic_shear_modulus_gpa[bp_id]),") GPA", sep="")
+      print('{:30s}'.format('Shear Modulus G (Reuss):'), end=" ")
+      print('{:14.6f}'.format(bp.calc_g_r[bp_id]), end="    ")
+      print("(", '{:14.6f}'.format(bp.calc_g_r_gpa[bp_id]),") GPA", sep="")
+      print('{:30s}'.format('Shear Modulus G (Voigt):'), end=" ")
+      print('{:14.6f}'.format(bp.calc_g_v[bp_id]), end="    ")
+      print("(", '{:14.6f}'.format(bp.calc_g_v_gpa[bp_id]),") GPA", sep="")
+
+      print('{:30s}'.format('Young\'s Modulus E:'), end=" ")
+      print('{:14.6f}'.format(bp.calc_e[bp_id]), end="    ")
+      print("(", '{:14.6f}'.format(bp.calc_e_gpa[bp_id]),") GPA", sep="")
+
+      print('{:30s}'.format('Poisson Ratio'), end=" ")
+      print('{:14.6f}'.format(bp.calc_v[bp_id]))
+
+      print('{:30s}'.format('Cachy Pressure:'), end=" ")
+      print('{:14.6f}'.format(bp.calc_cubic_cauchy_pressure[bp_id]), end="    ")
+      print("(", '{:14.6f}'.format(bp.calc_cubic_cauchy_pressure_gpa[bp_id]),") GPA", sep="")
+
+      print('{:30s}'.format('Melting Point:'), end=" ")
+      print('{:14.6f}'.format(bp.calc_melting[bp_id]), "K", sep="")
+
+      print('{:30s}'.format('Cubic Stability:'), end=" ")
+      print('{:14.6f}'.format(bp.calc_cubic_stability[bp_id]), " (1=Stable, 0=Unstable)", sep="")
+      print('{:30s}'.format('Stability:'), end=" ")
+      print('{:14.6f}'.format(bp.calc_stability[bp_id]), " (1=Stable, 0=Unstable)", sep="")
+      print('')         
       print('')   
   
     print('RSS:')    
@@ -6513,6 +5931,8 @@ class rss_calc:
     print('v:', g.rss['bp']['v'], "   w: ",g.rss['bp']['v_weighted'])
     print('')
     print('')
+    print('')
+    print('')
     print('RSS: ' + str(rss))
     print('')
     print('')
@@ -6522,23 +5942,25 @@ class rss_calc:
 #print(g.rss)
     print('')
     
-    exit()
+    potential.plot(g.dirs['wd'] + '/rss/potential_function_plots')
+
+    std.make_dir(g.dirs['wd'] + '/rss/eos_ec')  
+    b_props.bp_eos_plot(g.dirs['wd'] + '/rss/eos_ec')
 
 # Plots
 #potential.plot_fortran_potentials()
 #potential.plot_python_potentials()
-    potential.plot_python_potentials(g.dirs['wd'] + '/rss/plots/potential_python')
-    potential.plot_fortran_potentials(g.dirs['wd'] + '/rss/plots/potential_fortran')
-    
-    b_props.bp_output()
-    b_props.bp_eos_plot(g.dirs['wd'] + '/rss/plots')
+#potential.plot_python_potentials(g.dirs['wd'] + '/rss/plots/potential_python')
+#potential.plot_fortran_potentials(g.dirs['wd'] + '/rss/plots/potential_fortran')
+#b_props.bp_output()
+#b_props.bp_eos_plot(g.dirs['wd'] + '/rss/plots')
 
   def output_dir():
     std.make_dir(g.dirs['wd'] + '/rss')  
     std.make_dir(g.dirs['wd'] + '/rss/plots')
     
 # ASSUMES EFS AND BP ALREADY SET UP
-  def run_calc(save_in_top=True): 
+  def run_calc(save_in_top=True, log=False): 
 # START TIME
     s = time.time()  
   
@@ -6552,8 +5974,8 @@ class rss_calc:
     try:
       bp_cc = int(bp.cc)
     except:  
-      bp_cc = 0
-
+      bp_cc = 0    
+  
 # RUN CALCULATIONS
     efs.rss_calc()
     bp.energy()
@@ -6564,9 +5986,14 @@ class rss_calc:
     efs_calc.get_rss()   
     bp_calc.get_results()
     bp_calc.get_rss()
+
+# Log
+    if(log == True):
+      rss_calc.log()
  
+# Save residual
     g.rss['residual'] = numpy.asarray(g.rss['residual'])
-    
+  
 # SUM WEIGHTED RSS
     rss = 0.0
     if(g.rss['efs']['ok']):
@@ -6597,51 +6024,24 @@ class rss_calc:
     if(g.rss['since_improvement'] == None):
       g.rss['since_improvement'] = 0
     g.rss['since_improvement'] = g.rss['since_improvement'] + 1
-    g.rss['current_bp_max_density'] = copy.deepcopy(bp.max_density)
-    g.rss['current_efs_max_density'] = copy.deepcopy(efs.max_density)
+    g.rss['current_bp_max_density'] = numpy.copy(bp.max_density)
+    g.rss['current_efs_max_density'] = numpy.copy(efs.max_density)
     if(g.rss['best'] == None or g.rss['current'] < g.rss['best']):
       main.log('Best rss: ' + str(g.rss['best']) + ' (since last: ' + str(g.rss['since_improvement']) + ')')
-      g.rss['best_bp_max_density'] = copy.deepcopy(bp.max_density)
-      g.rss['best_efs_max_density'] = copy.deepcopy(efs.max_density)
+      g.rss['best_bp_max_density'] = numpy.copy(bp.max_density)
+      g.rss['best_efs_max_density'] = numpy.copy(efs.max_density)
       g.rss['best'] = g.rss['current']
       g.rss['since_improvement'] = 0
       
-      g.efs_results_best = copy.deepcopy(g.efs_results)
-      g.bp_results_best = copy.deepcopy(g.bp_results)
-    
-    """
-# TOP 100 List
-    if(save_in_top):
-      list_len = g.fitting['top_parameters']
+      g.efs_results_best = numpy.copy(g.efs_results)
+      g.bp_results_best = numpy.copy(g.bp_results)
 
-# COPY ARRAYS
-      p_now = numpy.copy(potential.get_parameters())
-      efs_results = copy.deepcopy(g.efs_results)
-      bp_results = copy.deepcopy(g.bp_results)
-
-      if(len(g.top_parameters) == 0):
-        g.top_parameters.append([rss, p_now, efs_results, bp_results, bp.max_density, efs.max_density])
-      else:    
-        i = 0
-        while(i<len(g.top_parameters)):
-          if(rss < g.top_parameters[i][0]):
-            break
-          elif(rss == g.top_parameters[i][0] and g.top_parameters[i][1].all() == p_now.all()):
-            i = list_len
-            break
-          else:
-            i = i + 1
-        if(i < list_len):
-          g.top_parameters.insert(i, [rss, p_now, efs_results,bp_results, bp.max_density, efs.max_density])
-        if(len(g.top_parameters) > list_len):
-          g.top_parameters.pop()
-    """ 
-      
 # END TIME
     e = time.time()      
     dt = e - s
 
 #efs_cc bp_cc
+    g.benchmark['dt'] = dt
     g.benchmark['total_atoms'] = g.benchmark['total_atoms'] + (bp.total_atoms + efs.total_atoms)
     g.benchmark['total_interactions'] = g.benchmark['total_interactions'] + (bp.l_nl_size + efs.l_nl_size)
     g.benchmark['configs'] =  g.benchmark['configs'] + efs_cc + bp_cc
@@ -6684,6 +6084,12 @@ class rss_calc:
       print(str('{:14.6f}'.format((calc - known)**2)), end="")
       print()
 
+  def log():
+    std.make_dir(g.dirs['wd'] + '/logs') 
+    fh.open(g.dirs['wd'] + '/logs/efs_calc.txt', 'a')  
+    fh.close()
+    print(g.efs_results )
+    
 ###########################################
 #  CLASS p
 ###########################################
@@ -6691,11 +6097,15 @@ class pf:
 
   start_time = 0.0
   end_time = 0.0  
-  
+  rss_plot_data = []
+
   def run():   
   
 # Start Time
     pf.start_time = time.time()
+
+    pf.pbest_dir = g.dirs['wd'] + '/fitting/saved_potentials/0000_pbest/'
+    std.make_dir(pf.pbest_dir)
   
 # Log
     main.log_title("Potential Fit")
@@ -6710,31 +6120,40 @@ class pf:
 # Run once with initial parameters
     g.pfdata['stage'] = 'START - INITIAL PARAMETERS'
     g.pfdata['stage_brief'] = 'START'
-    p = potential.get_start_parameters()
-    pf_potential.update(p)
     rss = pf.get_rss()
-    pf.set_current(p)
-
-# Load saved
-    pf_saved.run()
-
-#pf_saa.run()
 
     for fit in g.fit:
       pf.fit = fit
       if(pf.fit['type'].lower() == "random"):        
-        pf_random.run()
+        pf_random.run(fit)
       elif(pf.fit['type'].lower() == "sa"): 
-        pf_sa.run()
+        pf_sa.run(fit)
+      elif(pf.fit['type'].lower() == "gsa"): 
+        pf_gsa.run(fit)
       elif(pf.fit['type'].lower() == "ga"): 
-        pf_genetic.run()
+        pf_genetic.run(fit)
       elif(pf.fit['type'].lower() == "ng"): 
-        pf_ng.run()
+        pf_ng.run(fit)
+      elif(pf.fit['type'].lower() == "sps"): 
+        pf_sps.run(fit)
+      elif(pf.fit['type'].lower() == "nm"): 
+        pf_neldermead.run(fit)
+      elif(pf.fit['type'].lower() == "bfgs"): 
+        pf_bfgs.run(fit)
+      elif(pf.fit['type'].lower() == "bh"): 
+        pf_bh.run(fit)
+      elif(pf.fit['type'].lower() == "cg"): 
+        pf_cg.run(fit)
+
+    pf_save.top("BEST_PARAMETERS")
+
+    potential.update(g.pfdata['p']['best'] )
+    rss = pf.get_rss()
 
     pf_top.save(g.dirs['wd'] + '/save', 'top_parameters.txt')
 
 # Output
-    potential_output.full()
+#potential_output.full()
           
 # End Time
     pf.end_time = time.time()
@@ -6742,77 +6161,48 @@ class pf:
 # Log fit time
     main.log("Fit time: ", str(pf.end_time - pf.start_time))
 
-    print(g.top_parameters[0][0])
-    print(g.top_parameters[0][1])
-    print(g.top_parameters[0][2])
-    print(g.top_parameters[0][3])
-    print(g.top_parameters[0][4])
-    print(g.top_parameters[0][5])
+    pf_save.rss_plot_full()
 
-# Final
-    pf_final.run()
-
-#pf_ng.run()
-
-# Enhance top
-#pf_setop.run()
-
-# Run Genetic
-#pf_genetic.run()
-    
-# Run Sim Annealing on Best Result
-#pf_sa.run()
-
-#pf_gd.run()
-#pf_steps.run()
-  
-#pf_ng.run()
-
-# Display
-#g.pfdata['stage'] = 'Finished'
-#display.finish()
-      
 ######################################################
 # SET UP - initialise EFS, BP and any other modules
 #          and run first calc
 ######################################################
 
-  def set_current(p):
-    g.pfdata['p']['current'] = numpy.copy(p)
-    
-  def get_rss(save_in_top=True):  
+  def get_rss(save_in_top=True, quiet=False):  
     rss = rss_calc.run_calc(save_in_top)  
         
     g.pfdata['rss']['current'] = rss
     g.pfdata['rss']['counter'] += 1
-    g.pfdata['max_density']['bp_current'] = bp.max_density
-    g.pfdata['max_density']['efs_current'] = efs.max_density
-    
+
 # If successful
-    if(rss is not None):   
+    if(rss is not None and not quiet):   
     
 # Store Details
+      g.pfdata['bp']['current'] = g.bp_results.copy()
       g.pfdata['rss']['counter_successful'] += 1
       g.pfdata['rss']['since_improvement'] += 1    
       if(g.pfdata['rss']['start'] == None):
         g.pfdata['rss']['start'] = rss
       if(g.pfdata['rss']['best'] == None or rss < g.pfdata['rss']['best']):
-        g.pfdata['p']['best'] = numpy.copy(g.pfdata['p']['current'])
+        g.pfdata['p']['best'] = numpy.copy(potential.pot['p'])
         g.pfdata['rss']['best'] = rss
-        g.pfdata['bp']['best'] = copy.deepcopy(g.bp_results)        
-        g.pfdata['rss']['since_improvement'] = 0
-        g.pfdata['max_density']['bp_best'] = bp.max_density
-        g.pfdata['max_density']['efs_best'] = efs.max_density
-        
+        g.pfdata['bp']['best'] = g.bp_results.copy()    
+        g.pfdata['efs']['best'] = g.efs_results.copy()     
+        g.pfdata['rss']['since_improvement'] = 0       
+
+        potential.save(pf.pbest_dir, g.pfdata['p']['best']) 
+        pf_save.save_summary(pf.pbest_dir, g.pfdata['p']['best'], g.pfdata['rss']['best'], g.pfdata['bp']['best'], g.pfdata['bp']['known'],  g.pfdata['efs']['best'], g.pfdata['efs']['known'])
+        potential.plot(pf.pbest_dir)
+
 # Save in top
       if(save_in_top):
         list_len = g.fitting['top_parameters']
 
 # COPY ARRAYS
-        p_now = numpy.copy(potential.get_parameters())
-        efs_results = copy.deepcopy(g.efs_results)
-        bp_results = copy.deepcopy(g.bp_results)
-        rss_details = copy.deepcopy(g.rss)
+        p_now = numpy.copy(potential.pot['p'])
+        efs_results = g.efs_results.copy()
+        bp_results = g.bp_results.copy()
+        rss_details = g.rss.copy()
 
         if(len(g.top_parameters) == 0):
           g.top_parameters.append([rss, p_now, efs_results, bp_results, bp.max_density, efs.max_density, rss_details])
@@ -6832,7 +6222,10 @@ class pf:
             g.top_parameters.pop()    
 
 # DISPLAY
-    pf_display.output()    
+    if(not quiet):
+      pf_display.output()    
+#for i in range(min(len(g.top_parameters),10)):
+#  print(g.top_parameters[i][0])
     return rss
     
   def summary_line(opt_type, t_start, t_end, rss_start, rss_end):
@@ -6855,6 +6248,10 @@ class pf:
 
     pf.fh.write(opt_type + rss_start + "-->  " + rss_end + "  " + t_taken + "\n")
     
+  def save_rss_plot_data(t_start, name, data):
+    plot_data = numpy.asarray(data)
+    pf.rss_plot_data.append([t_start, name, data])
+
 ###########################################
 #  CLASS g
 ###########################################
@@ -6950,6 +6347,88 @@ class gd:
     return p, rss
 
 ###########################################
+#  CLASS rescale_densit
+###########################################
+class rescale_density:
+  
+  def run():
+    m = {}
+    for fn in range(len(g.pot_functions['functions'])): 
+      if(g.pot_functions['functions'][fn]['f_type_id'] == 2):
+        a_id = g.pot_functions['functions'][fn]['a']
+        f_id = g.pot_functions['functions'][fn]['f_group']
+        m_rho = rescale_density.estimate_density(fn)
+
+        print(fn, m_rho)
+
+#m[fn] = 1.0 / m_rho
+#fn_emb = potential.find_fn(3, a_id, f_id)
+#m[fn_emb] = 1.0 / m_rho
+
+    """
+# Update potential
+    a = 0
+    for fn in range(len(g.pot_functions['functions'])): 
+      if(g.pot_functions['functions'][fn]['fit_type'] == 1):     # NODE SPLINE   
+# Calc b
+        b = a + g.pot_functions['functions'][fn]['fit_size']  
+        
+        g.pot_functions['functions'][fn]['s_nodes'][:,1] = p[a:b]
+        potential.make_spline_points_inner(fn)
+        
+# Make Analytic Points
+#g.pot_functions['functions'][fn]['s_params'][:] = p[a:b]
+# LOAD ORIGINAL
+#g.pot_functions['functions'][fn]['points'] = numpy.copy(g.pot_functions['functions'][fn]['points_original'])
+# VARY SPLINE
+#potential.vary_tabulated_points(fn, p[a:b])
+        
+# Update a
+        a = b   
+        
+      elif(g.pot_functions['functions'][fn]['fit_type'] == 2):   # ANALYTIC  
+# Calc b
+        b = a + g.pot_functions['functions'][fn]['fit_size'] 
+# Make Analytic Points
+        g.pot_functions['functions'][fn]['a_params'][:] = p[a:b]
+        potential.make_analytic_points_inner(fn)
+        a = b    
+    """
+
+  def estimate_densities():
+    out = []
+    for fn in range(len(g.pot_functions['functions'])): 
+      if(g.pot_functions['functions'][fn]['f_type_id'] == 2):
+        out.append([fn, rescale_density.estimate_density(fn)])
+    return out
+
+  def estimate_density(fn):
+# Symetric simple cubic used as test case
+    sc = {0.86602539999999995: 8, 0.80039053000000004: 24, 0.75: 24, 0.71807032999999998: 24, 0.70710678000000005: 12, 0.72886899000000005: 24, 0.67314560000000001: 48, 0.63737743999999996: 48, 0.625: 24, 0.61237244000000002: 24, 0.57282195999999996: 48, 0.55901699000000005: 24, 0.53033008999999998: 36, 0.51538819999999996: 48, 0.5: 6, 0.64951904999999999: 8, 0.58630196999999995: 24, 0.54486237000000004: 24, 0.46770717000000001: 48, 0.45069390999999998: 24, 0.4145781: 24, 0.39528470999999998: 24, 0.375: 30, 0.43301269999999997: 8, 0.35355339000000002: 12, 0.30618622000000001: 24, 0.27950849999999999: 24, 0.25: 6, 0.21650634999999999: 8, 0.17677670000000001: 12, 0.125: 7}
+    a_prim = 0.125
+    a = [2.0,3.0,4.0,5.0] 
+    m_rho = 0.0
+    for a0 in a:
+      a0 = (1 / a_prim) * a0
+      rho = 0.0    
+      for k in sc.keys():
+        y = interp.search_x(a0 * k, g.pot_functions['functions'][fn]['points'][:,0], g.pot_functions['functions'][fn]['points'][:,1])
+        rho = rho + sc[k] * y
+      m_rho = max(m_rho, rho)
+    return m_rho
+    
+  def max_densities():    
+    density_list = None
+    for fn in range(len(g.pot_functions['functions'])): 
+      if(g.pot_functions['functions'][fn]['f_type_id'] == 2):
+        rho = rescale_density.estimate_density(fn) 
+        if(density_list is None):
+          density_list = str(rho)
+        else:
+          density_list = density_list + "/" + str(rho)
+    return density_list
+        
+###########################################
 #  CLASS pf_star
 ###########################################
 class pf_start:
@@ -7031,28 +6510,31 @@ class pf_genetic:
   start_time = 0
   variation_factor = 1.0
 
-  def run():    
-    if(pf.fit['gens'] == 0):
+  def run(fit):    
+    if(fit['gens'] == 0):
       return 0
     
-    g.pfdata['stage'] = 'Genetic Algorithm ' + str(pf_genetic.count)
-    g.pfdata['stage_brief'] = 'GA' + str(pf_genetic.count)
-
 #
     t_start = time.time()
-    start_best_rss = g.pfdata['rss']['best'] 
+    start_best_rss = g.pfdata['rss']['best']  
     pf_genetic.start_time = time.time()
     pf_genetic.count = pf_genetic.count + 1
+    pf_genetic.rss_plot = []
+    pf_genetic.rss_plot.append([time.time() - pf_genetic.start_time, start_best_rss])
+    pf_genetic.rss_best = start_best_rss
+
+    g.pfdata['stage'] = 'Genetic Algorithm ' + str(pf_genetic.count)
+    g.pfdata['stage_brief'] = 'GA' + str(pf_genetic.count)
   
     main.log_title("Genetic Fit")   
     
 # Load from input
     pf_genetic.width = g.pfdata['psize']
-    pf_genetic.pop_size = pf.fit['pop_size']
-    pf_genetic.fresh_size = pf.fit['fresh_size']
-    pf_genetic.generations = pf.fit['gens']
-    pf_genetic.no_clone_var = pf.fit['no_clone_var']
-    pf_genetic.gen_variation_multiplier = pf.fit['gen_variation_multiplier']
+    pf_genetic.pop_size = fit['pop_size']
+    pf_genetic.fresh_size = fit['fresh_size']
+    pf_genetic.generations = fit['gens']
+    pf_genetic.no_clone_var = fit['no_clone_var']
+    pf_genetic.gen_variation_multiplier = fit['gen_variation_multiplier']
 
 # Force to be even
     if(pf_genetic.pop_size % 2 != 0):
@@ -7100,10 +6582,9 @@ class pf_genetic:
         if(n <= len(start_parameters)):
           pf_genetic.pop[pn, :] = start_parameters[n-1][:]
         else:
-          pf_genetic.pop[pn, :] = pf_parameters.random_p()
-        
+          pf_genetic.pop[pn, :] = potential.random(g.pfdata['p']['best'], 1.0, False)        
 # Try - if it fails or rss == None, try next
-        pf_potential.update(pf_genetic.pop[pn, :])
+        potential.update(pf_genetic.pop[pn, :])
         try:
 # Update
           rss = pf.get_rss()
@@ -7112,6 +6593,9 @@ class pf_genetic:
             pf_genetic.pop_rss[pn] = rss
         except:
           pass
+        if(rss < pf_genetic.rss_best):
+          pf_genetic.rss_best = rss
+          pf_genetic.rss_plot.append([time.time() - pf_genetic.start_time, pf_genetic.rss_best])
 
 ###################################
 # LOOP THROUGH GENERATIONS
@@ -7122,9 +6606,13 @@ class pf_genetic:
       pf_genetic.generation = pf_genetic.generation + 1
       pf_genetic.run_gen()
 
+    pf_genetic.rss_plot.append([time.time() - pf_genetic.start_time, pf_genetic.rss_best])
+
 # End
     pf.summary_line("GENETIC ALGORITHM " + str(pf_genetic.count), t_start, time.time(), start_best_rss,  g.pfdata['rss']['best'])
-    pf_save.top("GENETIC_ALGORITHM_" + str(pf_sa.count))
+    pf_save.top("GENETIC_ALGORITHM_" + str(pf_genetic.count))
+    pf_save.rss_plot("GENETIC_ALGORITHM_" + str(pf_genetic.count), pf_genetic.rss_plot)
+    pf.save_rss_plot_data(t_start, "GENETIC_ALGORITHM_" + str(pf_genetic.count), pf_genetic.rss_plot)
   
   def run_gen():
 
@@ -7219,20 +6707,28 @@ class pf_genetic:
 
 # Check the children actually give valid parameters
     loop = False     
-    pf_potential.update(pf_genetic.children[ca, :])
-    rss = pf.get_rss()
-    if(rss is None):
-      loop = True
+    potential.update(pf_genetic.children[ca, :])
+    rss_a = pf.get_rss()
+    if(rss_a is None):
+      loop = True 
       
-    pf_potential.update(pf_genetic.children[cb, :])
-    rss = pf.get_rss()
-    if(rss is None):
+    potential.update(pf_genetic.children[cb, :])
+    rss_b = pf.get_rss()
+    if(rss_b is None):
       loop = True
       
     if(loop == False):
-      pf_genetic.children_rss[ca] = rss
-      pf_genetic.children_rss[cb] = rss
+      pf_genetic.children_rss[ca] = rss_a
+      pf_genetic.children_rss[cb] = rss_b
       
+    if(rss_a != None and rss_b != None):
+      if(rss_a < pf_genetic.rss_best):
+        pf_genetic.rss_best = rss_a
+        pf_genetic.rss_plot.append([time.time() - pf_genetic.start_time, pf_genetic.rss_best])
+      if(rss_b < pf_genetic.rss_best):
+        pf_genetic.rss_best = rss_b
+        pf_genetic.rss_plot.append([time.time() - pf_genetic.start_time, pf_genetic.rss_best])
+
 # Loop again or not
     return loop
     
@@ -7249,24 +6745,25 @@ class pf_genetic:
       return state
 
   def make_fresh():    
-
-    for p in range(pf_genetic.fresh_size):
+    for pn in range(pf_genetic.fresh_size):
       loop = True
+      pbest = numpy.copy(g.top_parameters[0][1])
       while(loop):
         try:
-          rn = min(len(g.top_parameters) - 1, numpy.floor((len(g.top_parameters) + 1) * random.uniform(0.0, 1.0)**3))
-          pbest = numpy.copy(g.top_parameters[0][1])
-          pf_genetic.fresh[p, :] = pf_parameters.random_p(pbest, pf_genetic.variation_factor)
-
-#pf_genetic.fresh[p, :] = numpy.copy(g.top_parameters[0][1])
-
-          pf_potential.update(pf_genetic.fresh[p, :])
+          rn = int(min(len(g.top_parameters) - 1, numpy.floor((len(g.top_parameters) + 1) * random.uniform(0.0, 1.0)**3)))
+          p_trial = numpy.copy(g.top_parameters[rn][1])
+          p_new = potential.random(p_trial, pf_genetic.variation_factor, False)
           rss = pf.get_rss()
           if(rss is not None):
             loop = False
-            pf_genetic.fresh_rss[p] = rss
         except:
           pass 
+      pf_genetic.fresh[pn, :] = p_new
+      pf_genetic.fresh_rss[pn] = rss
+
+      if(rss < pf_genetic.rss_best):
+        pf_genetic.rss_best = rss
+        pf_genetic.rss_plot.append([time.time() - pf_genetic.start_time, pf_genetic.rss_best])
 
 # Used to merge parents, fresh and all children into ordered array
   def merge():
@@ -7987,28 +7484,41 @@ class pf_cycle:
 ###########################################
 class pf_potential:
 
+# Analytic potentials only
   def update(p, no_rescale=False):    
+    
+# Estimate densities to rescale embedding functions
+    rho = pf_potential.estimate_densities()
   
+# Change upper bound for embedding functions
+    """
+    for fn in range(len(g.pot_functions['functions'])): 
+      if(g.pot_functions['functions'][fn]['f_type_id'] == 3):
+        g.pot_functions['functions'][fn]['a_u'] = 1.0
+        a = g.pot_functions['functions'][fn]['a']
+        f_group = g.pot_functions['functions'][fn]['f_group']
+        try:
+          rho_max = rho[a][f_group] * potential.embedding_range_factor
+          if(rho_max > 1.0):
+            g.pot_functions['functions'][fn]['a_u'] = rho_max 
+#print(fn, rho_max)
+          else:
+            g.pot_functions['functions'][fn]['a_u'] = 1.0
+        except:
+          pass
+    """
+
 # Update potential
     a = 0
-
     for fn in range(len(g.pot_functions['functions'])): 
 # Calc b
       b = a + g.pot_functions['functions'][fn]['fit_size']  
-      if(g.pot_functions['functions'][fn]['fit_type'] == 1):     # NODE SPLINE           
-        g.pot_functions['functions'][fn]['s_nodes'][:,1] = p[a:b]
-        potential.make_spline_points_inner(fn)       
-      elif(g.pot_functions['functions'][fn]['fit_type'] == 2):   # ANALYTIC  
 # Make Analytic Points
-        g.pot_functions['functions'][fn]['a_params'][:] = p[a:b]
-        potential.make_analytic_points_inner(fn)
-
+      g.pot_functions['functions'][fn]['a_params'][:] = p[a:b]
+      potential.make_analytic_points_inner(fn)
 # Update a
       a = b     
         
-# Rescale embedding data points to cover density range
-    potential.rescale_embedding()
-
 # Update efs and bp modules
     potential.efs_add_potentials()     # Load potentials
     potential.bp_add_potentials()      # Load potentials
@@ -8017,6 +7527,62 @@ class pf_potential:
     potential.parameters = numpy.copy(potential.get_parameters())
     g.pfdata['p']['current'] = numpy.copy(potential.get_parameters())
  
+  def estimate_densities():
+    out = {}
+    for fn in range(len(g.pot_functions['functions'])): 
+      if(g.pot_functions['functions'][fn]['f_type_id'] == 2):
+        rho_max = rescale_density.estimate_density(fn)
+        a = g.pot_functions['functions'][fn]['a']
+        f_group = g.pot_functions['functions'][fn]['f_group']
+        if(a not in out.keys()):
+          out[a] = {}
+        out[a][f_group] = rho_max
+    return out
+
+  def estimate_density(fn):
+# Symetric simple cubic used as test case
+    sc = {0.86602539999999995: 8, 0.80039053000000004: 24, 0.75: 24, 0.71807032999999998: 24, 0.70710678000000005: 12, 0.72886899000000005: 24, 0.67314560000000001: 48, 0.63737743999999996: 48, 0.625: 24, 0.61237244000000002: 24, 0.57282195999999996: 48, 0.55901699000000005: 24, 0.53033008999999998: 36, 0.51538819999999996: 48, 0.5: 6, 0.64951904999999999: 8, 0.58630196999999995: 24, 0.54486237000000004: 24, 0.46770717000000001: 48, 0.45069390999999998: 24, 0.4145781: 24, 0.39528470999999998: 24, 0.375: 30, 0.43301269999999997: 8, 0.35355339000000002: 12, 0.30618622000000001: 24, 0.27950849999999999: 24, 0.25: 6, 0.21650634999999999: 8, 0.17677670000000001: 12, 0.125: 7}
+    a_prim = 0.125
+    a = [2.0,3.0,4.0,5.0] 
+    m_rho = 0.0
+    for a0 in a:
+      a0 = (1 / a_prim) * a0
+      rho = 0.0    
+      for k in sc.keys():
+        y = interp.search_x(a0 * k, g.pot_functions['functions'][fn]['points'][:,0], g.pot_functions['functions'][fn]['points'][:,1])
+        rho = rho + sc[k] * y
+      m_rho = max(m_rho, rho)
+    return m_rho
+
+  def rescale_parameters(p):
+    a = 0
+    for fn in range(len(g.pot_functions['functions'])): 
+# Calc b
+      b = a + g.pot_functions['functions'][fn]['fit_size']  
+      if(g.pot_functions['functions'][fn]['f_type_id'] == 2):
+#a
+
+        """
+# Symetric simple cubic used as test case
+        sc = {0.86602539999999995: 8, 0.80039053000000004: 24, 0.75: 24, 0.71807032999999998: 24, 0.70710678000000005: 12, 0.72886899000000005: 24, 0.67314560000000001: 48, 0.63737743999999996: 48, 0.625: 24, 0.61237244000000002: 24, 0.57282195999999996: 48, 0.55901699000000005: 24, 0.53033008999999998: 36, 0.51538819999999996: 48, 0.5: 6, 0.64951904999999999: 8, 0.58630196999999995: 24, 0.54486237000000004: 24, 0.46770717000000001: 48, 0.45069390999999998: 24, 0.4145781: 24, 0.39528470999999998: 24, 0.375: 30, 0.43301269999999997: 8, 0.35355339000000002: 12, 0.30618622000000001: 24, 0.27950849999999999: 24, 0.25: 6, 0.21650634999999999: 8, 0.17677670000000001: 12, 0.125: 7}
+        a_prim = 0.125
+        a0_list = [2.0,3.0,4.0,5.0] 
+        m_rho = 0.0
+        for a0 in a0_list:
+          a0 = (1 / a_prim) * a0
+          rho = 0.0    
+          for k in sc.keys():
+            y = g.pot_functions['functions'][fn]['f'](a0 * k,  
+                                                      p[a:b],  
+                                                      g.pot_functions['functions'][fn]['a_params_fixed'])
+            rho = rho + sc[k] * y
+          m_rho = max(m_rho, rho)
+        """ 
+            
+# Update a
+      a = b     
+
+  """
   def take_density(p, p_dens): 
     a = 0
     for fn in range(len(g.pot_functions['functions'])): 
@@ -8029,6 +7595,7 @@ class pf_potential:
           p[a:b] = copy.deepcopy(p_dens[a:b])
       a = b
     return p
+  """
 
 """
   
@@ -8061,233 +7628,6 @@ class pf_potential:
         a = b    
 """
 
-###########################################
-#  CLASS pf_generatio
-###########################################
-class pf_generation:
-
-  parents = None
-  pop_size = None
-  pop_size_half = None
-  fresh_size = None
-
-  def run():
-    main.log_hr()
-    main.log("Generation " + str(g.pfdata['generation']['counter']))
-    main.log_hr()
-
-    pf_generation.pop_size = g.fit['pop_size']
-    pf_generation.pop_size_half = g.fit['pop_size'] // 2
-    pf_generation.fresh_size = g.fit['fresh_size']
-
-# Make array of parents and shuffle
-    pf_generation.parents = numpy.arange(pf_generation.pop_size)
-    numpy.random.shuffle(pf_generation.parents)
-    
-    c = 0
-# Breed Population
-    g.pfdata['stage'] = 'Breed Population'  
-    for p in range(pf_generation.pop_size_half):  
-      loop = True
-      while(loop):
-        loop = pf_generation.breed_event(p, c, 'p+p')      
-      c = c + 2
-       
-# Make Fresh
-    g.pfdata['stage'] = 'Initialising Fresh Population'   
-    pf_generation.make_fresh()
-       
-# Reshuffle
-    numpy.random.shuffle(pf_generation.parents)
-    
-# Breed Population-Fresh
-    g.pfdata['stage'] = 'Breed With Fresh Population'  
-    for p in range(pf_generation.fresh_size):  
-      loop = True
-      while(loop):
-        loop = pf_generation.breed_event(p, c, 'p+f')      
-      c = c + 2
-      
-# Merge populations and select top to form next generation
-    g.pfdata['stage'] = 'Merge Populations'   
-    pf_generation.merge()
-    
-# Extinction Event
-    g.pfdata['stage'] = 'Extinction'   
-    pf_extinction.run()
-    
-# Load best back into population
-    g.pfdata['params']['pop'][:, :] = g.pfdata['params']['pop_merged'][0:pf_generation.pop_size, :]
-    g.pfdata['params']['pop_rss'][:] = g.pfdata['params']['pop_merged_rss'][0:pf_generation.pop_size]
-    
-# Enhance
-    g.pfdata['stage'] = 'Enhance'   
-    pf_enhance.run()
-
-#g.pfdata['generation']['counter']
-#pf_setop
-    
-    cstr = str(g.pfdata['generation']['counter'])
-    while(len(cstr)<5):
-      cstr = '0' + cstr    
-    gen_dir = g.dirs['wd'] + '/fitting/genetic/' +  cstr
-    std.make_dir(gen_dir)
-  
-    potential_output.full(gen_dir)
-    
-  def breed_event(p, c, opt):
-    pc = g.pfdata['params']['count']
-    
-    pa = pf_generation.parents[p]
-    if(opt == 'p+p'):  
-      pb = pf_generation.parents[p + pf_generation.pop_size_half]
-      pb_array = 'pop'
-    if(opt == 'p+f'): 
-      pb = p
-      pb_array = 'fresh'
-    
-    ca = c
-    cb = c + 1
-    
-# Breed
-    state = pf_generation.get_state()
-    for i in range(pc):
-      state = pf_generation.get_state(state)
-      if(state):
-        g.pfdata['params']['children'][ca, i] = g.pfdata['params']['pop'][pa, i]
-        g.pfdata['params']['children'][cb, i] = g.pfdata['params'][pb_array][pb, i]
-      else:      
-        g.pfdata['params']['children'][cb, i] = g.pfdata['params']['pop'][pa, i]
-        g.pfdata['params']['children'][ca, i] = g.pfdata['params'][pb_array][pb, i]
-      
-# Mutate
-    g.pfdata['params']['children'][ca, :] = pf_generation.mutate(g.pfdata['params']['children'][ca, :], g.fit['mutate_chance'])
-    g.pfdata['params']['children'][cb, :] = pf_generation.mutate(g.pfdata['params']['children'][cb, :], g.fit['mutate_chance'])
-    
-# No clones - Child A
-    for pn in range(pf_generation.pop_size):
-      if((g.pfdata['params']['children'][ca, :] == g.pfdata['params']['pop'][pn,:]).all()):
-        r = numpy.random.rand(pc)   
-        g.pfdata['params']['children'][ca, :] = g.pfdata['params']['children'][ca, :] * g.fit['no_clone_var'] * (0.5 - r)
-        break
-        
-# No clones - Child B
-    for pn in range(pf_generation.pop_size):
-      if((g.pfdata['params']['children'][cb, :] == g.pfdata['params']['pop'][pn,:]).all()):
-        r = numpy.random.rand(pc)   
-        g.pfdata['params']['children'][cb, :] = g.pfdata['params']['children'][cb, :] * g.fit['no_clone_var'] * (0.5 - r)
-        break
-
-    loop = False 
-    
-    pf_potential.update(g.pfdata['params']['children'][ca, :])
-    rss = pf.get_rss()
-    if(rss is None):
-      loop = True
-      
-    pf_potential.update(g.pfdata['params']['children'][cb, :])
-    rss = pf.get_rss()
-    if(rss is None):
-      loop = True
-      
-    if(loop == False):
-      g.pfdata['params']['children_rss'][ca] = rss
-      g.pfdata['params']['children_rss'][cb] = rss
-      
-# Loop again or not
-    return loop
-    
-  def get_state(state = None):
-    if(state == None):
-      if(random.uniform(0.0, 100.0) > 50.0):
-        return True
-      return False
-    else:
-      if(random.uniform(0.0, 100.0) > 50.0):
-        if(state):
-          return False
-        return True
-      return state
-      
-  def mutate(params, chance=0.01):
-    mutant = pf_cycle.random_p(0.0, g.fit['mutate_scale'])
-    for i in range(len(params)):
-      if(random.uniform(0.0, 1.0) <= chance):
-        params[i] = mutant[i]
-    return params   
-    
-  def make_fresh():    
-    w = g.fit['fresh_ws']
-    w_inc = (g.fit['fresh_we'] - g.fit['fresh_ws']) / (g.fit['fresh_size'] // 2 - 1)
-    for p in range(g.fit['fresh_size']):
-      loop = True
-      while(loop):
-        try:
-          rn = min(len(g.top_parameters) - 1, numpy.floor((len(g.top_parameters) + 1) * random.uniform(0.0, 1.0)**3))
-          pbest = numpy.copy(g.top_parameters[rn][1])
-
-          g.pfdata['params']['fresh'][p, :] = pf_parameters.random_p(pbest)
-          pf_potential.update(g.pfdata['params']['fresh'][p, :])
-          rss = pf.get_rss()
-          if(g.pfdata['rss']['current'] is not None):
-            loop = False
-            g.pfdata['params']['fresh_rss'][p] = rss
-        except:
-          pass 
-
-# Used to merge parents, fresh and all children into ordered array
-  def merge():
-    ps = g.fit['pop_size']
-    fs = g.fit['fresh_size']
-    cs = g.fit['pop_size'] + 2 * g.fit['fresh_size']
-    
-# Reset array
-    g.pfdata['params']['pop_merged'][:,:] = 0.0
-    g.pfdata['params']['pop_merged_rss'][:] = 0.0
-    g.pfdata['params']['pop_merged'][0:ps,:] = g.pfdata['params']['pop'][:,:]   
-    g.pfdata['params']['pop_merged_rss'][0:ps] = g.pfdata['params']['pop_rss'][:] 
-    g.pfdata['params']['pop_merged'][ps:ps+fs,:] = g.pfdata['params']['fresh'][:,:]   
-    g.pfdata['params']['pop_merged_rss'][ps:ps+fs] = g.pfdata['params']['fresh_rss'][:] 
-    g.pfdata['params']['pop_merged'][ps+fs:ps+fs+cs,:] = g.pfdata['params']['children'][:,:]  
-    g.pfdata['params']['pop_merged_rss'][ps+fs:ps+fs+cs] = g.pfdata['params']['children_rss'][:] 
-        
-# Sort
-    pf_generation.sort_merged()
-    
-  def sort_merged():
-    sort.sort_1d_dp_asc(g.pfdata['params']['pop_merged_rss'][:])
-    g.pfdata['params']['pop_merged_rss'] = sort.apply_keytable_1d_dp(g.pfdata['params']['pop_merged_rss'])
-    g.pfdata['params']['pop_merged'] = sort.apply_keytable_2d_dp(g.pfdata['params']['pop_merged'])
-
-###############################################################################################
-#
-# Delete some day
-#
-###############################################################################################
-
-  def make_fresh_old():    
-    w = g.fit['fresh_ws']
-    w_inc = (g.fit['fresh_we'] - g.fit['fresh_ws']) / (g.fit['fresh_size'] // 2 - 1)
-    for p in range(g.fit['fresh_size']):
-      loop = True
-      while(loop):   
-        if(p % 2 == 0):
-          g.pfdata['params']['fresh'][p, :] = pf_cycle.random_p(g.pfdata['top']['p'][0,:], w)       
-        else:  
-          r = random.randint(0, 9)
-          g.pfdata['params']['fresh'][p, :] = pf_cycle.random_p(g.pfdata['top']['p'][r,:], w)              
-        loop = False
-        try:
-          pf_potential.update(g.pfdata['params']['fresh'][p, :])
-          rss = pf.get_rss()
-          if(g.pfdata['rss']['current'] is not None):
-            loop = False
-            g.pfdata['params']['fresh_rss'][p] = rss
-        except:
-          pass 
-      if(p % 2 == 1):
-        w = w + w_inc
-  
 ###########################################
 #  CLASS pf_extinctio
 ###########################################
@@ -8650,6 +7990,233 @@ class pf_parameters:
     return (g.pfdata['params']['var'][1,:] - g.pfdata['params']['var'][0,:])
 
 ###########################################
+#  CLASS pf_generatio
+###########################################
+class pf_generation:
+
+  parents = None
+  pop_size = None
+  pop_size_half = None
+  fresh_size = None
+
+  def run():
+    main.log_hr()
+    main.log("Generation " + str(g.pfdata['generation']['counter']))
+    main.log_hr()
+
+    pf_generation.pop_size = g.fit['pop_size']
+    pf_generation.pop_size_half = g.fit['pop_size'] // 2
+    pf_generation.fresh_size = g.fit['fresh_size']
+
+# Make array of parents and shuffle
+    pf_generation.parents = numpy.arange(pf_generation.pop_size)
+    numpy.random.shuffle(pf_generation.parents)
+    
+    c = 0
+# Breed Population
+    g.pfdata['stage'] = 'Breed Population'  
+    for p in range(pf_generation.pop_size_half):  
+      loop = True
+      while(loop):
+        loop = pf_generation.breed_event(p, c, 'p+p')      
+      c = c + 2
+       
+# Make Fresh
+    g.pfdata['stage'] = 'Initialising Fresh Population'   
+    pf_generation.make_fresh()
+       
+# Reshuffle
+    numpy.random.shuffle(pf_generation.parents)
+    
+# Breed Population-Fresh
+    g.pfdata['stage'] = 'Breed With Fresh Population'  
+    for p in range(pf_generation.fresh_size):  
+      loop = True
+      while(loop):
+        loop = pf_generation.breed_event(p, c, 'p+f')      
+      c = c + 2
+      
+# Merge populations and select top to form next generation
+    g.pfdata['stage'] = 'Merge Populations'   
+    pf_generation.merge()
+    
+# Extinction Event
+    g.pfdata['stage'] = 'Extinction'   
+    pf_extinction.run()
+    
+# Load best back into population
+    g.pfdata['params']['pop'][:, :] = g.pfdata['params']['pop_merged'][0:pf_generation.pop_size, :]
+    g.pfdata['params']['pop_rss'][:] = g.pfdata['params']['pop_merged_rss'][0:pf_generation.pop_size]
+    
+# Enhance
+    g.pfdata['stage'] = 'Enhance'   
+    pf_enhance.run()
+
+#g.pfdata['generation']['counter']
+#pf_setop
+    
+    cstr = str(g.pfdata['generation']['counter'])
+    while(len(cstr)<5):
+      cstr = '0' + cstr    
+    gen_dir = g.dirs['wd'] + '/fitting/genetic/' +  cstr
+    std.make_dir(gen_dir)
+  
+    potential_output.full(gen_dir)
+    
+  def breed_event(p, c, opt):
+    pc = g.pfdata['params']['count']
+    
+    pa = pf_generation.parents[p]
+    if(opt == 'p+p'):  
+      pb = pf_generation.parents[p + pf_generation.pop_size_half]
+      pb_array = 'pop'
+    if(opt == 'p+f'): 
+      pb = p
+      pb_array = 'fresh'
+    
+    ca = c
+    cb = c + 1
+    
+# Breed
+    state = pf_generation.get_state()
+    for i in range(pc):
+      state = pf_generation.get_state(state)
+      if(state):
+        g.pfdata['params']['children'][ca, i] = g.pfdata['params']['pop'][pa, i]
+        g.pfdata['params']['children'][cb, i] = g.pfdata['params'][pb_array][pb, i]
+      else:      
+        g.pfdata['params']['children'][cb, i] = g.pfdata['params']['pop'][pa, i]
+        g.pfdata['params']['children'][ca, i] = g.pfdata['params'][pb_array][pb, i]
+      
+# Mutate
+    g.pfdata['params']['children'][ca, :] = pf_generation.mutate(g.pfdata['params']['children'][ca, :], g.fit['mutate_chance'])
+    g.pfdata['params']['children'][cb, :] = pf_generation.mutate(g.pfdata['params']['children'][cb, :], g.fit['mutate_chance'])
+    
+# No clones - Child A
+    for pn in range(pf_generation.pop_size):
+      if((g.pfdata['params']['children'][ca, :] == g.pfdata['params']['pop'][pn,:]).all()):
+        r = numpy.random.rand(pc)   
+        g.pfdata['params']['children'][ca, :] = g.pfdata['params']['children'][ca, :] * g.fit['no_clone_var'] * (0.5 - r)
+        break
+        
+# No clones - Child B
+    for pn in range(pf_generation.pop_size):
+      if((g.pfdata['params']['children'][cb, :] == g.pfdata['params']['pop'][pn,:]).all()):
+        r = numpy.random.rand(pc)   
+        g.pfdata['params']['children'][cb, :] = g.pfdata['params']['children'][cb, :] * g.fit['no_clone_var'] * (0.5 - r)
+        break
+
+    loop = False 
+    
+    pf_potential.update(g.pfdata['params']['children'][ca, :])
+    rss = pf.get_rss()
+    if(rss is None):
+      loop = True
+      
+    pf_potential.update(g.pfdata['params']['children'][cb, :])
+    rss = pf.get_rss()
+    if(rss is None):
+      loop = True
+      
+    if(loop == False):
+      g.pfdata['params']['children_rss'][ca] = rss
+      g.pfdata['params']['children_rss'][cb] = rss
+      
+# Loop again or not
+    return loop
+    
+  def get_state(state = None):
+    if(state == None):
+      if(random.uniform(0.0, 100.0) > 50.0):
+        return True
+      return False
+    else:
+      if(random.uniform(0.0, 100.0) > 50.0):
+        if(state):
+          return False
+        return True
+      return state
+      
+  def mutate(params, chance=0.01):
+    mutant = pf_cycle.random_p(0.0, g.fit['mutate_scale'])
+    for i in range(len(params)):
+      if(random.uniform(0.0, 1.0) <= chance):
+        params[i] = mutant[i]
+    return params   
+    
+  def make_fresh():    
+    w = g.fit['fresh_ws']
+    w_inc = (g.fit['fresh_we'] - g.fit['fresh_ws']) / (g.fit['fresh_size'] // 2 - 1)
+    for p in range(g.fit['fresh_size']):
+      loop = True
+      while(loop):
+        try:
+          rn = min(len(g.top_parameters) - 1, numpy.floor((len(g.top_parameters) + 1) * random.uniform(0.0, 1.0)**3))
+          pbest = numpy.copy(g.top_parameters[rn][1])
+
+          g.pfdata['params']['fresh'][p, :] = pf_parameters.random_p(pbest)
+          pf_potential.update(g.pfdata['params']['fresh'][p, :])
+          rss = pf.get_rss()
+          if(g.pfdata['rss']['current'] is not None):
+            loop = False
+            g.pfdata['params']['fresh_rss'][p] = rss
+        except:
+          pass 
+
+# Used to merge parents, fresh and all children into ordered array
+  def merge():
+    ps = g.fit['pop_size']
+    fs = g.fit['fresh_size']
+    cs = g.fit['pop_size'] + 2 * g.fit['fresh_size']
+    
+# Reset array
+    g.pfdata['params']['pop_merged'][:,:] = 0.0
+    g.pfdata['params']['pop_merged_rss'][:] = 0.0
+    g.pfdata['params']['pop_merged'][0:ps,:] = g.pfdata['params']['pop'][:,:]   
+    g.pfdata['params']['pop_merged_rss'][0:ps] = g.pfdata['params']['pop_rss'][:] 
+    g.pfdata['params']['pop_merged'][ps:ps+fs,:] = g.pfdata['params']['fresh'][:,:]   
+    g.pfdata['params']['pop_merged_rss'][ps:ps+fs] = g.pfdata['params']['fresh_rss'][:] 
+    g.pfdata['params']['pop_merged'][ps+fs:ps+fs+cs,:] = g.pfdata['params']['children'][:,:]  
+    g.pfdata['params']['pop_merged_rss'][ps+fs:ps+fs+cs] = g.pfdata['params']['children_rss'][:] 
+        
+# Sort
+    pf_generation.sort_merged()
+    
+  def sort_merged():
+    sort.sort_1d_dp_asc(g.pfdata['params']['pop_merged_rss'][:])
+    g.pfdata['params']['pop_merged_rss'] = sort.apply_keytable_1d_dp(g.pfdata['params']['pop_merged_rss'])
+    g.pfdata['params']['pop_merged'] = sort.apply_keytable_2d_dp(g.pfdata['params']['pop_merged'])
+
+###############################################################################################
+#
+# Delete some day
+#
+###############################################################################################
+
+  def make_fresh_old():    
+    w = g.fit['fresh_ws']
+    w_inc = (g.fit['fresh_we'] - g.fit['fresh_ws']) / (g.fit['fresh_size'] // 2 - 1)
+    for p in range(g.fit['fresh_size']):
+      loop = True
+      while(loop):   
+        if(p % 2 == 0):
+          g.pfdata['params']['fresh'][p, :] = pf_cycle.random_p(g.pfdata['top']['p'][0,:], w)       
+        else:  
+          r = random.randint(0, 9)
+          g.pfdata['params']['fresh'][p, :] = pf_cycle.random_p(g.pfdata['top']['p'][r,:], w)              
+        loop = False
+        try:
+          pf_potential.update(g.pfdata['params']['fresh'][p, :])
+          rss = pf.get_rss()
+          if(g.pfdata['rss']['current'] is not None):
+            loop = False
+            g.pfdata['params']['fresh_rss'][p] = rss
+        except:
+          pass 
+      if(p % 2 == 1):
+        w = w + w_inc
+  
+###########################################
 #  CLASS pf_seto
 ###########################################
 class pf_setop:
@@ -8833,7 +8400,11 @@ class pf_sa:
   t = None
   count = 0
 
-  def run():
+  def run(fit):
+    for repeat in range(fit['repeat']):
+      pf_sa.run_sa(fit)
+
+  def run_sa(fit):
     pf_sa.count = pf_sa.count + 1
     t_start = time.time()
     start_best_rss = g.pfdata['rss']['best'] 
@@ -8846,7 +8417,7 @@ class pf_sa:
 
 # Start - use best
     p = g.pfdata['p']['best']
-    pf_potential.update(p)
+    potential.update(p)
     rss = pf.get_rss(False)
     p_count = len(p)
 
@@ -8854,8 +8425,338 @@ class pf_sa:
     p_best = numpy.copy(p)
     rss_best = rss
 
+    rss_plot = []
+    rss_plot.append([time.time()-t_start, rss_best])
+
+    for tn in range(pf.fit['sa_loops_t']):
+      pv = pf.fit['sa_var'] * pf.fit['sa_var_factor']**tn
+      if(pf.fit['sa_loops_t'] == 1):
+        pf_sa.t = pf.fit['sa_temp_start']
+      else:
+        pf_sa.t = numpy.round(pf.fit['sa_temp_start'] - tn *  (pf.fit['sa_temp_start'] - pf.fit['sa_temp_end']) / (pf.fit['sa_loops_t'] - 1), 6)
+        g.pfdata['stage'] = 'Simulated Annealing ' +str(pf_sa.count) + ' Loop ' + str(tn + 1) + '  Temp: ' + str(pf_sa.t) + ' Pvar: ' + str(pv)
+        rss_start_loop = rss_best
+      for n in range(pf.fit['sa_loops_i']):
+        loop = True
+        while(loop):
+          p_new = potential.random(p, pv, False)
+          rss_new = pf.get_rss(False)
+          if(rss_new is not None):
+            loop = False
+        if(rss_new is not None):
+          if(rss_new < rss or numpy.random.uniform() < numpy.exp((rss-rss_new) / pf_sa.t)):
+            p = numpy.copy(p_new)
+            rss = rss_new
+            if(rss_new < rss_best):
+              p_best = numpy.copy(p_new)
+              rss_best = rss_new
+              rss_plot.append([time.time()-t_start, rss_best])
+      if(rss_best < rss_start_loop):
+        potential.update(p_best)
+        pf.get_rss(True)
+      p = numpy.copy(p_best)  
+    rss_plot.append([time.time()-t_start, rss_best])
+
+    pf.summary_line("SIMULATED ANNEALING " + str(pf_sa.count), t_start, time.time(), start_best_rss,  g.pfdata['rss']['best'])
+    pf_save.top("SIMULATED_ANNEALING_" + str(pf_sa.count))
+    pf_save.rss_plot("SIMULATED_ANNEALING_" + str(pf_sa.count), rss_plot)
+    pf.save_rss_plot_data(t_start, "SIMULATED_ANNEALING_" + str(pf_sa.count), rss_plot)
+    
+###########################################
+#  CLASS pf_neldermea
+###########################################
+class pf_neldermead:
+
+  count = 0
+  p_full = None
+
+  def run(fit):
+    for repeat in range(fit['repeat']):
+      pf_neldermead.run_nm(fit)
+
+  def get_rss(ps):
+    p = pf_neldermead.grow_p(ps)
+    potential.update(p)
+    rss = pf.get_rss(False)
+    return rss
+
+  def shrink_p(p):
+    p_out = []
+    pdiff = potential.pot['p_upper'][:] - potential.pot['p_lower'][:]
+    for i in range(len(pdiff)):
+      if(pdiff[i] != 0.0):
+        p_out.append(p[i])
+    p_out = numpy.asarray(p_out)
+    return p_out
+
+  def grow_p(psmall):
+    p_out = []
+    pdiff = potential.pot['p_upper'][:] - potential.pot['p_lower'][:]
+    n = 0
+    for i in range(len(pdiff)):
+      if(pdiff[i] != 0.0):
+        p_out.append(psmall[n])
+        n = n + 1
+      else:
+        p_out.append(pf_neldermead.p_full[i])
+    p_out = numpy.asarray(p_out)
+    return p_out
+    
+  def run_nm(fit):
+    pf_neldermead.count = pf_neldermead.count + 1
+    t_start = time.time()
+    start_best_rss = g.pfdata['rss']['best'] 
+
+    g.pfdata['stage'] = 'Nelder-Mead ' + str(pf_neldermead.count)
+    g.pfdata['stage_brief'] = 'NM' + str(pf_neldermead.count)
+  
+    pf_neldermead.p_full = numpy.copy(g.pfdata['p']['best'])
+    p = numpy.copy(g.pfdata['p']['best'])
+
+# Shrink to non-fixed parameters
+    ps = pf_neldermead.shrink_p(p)
+
+    res = minimize(pf_neldermead.get_rss, ps, method='nelder-mead',
+              options={'xatol':  float(fit['nm_xatol']), 'maxiter': int(fit['nm_maxiter']), })
+    ps = numpy.copy(res['x'])
+
+    p = pf_neldermead.grow_p(ps)
+    potential.update(p)
+    rss = pf.get_rss(False)
+
+    pf.summary_line("NELDER MEAD " + str(pf_neldermead.count), t_start, time.time(), start_best_rss,  g.pfdata['rss']['best'])
+    pf_save.top("NELDER_MEAD_" + str(pf_neldermead.count))
+#pf_save.rss_plot("NELDER_MEAD_" + str(pf_neldermead.count), rss_plot)
+#pf.save_rss_plot_data(t_start, "NELDER_MEAD_" + str(pf_neldermead.count), rss_plot)
+
+###########################################
+#  CLASS pf_b
+###########################################
+class pf_bh:
+
+  count = 0
+  p_full = None
+
+  def run(fit):
+    for repeat in range(fit['repeat']):
+      pf_bh.run_bh(fit)
+
+  def get_rss(ps):
+    p = pf_bh.grow_p(ps)
+    potential.update(p)
+    rss = pf.get_rss(False)
+    return rss
+
+  def shrink_p(p):
+    p_out = []
+    pdiff = potential.pot['p_upper'][:] - potential.pot['p_lower'][:]
+    for i in range(len(pdiff)):
+      if(pdiff[i] != 0.0):
+        p_out.append(p[i])
+    p_out = numpy.asarray(p_out)
+    return p_out
+
+  def grow_p(psmall):
+    p_out = []
+    pdiff = potential.pot['p_upper'][:] - potential.pot['p_lower'][:]
+    n = 0
+    for i in range(len(pdiff)):
+      if(pdiff[i] != 0.0):
+        p_out.append(psmall[n])
+        n = n + 1
+      else:
+        p_out.append(pf_bh.p_full[i])
+    p_out = numpy.asarray(p_out)
+    return p_out
+    
+  def run_bh(fit):
+    pf_bh.count = pf_bh.count + 1
+    t_start = time.time()
+    start_best_rss = g.pfdata['rss']['best'] 
+
+    g.pfdata['stage'] = 'Basin-Hopping ' + str(pf_bh.count)
+    g.pfdata['stage_brief'] = 'BH' + str(pf_bh.count)
+  
+    pf_bh.p_full = numpy.copy(g.pfdata['p']['best'])
+    p = numpy.copy(g.pfdata['p']['best'])
+
+# Shrink to non-fixed parameters
+    ps = pf_bh.shrink_p(p)
+    res = basinhopping(pf_bh.get_rss, ps, niter=float(fit['bh_niter']), T=1.0, stepsize=0.5)
+    ps = numpy.copy(res['x'])
+    p = pf_bh.grow_p(ps)
+    potential.update(p)
+    rss = pf.get_rss(False)
+
+    pf.summary_line("BASIN HOPPING " + str(pf_bh.count), t_start, time.time(), start_best_rss,  g.pfdata['rss']['best'])
+    pf_save.top("BASIN_HOPPING_" + str(pf_bh.count))
+#pf_save.rss_plot("NELDER_MEAD_" + str(pf_neldermead.count), rss_plot)
+#pf.save_rss_plot_data(t_start, "NELDER_MEAD_" + str(pf_neldermead.count), rss_plot)
+
+###########################################
+#  CLASS pf_c
+###########################################
+class pf_cg:
+
+  count = 0
+  p_full = None
+
+  def run(fit):
+    for repeat in range(fit['repeat']):
+      pf_cg.run_cg(fit)
+
+  def get_rss(ps):
+    p = pf_cg.grow_p(ps)
+    potential.update(p)
+    rss = pf.get_rss(False)
+    return rss
+
+  def shrink_p(p):
+    p_out = []
+    pdiff = potential.pot['p_upper'][:] - potential.pot['p_lower'][:]
+    for i in range(len(pdiff)):
+      if(pdiff[i] != 0.0):
+        p_out.append(p[i])
+    p_out = numpy.asarray(p_out)
+    return p_out
+
+  def grow_p(psmall):
+    p_out = []
+    pdiff = potential.pot['p_upper'][:] - potential.pot['p_lower'][:]
+    n = 0
+    for i in range(len(pdiff)):
+      if(pdiff[i] != 0.0):
+        p_out.append(psmall[n])
+        n = n + 1
+      else:
+        p_out.append(pf_cg.p_full[i])
+    p_out = numpy.asarray(p_out)
+    return p_out
+    
+  def run_cg(fit):
+    pf_cg.count = pf_cg.count + 1
+    t_start = time.time()
+    start_best_rss = g.pfdata['rss']['best'] 
+
+    g.pfdata['stage'] = 'Conjugate-Gradient ' + str(pf_cg.count)
+    g.pfdata['stage_brief'] = 'CG' + str(pf_cg.count)
+  
+    pf_cg.p_full = numpy.copy(g.pfdata['p']['best'])
+    p = numpy.copy(g.pfdata['p']['best'])
+
+# Shrink to non-fixed parameters
+    ps = pf_cg.shrink_p(p)
+    res = minimize(pf_cg.get_rss, ps, method='CG')
+    ps = numpy.copy(res['x'])
+    p = pf_cg.grow_p(ps)
+    potential.update(p)
+    rss = pf.get_rss(False)
+
+    pf.summary_line("CONJUGATE GRADIENT " + str(pf_cg.count), t_start, time.time(), start_best_rss,  g.pfdata['rss']['best'])
+    pf_save.top("GONJUGATE_GRADIENT_" + str(pf_cg.count))
+#pf_save.rss_plot("NELDER_MEAD_" + str(pf_neldermead.count), rss_plot)
+#pf.save_rss_plot_data(t_start, "NELDER_MEAD_" + str(pf_neldermead.count), rss_plot)
+
+###########################################
+#  CLASS pf_bfg
+###########################################
+class pf_bfgs:
+
+  count = 0
+  p_full = None
+
+  def run(fit):
+    for repeat in range(fit['repeat']):
+      pf_bfgs.run_nm(fit)
+
+  def get_rss(ps):
+    p = pf_bfgs.grow_p(ps)
+    potential.update(p)
+    rss = pf.get_rss(False)
+    return rss
+
+  def shrink_p(p):
+    p_out = []
+    pdiff = potential.pot['p_upper'][:] - potential.pot['p_lower'][:]
+    for i in range(len(pdiff)):
+      if(pdiff[i] != 0.0):
+        p_out.append(p[i])
+    p_out = numpy.asarray(p_out)
+    return p_out
+
+  def grow_p(psmall):
+    p_out = []
+    pdiff = potential.pot['p_upper'][:] - potential.pot['p_lower'][:]
+    n = 0
+    for i in range(len(pdiff)):
+      if(pdiff[i] != 0.0):
+        p_out.append(psmall[n])
+        n = n + 1
+      else:
+        p_out.append(pf_bfgs.p_full[i])
+    p_out = numpy.asarray(p_out)
+    return p_out
+    
+  def run_nm(fit):
+    pf_bfgs.count = pf_bfgs.count + 1
+    t_start = time.time()
+    start_best_rss = g.pfdata['rss']['best'] 
+
+    g.pfdata['stage'] = 'BFGS ' + str(pf_bfgs.count)
+    g.pfdata['stage_brief'] = 'BFGS' + str(pf_bfgs.count)
+  
+    pf_bfgs.p_full = numpy.copy(g.pfdata['p']['best'])
+    p = numpy.copy(g.pfdata['p']['best'])
+
+# Shrink to non-fixed parameters
+    ps = pf_bfgs.shrink_p(p)
+
+    res = minimize(pf_bfgs.get_rss, ps, method='BFGS',
+              options={'gtol':  float(fit['bfgs_gtol']), 'maxiter': int(fit['bfgs_maxiter']), })
+    ps = numpy.copy(res['x'])
+
+    p = pf_bfgs.grow_p(ps)
+    potential.update(p)
+    rss = pf.get_rss(False)
+
+    pf.summary_line("BFGS " + str(pf_bfgs.count), t_start, time.time(), start_best_rss,  g.pfdata['rss']['best'])
+    pf_save.top("BFGS_" + str(pf_bfgs.count))
+
+###########################################
+#  CLASS pf_gs
+###########################################
+class pf_gsa:
+
+  t = None
+  count = 0
+
+  def run(fit):
+    pf_sa.count = pf_sa.count + 1
+    t_start = time.time()
+    start_best_rss = g.pfdata['rss']['best'] 
+
+    if(pf.fit['sa_loops_t'] == 0 or pf.fit['sa_loops_i'] == 0):
+      return 0
+
+    g.pfdata['stage'] = 'Simulated Annealing ' + str(pf_sa.count)
+    g.pfdata['stage_brief'] = 'SA' + str(pf_sa.count)
+
+# Start - use best
+    p = g.pfdata['p']['best']
+    potential.update(p)
+    rss = pf.get_rss(False)
+    p_count = len(p)
+
+# Store Best Parameters
+    p_best = numpy.copy(p)
+    rss_best = rss
+
+    rss_plot = []
+    rss_plot.append([time.time()-t_start, rss_best])
+
     step = pf.fit['sa_step']  
     for tn in range(pf.fit['sa_loops_t']):
+      pgrad = pf_pgradient.run(p_best, g.pfdata['params_var'], True)
       if(pf.fit['sa_loops_t'] == 1):
         pf_sa.t = pf.fit['sa_temp_start']
         f = 1.0
@@ -8867,9 +8768,7 @@ class pf_sa:
       for n in range(pf.fit['sa_loops_i']):
         loop = True
         while(loop):
-          p_new = numpy.copy(p)
-          p_new = p_new + f * step * (0.5 - numpy.random.rand(p_count))
-          pf_potential.update(p_new)
+          p_new = potential.random(p, f * step, False, pgrad)
           rss_new = pf.get_rss(False)
           if(rss_new is not None):
             loop = False
@@ -8880,12 +8779,14 @@ class pf_sa:
             if(rss_new < rss_best):
               p_best = numpy.copy(p_new)
               rss_best = rss_new
+              rss_plot.append([time.time()-t_start, rss_best])
       if(rss_best < rss_start_loop):
-        pf_potential.update(p_best)
-        rss_new = pf.get_rss(True)
+        potential.update(p_best)
+        pf.get_rss(True)
 
-    pf.summary_line("SIMULATED ANNEALING " + str(pf_sa.count), t_start, time.time(), start_best_rss,  g.pfdata['rss']['best'])
-    pf_save.top("SIMULATED_ANNEALING_" + str(pf_sa.count))
+    pf.summary_line("G_SIMULATED ANNEALING " + str(pf_sa.count), t_start, time.time(), start_best_rss,  g.pfdata['rss']['best'])
+    pf_save.top("G_SIMULATED_ANNEALING_" + str(pf_sa.count))
+    pf_save.rss_plot("G_SIMULATED_ANNEALING_" + str(pf_sa.count), rss_plot)
 
 ###########################################
 #  CLASS pf_sa
@@ -8975,6 +8876,64 @@ class pf_saa:
     pf.summary_line("SIMULATED ANNEALING " + str(pf_random.count), t_start, time.time(), start_best_rss,  g.pfdata['rss']['best'])
 
 ###########################################
+#  CLASS pf_sp
+###########################################
+class pf_sps:
+
+  t = None
+  count = 0
+
+  def run(fit):
+    for repeat in range(fit['repeat']):
+      pf_sps.run_sps(fit)
+
+  def run_sps(fit):
+    pf_sps.count = pf_sps.count + 1
+
+    t_start = time.time()
+    start_best_rss = g.pfdata['rss']['best'] 
+
+    g.pfdata['stage'] = 'Single Parameter Step ' + str(pf_sps.count)
+    g.pfdata['stage_brief'] = 'SPS' + str(pf_sps.count)
+
+# Start - use best
+    p = g.pfdata['p']['best']
+    potential.update(p)
+    rss = pf.get_rss(False)
+    p_count = len(p)
+
+# Store Best Parameters
+    p_best = numpy.copy(p)
+    rss_best = rss
+
+    rss_plot = []
+    rss_plot.append([time.time()-t_start, rss_best])
+
+    f = 0.01
+    for n_out in range(5):
+      for n_in in range(10):
+        p_var = potential.get_p_var()
+        for pn in range(len(p_var)):
+          if(p_var[pn] != 0.0):
+            p_new = numpy.copy(p_best)
+            p_new[pn] = p_new[pn] + f * p_var[pn] * (0.5 - numpy.random.rand())
+            potential.update(p_new)
+            rss_new = pf.get_rss(False)
+            if(rss_new < rss_best):
+              rss_best = rss_new
+              p_best = numpy.copy(p_new)
+              rss_plot.append([time.time()-t_start, rss_best])
+      f = f * 0.1
+    rss_plot.append([time.time()-t_start, rss_best])
+
+    pf.summary_line("SINGLE_PARAMETER_STEP " + str(pf_sps.count), t_start, time.time(), start_best_rss,  g.pfdata['rss']['best'])
+    pf_save.top("SINGLE_PARAMETER_STEP" + str(pf_sps.count))
+    pf_save.rss_plot("SINGLE_PARAMETER_STEP_" + str(pf_sps.count), rss_plot)
+    pf.save_rss_plot_data(t_start, "SINGLE_PARAMETER_STEP_" + str(pf_sps.count), rss_plot)
+
+    exit()
+
+###########################################
 #  CLASS pf_save
 ###########################################
 class pf_saved:
@@ -9001,25 +8960,40 @@ class pf_random:
   count = 0
   time_spent = 0.0
 
-  def run():
+  def run(fit):
     t_start = time.time()
     start_best_rss = g.pfdata['rss']['best'] 
     pf_random.count = pf_random.count + 1
     g.pfdata['stage'] = 'RANDOM ' + str(pf_random.count)
     g.pfdata['stage_brief'] = 'R' + str(pf_random.count)
 
+    p = g.pfdata['p']['best']
+    potential.update(p)
+    rss = pf.get_rss(False)
+    rss_best = rss
+    rss_plot = []
+    rss_plot.append([time.time()-t_start, rss_best])
+
+#pgrad = pf_pgradient.run(g.pfdata['p']['best'], g.pfdata['params_var'], True)
+#pgrad = 2.0 * abs(pgrad)
+
 # START PARAMETER
 # Try randomly generated parameters
     for n in range(pf.fit['random_size']):
-      p = pf_parameters.random_p(0.0)
-      pf_potential.update(p)
-      rss = pf.get_rss()
-
+#potential.random(g.pfdata['p']['best'], 1.0, fit['oversized_parameters'], pgrad)
+      potential.random(g.pfdata['p']['best'], 1.0, fit['oversized_parameters'])
+      rss_new = pf.get_rss()
+      if(rss_new < rss_best):
+        rss_best = rss_new
+        rss_plot.append([time.time()-t_start, rss_best])
+    rss_plot.append([time.time()-t_start, rss_best])
+        
     pf_random.time_spent = pf_random.time_spent + (time.time() - t_start)
 
     pf.summary_line("RANDOM SEARCH " + str(pf_random.count), t_start, time.time(), start_best_rss,  g.pfdata['rss']['best'])
-   
     pf_save.top("RANDOM_SEARCH_" + str(pf_random.count))
+    pf_save.rss_plot("RANDOM_SEARCH_" + str(pf_random.count), rss_plot)
+    pf.save_rss_plot_data(t_start, "RANDOM_SEARCH_" + str(pf_random.count), rss_plot)
 
 ###########################################
 #  CLASS pf_to
@@ -9050,7 +9024,7 @@ class pf_top:
         for bi in range(len(bp_calculations)):
           fh.write("a0 " + str(bp_calculations[bi]['a0']) + "\n")
           fh.write("e0 " + str(bp_calculations[bi]['e0']) + "\n")
-          fh.write("b0 " + str(bp_calculations[bi]['b0']) + "\n")
+          fh.write("b0 " + str(bp_calculations[bi]['b0_gpa']) + "\n")
       except:
         pass
       fh.write("---END---" + "\n")
@@ -9091,31 +9065,37 @@ class pf_top:
 ###########################################
 class pf_pgradient:
 
-  def run(p):
-    pf_potential.update(p)
-    rss = pf.get_rss(False)
+  def run(p, p_var=None, direction=False):
+    if(type(p_var) == type(None)):
+      p_var = numpy.zeros((len(p),),)
+      p_var[:] = 1.0
+
+    potential.update(p)
+    rss = pf.get_rss(False, True)
     grad = numpy.zeros((len(p),), dtype=numpy.float64,)
 
     for i in range(len(p)):
+      if(p_var[i] == 0):
+        grad[i] = 0.0
+      else:
 # Forward
-      p_f = numpy.copy(p)
-      h = 1.0e-10 * p_f[i]
-      if(p_f[i] == 0.0):
-        h = 1.0e-10
-      p_f[i] = p_f[i] + h
-      pf_potential.update(p_f)
-      rss_f = pf.get_rss(False)
+        p_f = numpy.copy(p)
+        h = 1.0e-8
+        p_f[i] = p_f[i] + h
+        potential.update(p_f)
+        rss_f = pf.get_rss(False, True)
 # Backward
-      p_b = numpy.copy(p)
-      h = 1.0e-10 * p_b[i]
-      if(p_b[i] == 0.0):
-        h = 1.0e-10
-      p_b[i] = p_b[i] - h
-      pf_potential.update(p_b)
-      rss_b = pf.get_rss(False)
+        p_b = numpy.copy(p)
+        h = 1.0e-8
+        p_b[i] = p_b[i] - h
+        potential.update(p_b)
+        rss_b = pf.get_rss(False, True)
       
-      grad[i] = (rss_f - rss_b) / (2.0 * h)
-
+        grad[i] = (rss_f - rss_b) / (2.0 * h)
+    if(direction == True):
+      for i in range(len(grad)):
+        if(grad[i] != 0):
+          grad[i] = grad[i] / abs(grad[i])
     return grad
 
 ###########################################
@@ -9196,15 +9176,27 @@ class pf_display_simple:
   def output():
     if(g.pfdata['last_stage'] == None or g.pfdata['last_stage'] != g.pfdata['stage']):
       g.pfdata['last_stage'] = g.pfdata['stage']
-      print("#####################################")
+      print("##########################################################################")
       print(g.pfdata['stage'])
-      print("#####################################")
+      print("##########################################################################")
     
-    if(g.pfdata['rss']['current'] == None):
-      rss_current = "Error"
-    else:
+    rss_current = "Error"
+    a0 = ''
+    e0 = ''
+    b0 = ''
+
+    if(g.pfdata['rss']['current'] != None):
       rss_current = '{:12.4e}'.format(g.pfdata['rss']['current'])
 
+    bplen = 14
+    if(g.pfdata['bp']['current'] != None):
+      bplen = 0 
+      for i in range(len(g.pfdata['bp']['current']['bp_calculations'])):
+        a0 = a0 + '{:12.4e}'.format(g.pfdata['bp']['current']['bp_calculations'][i]['a0']) + ' '
+        e0 = e0 + '{:12.4e}'.format(g.pfdata['bp']['current']['bp_calculations'][i]['e0']) + ' '
+        b0 = b0 + '{:12.4e}'.format(g.pfdata['bp']['current']['bp_calculations'][i]['b0_gpa']) + ' '
+        bplen = bplen + 14
+    
     pf_time = '{:6.3f}'.format(time.time() - pf.start_time)
     rss_best = '{:12.4e}'.format(g.pfdata['rss']['best'])
 
@@ -9216,6 +9208,10 @@ class pf_display_simple:
     print(pf_display.pad_l(pf_time, 10), end="    ")
     print(pf_display.pad_r(rss_best, 14), end=" ")
     print(pf_display.pad_r(rss_current, 14), end=" ")
+    print(pf_display.pad_r("", 14), end=" ")
+    print(pf_display.pad_r(a0, bplen), end=" ")
+    print(pf_display.pad_r(e0, bplen), end=" ")
+    print(pf_display.pad_r(b0, bplen), end=" ")
     print()
 
 ###########################################
@@ -9225,21 +9221,16 @@ class pf_init:
 
   def run():  
 
-# If a spline fit, convert into a spline with the set number of nodes
-    for fn in range(len(g.pot_functions['functions'])):       
-      if(g.pot_functions['functions'][fn]['fit_type'] == 1):     
-        potential.vary_tabulated_points(fn)
-
 # Setup EFS
     efs.init()                         # Initialise (allocate arrays)
-    efs_calc.set_weights()             # Set weightings
-    potential.efs_add_potentials()     # Load potentials
+    efs_calc.set_weights()
+    potential.load_to_efs()
     configs.efs_add_config()           # Add configs
-    
+
 # Setup BP
     bp_calc.init()
     bp_calc.set_weights()
-    potential.bp_add_potentials()
+    potential.load_to_bp()
     b_props.bp_add()
     bp_calc.get_known()
 
@@ -9256,40 +9247,18 @@ class pf_init:
                        'counter_successful': 0,
                        'since_improvement': 0,}
 
-    g.pfdata['psize'] = potential.parameter_count()
-    g.pfdata['p'] = {'current': None, 'best': None,}
+    g.pfdata['psize'] = potential.pot['p_count']
+    g.pfdata['p'] = {'current': None, 'best': None, 'known': None,}
+    g.pfdata['bp'] = {'current': None, 'best': None, 'known': None,}
+    g.pfdata['efs'] = {'current': None, 'best': None,}
+#g.pfdata['max_density'] = {'bp_current': None, 'efs_current': None, 'bp_best': None, 'efs_best': None,}
 
-    g.pfdata['bp'] = {'current': None, 'best': None,}
+# SAVE Starting Parameters & Variation
+    g.pfdata['params_start']  = numpy.copy(potential.pot['p'])
+    g.pfdata['params_var'] = numpy.copy(potential.pot['p_var'])
 
-    g.pfdata['max_density'] = {'bp_current': None, 'efs_current': None, 'bp_best': None, 'efs_best': None,}
-    
-# SAVE Starting Parameters
-    g.pfdata['params_start'] = numpy.zeros((g.pfdata['psize'],),)
-    a = 0
-    for fn in range(len(g.pot_functions['functions'])):        
-      if(g.pot_functions['functions'][fn]['fit_type'] == 1):     # TABULATED      
-        b = a + g.pot_functions['functions'][fn]['fit_size']     
-        g.pfdata['params_start'][a:b] = numpy.zeros((g.pot_functions['functions'][fn]['fit_size'],),)
-        a = b
-      elif(g.pot_functions['functions'][fn]['fit_type'] == 2):   # ANALYTIC  
-        b = a + g.pot_functions['functions'][fn]['fit_size'] 
-        g.pfdata['params_start'][a:b] = g.pot_functions['functions'][fn]['a_params'][:]
-        a = b    
-    
-# SAVE Variation
-    g.pfdata['params_var'] = numpy.zeros((2,g.pfdata['psize'],),)
-    a = 0
-    for fn in range(len(g.pot_functions['functions'])):        
-      if(g.pot_functions['functions'][fn]['fit_type'] == 1):     # TABULATED      
-        b = a + g.pot_functions['functions'][fn]['fit_size']     
-        g.pfdata['params_var'][0,a:b] = g.pot_functions['functions'][fn]['fit_parameters'][0,:]  # Lower
-        g.pfdata['params_var'][1,a:b] = g.pot_functions['functions'][fn]['fit_parameters'][1,:]  # Upper
-        a = b 
-      elif(g.pot_functions['functions'][fn]['fit_type'] == 2):   # ANALYTIC  
-        b = a + g.pot_functions['functions'][fn]['fit_size'] 
-        g.pfdata['params_var'][0,a:b] = g.pot_functions['functions'][fn]['fit_parameters'][0,:]  # Lower
-        g.pfdata['params_var'][1,a:b] = g.pot_functions['functions'][fn]['fit_parameters'][1,:]  # Upper
-        a = b  
+    g.pfdata['bp']['known'] = g.bp_known.copy()
+    g.pfdata['efs']['known'] = g.efs_known.copy()
 
 ###########################################
 #  CLASS pf_sav
@@ -9297,14 +9266,25 @@ class pf_init:
 class pf_save:
  
   count = 0
+  count_name = ''
 
   def top(name):
     pf_save.count = pf_save.count + 1
+
+# Get Best
+    rss = g.pfdata['rss']['best']
+    p = numpy.copy(g.pfdata['p']['best'])
+    bp = g.pfdata['bp']['best'].copy()
+    bp_known = g.pfdata['bp']['known'].copy()
+    efs = g.pfdata['efs']['best'].copy()
+    efs_known = g.pfdata['efs']['known'].copy()
  
+# Make Dirs
     c = str(pf_save.count)
     while(len(c)<4):
       c = '0' + c
     name = c + '_' + name
+    pf_save.count_name = name
 
     dir_out = g.dirs['wd'] + '/fitting/saved_potentials/' + name + '/'
     plot_dir = dir_out + 'plots/'
@@ -9312,9 +9292,289 @@ class pf_save:
     std.make_dir(dir_out)
     std.make_dir(plot_dir)
     std.make_dir(pot_dir)
+
+# Save Top Ten
+    fh = open(dir_out + "/top_parameters.txt", 'w')
+    for i in range(len(g.top_parameters)):
+      i_str = str(i+1)
+      while(len(i_str)<8):
+        i_str = "0" + i_str
+      fh.write('########################' + '\n')
+      fh.write('# ' + i_str + '\n')
+      fh.write('########################' + '\n')
+      fh.write("RSS " + str(g.top_parameters[i][0]) + '\n')
+      try:
+        bp_calculations = g.top_parameters[i][3]['bp_calculations']
+        for bi in range(len(bp_calculations)):
+          fh.write("BP " + str(bi) + ":\n")
+          fh.write("a0: " + '{:12.4e}'.format(bp_calculations[bi]['a0']) + "   ")
+          fh.write("e0: " + '{:12.4e}'.format(bp_calculations[bi]['e0']) + "   ")
+          fh.write("b0: " + '{:12.4e}'.format(bp_calculations[bi]['b0_gpa']) + "   ")
+          fh.write('\n')
+      except:
+        pass
+      fh.write("P: " + '\n')
+      for j in range(len(g.top_parameters[i][1])):
+        fh.write('{:12.4e}'.format(g.top_parameters[i][1][j]) + " ")
+        if(j % 5 == 4):
+          fh.write('\n')
+      fh.write('\n')
+      fh.write('\n')
+    fh.close()
+
+    potential.save(pot_dir, p)
+
+    pf_save.save_summary(pot_dir, p, rss, bp, bp_known, efs, efs_known)
+
+    b_props.bp_eos_plot(plot_dir)
+
+  def save_summary(dir_out, p, rss, bp, bp_known, efs, efs_known):
+
+    fh = open(dir_out + 'summary.txt', 'w')
+    fh.write("RSS:  " + '\n')
+    fh.write(str(rss) + '\n')
+    fh.write("" + '\n')
+    fh.write("P:  " + '\n')
+    for pn in range(len(p)):
+      fh.write(str(p[pn]) + '\n')
+    fh.write("" + '\n')
+
+    for i in range(len(bp_known['bp_calculations'])):  
+      b = bp_known['bp_calculations'][i]   
+      fh.write("Known:" + '\n')
+
+      ec = []
+      for ei in range(6):
+        ec.append([])
+        for ej in range(6):
+          ec[ei].append(str('{:6.3f}'.format(b['ec_gpa'][ei, ej])))
+
+      fh.write("a0:     " + str(b['a0']) + '\n')
+      fh.write("e0:     " + str(b['e0']) + '\n')
+      fh.write("B0:     " + str(b['b0_gpa']) + '\n')
+
+      for ei in range(6):
+        if(ei == 0):          
+          fh.write("EC:     ")
+        else:          
+          fh.write("        ")
+        for ej in range(6):
+          fh.write(ec[ei][ej] + ' ')
+        fh.write('\n')
+      fh.write('\n')
+
+    for i in range(len(bp['bp_calculations'])):  
+      b = bp['bp_calculations'][i]   
+      fh.write("Calculated:" + '\n')
+
+      ec = []
+      for ei in range(6):
+        ec.append([])
+        for ej in range(6):
+          ec[ei].append(str('{:6.3f}'.format(b['ec_gpa'][ei, ej])))
+
+      fh.write("a0:     " + str(b['a0']) + '\n')
+      fh.write("e0:     " + str(b['e0']) + '\n')
+      fh.write("B0:     " + str(b['b0_gpa']) + '\n')
+      for ei in range(6):
+        if(ei == 0):          
+          fh.write("EC:     ")
+        else:          
+          fh.write("        ")
+        for ej in range(6):
+          fh.write(ec[ei][ej] + ' ')
+        fh.write('\n')
+      fh.write("" + '\n')
+
+    fh.write("" + '\n')
+    fh.write("" + '\n')
+    fh.close()   
+
+  def rss_plot(name, d):     
+    d = numpy.asarray(d)
+    dir_out = g.dirs['wd'] + '/fitting/saved_potentials/' + pf_save.count_name + '/'
+    plot_dir = dir_out + 'rss_plot/'
     
+    std.make_dir(dir_out)
+    std.make_dir(plot_dir)
+
+    plt.figure(figsize=(8,6))
+    plt.rc('font', family='serif')
+    plt.rc('xtick', labelsize='x-small')
+    plt.rc('ytick', labelsize='x-small')   
+    plt.title("RSS vs Time " + name)
+    plt.xlabel("Time/s")
+    plt.ylabel("RSS")
+    plt.plot(d[:,0], d[:,1], 'k')
+    plt.savefig(plot_dir + 'rss_over_time.eps', type='efs')
+    plt.close('all') 
+
+    plt.figure(figsize=(8,6))
+    plt.rc('font', family='serif')
+    plt.rc('xtick', labelsize='x-small')
+    plt.rc('ytick', labelsize='x-small')   
+    plt.title("RSS vs Time " + name)
+    plt.xlabel("Time/s")
+    plt.ylabel("RSS")
+    plt.ylim(1.0,10**(numpy.log10(1.0*max(d[:,1])) + 1))
+    plt.plot(d[:,0], d[:,1], 'k')
+    plt.yscale("log")
+    plt.savefig(plot_dir + 'rss_over_time_log.eps', type='efs')
+    plt.close('all') 
+
+  def rss_plot_full():     
+
+    plot_dir = g.dirs['wd'] + '/fitting/rss_plot/'
+    std.make_dir(plot_dir)
+
+    plt.figure(figsize=(12,8))
+    plt.rc('font', family='serif')
+    plt.rc('xtick', labelsize='x-small')
+    plt.rc('ytick', labelsize='x-small')  
+    plt.title("RSS vs Time")
+    plt.xlabel("Time/s")
+    plt.ylabel("RSS")
+    c = ['b','g','r','k']
+    n = 0
+    for p in pf.rss_plot_data:
+      dt = p[0] - pf.start_time
+      rss_name = p[1]
+      xy = numpy.copy(p[2])
+      xy[:,0] = xy[:,0] + dt
+      plt.plot(xy[:,0], xy[:,1], c[n%len(c)], label=rss_name)
+      n = n + 1
+    plt.legend()
+    plt.savefig(plot_dir + 'rss_over_time.eps', type='efs')
+    plt.close('all') 
+
+    plt.figure(figsize=(12,8))
+    plt.rc('font', family='serif')
+    plt.rc('xtick', labelsize='x-small')
+    plt.rc('ytick', labelsize='x-small')  
+    plt.title("RSS vs Time")
+    plt.xlabel("Time/s")
+    plt.ylabel("RSS")
+    c = ['b','g','r','k']
+    n = 0
+    for p in pf.rss_plot_data:
+      dt = p[0] - pf.start_time
+      rss_name = p[1]
+      xy = numpy.copy(p[2])
+      xy[:,0] = xy[:,0] + dt
+      plt.plot(xy[:,0], xy[:,1], c[n%len(c)], label=rss_name)
+      n = n + 1
+    plt.legend()
+    plt.yscale("log")
+    plt.savefig(plot_dir + 'rss_over_time_log.eps', type='efs')
+    plt.close('all') 
+
+    """
+ 
+    plt.title("RSS vs Time " + name)
+    plt.xlabel("Time/s")
+    plt.ylabel("RSS")
+    plt.plot(d[:,0], d[:,1], 'k')
+    plt.savefig(plot_dir + 'rss_over_time.eps', type='efs')
+    plt.close('all') 
+
+    plt.figure(figsize=(8,6))
+    plt.rc('font', family='serif')
+    plt.rc('xtick', labelsize='x-small')
+    plt.rc('ytick', labelsize='x-small')   
+    plt.title("RSS vs Time " + name)
+    plt.xlabel("Time/s")
+    plt.ylabel("RSS")
+    plt.ylim(1.0,10**(numpy.log10(1.0*max(d[:,1])) + 1))
+    plt.plot(d[:,0], d[:,1], 'k')
+    plt.yscale("log")
+    plt.savefig(plot_dir + 'rss_over_time_log.eps', type='efs')
+    plt.close('all') 
+    """
+
+    """  
+
+    fh = open(dir_out + 'summary.txt', 'w')
+    fh.write("RSS:  " + '\n')
+    fh.write(str(g.pfdata['rss']['best']) + '\n')
+    fh.write("" + '\n')
+    fh.write("P:  " + '\n')
+    for pn in range(len(g.top_parameters[0][1])):
+      fh.write(str(g.top_parameters[0][1][pn]) + '\n')
+    fh.write("" + '\n')
+
+    for i in range(len(g.top_parameters[0][3]['bp_calculations'])):
+      
+      fh.write("Known:" + '\n')
+      ec = []
+      for ei in range(6):
+        ec.append([])
+        for ej in range(6):
+          ec[ei].append(str('{:6.3f}'.format(g.bp_known['bp_calculations'][i]['ec_gpa'][ei, ej])))
+
+      fh.write("a0:     " + str(g.bp_known['bp_calculations'][i]['a0']) + '\n')
+      fh.write("e0:     " + str(g.bp_known['bp_calculations'][i]['e0']) + '\n')
+      fh.write("B0:     " + str(g.bp_known['bp_calculations'][i]['b0_gpa']) + '\n')
+      for ei in range(6):
+        if(ei == 0):          
+          fh.write("EC:     ")
+        else:          
+          fh.write("        ")
+        for ej in range(6):
+          fh.write(ec[ei][ej] + ' ')
+        fh.write('\n')
+      fh.write('\n')
+
+      fh.write("Calculated:" + '\n')
+      ec = []
+      for ei in range(6):
+        ec.append([])
+        for ej in range(6):
+          ec[ei].append(str('{:6.3f}'.format(g.top_parameters[0][3]['bp_calculations'][i]['ec_gpa'][ei, ej])))
+
+      fh.write("a0:     " + str(g.top_parameters[0][3]['bp_calculations'][i]['a0']) + '\n')
+      fh.write("e0:     " + str(g.top_parameters[0][3]['bp_calculations'][i]['e0']) + '\n')
+      fh.write("B0:     " + str(g.top_parameters[0][3]['bp_calculations'][i]['b0_gpa']) + '\n')
+      for ei in range(6):
+        if(ei == 0):          
+          fh.write("EC:     ")
+        else:          
+          fh.write("        ")
+        for ej in range(6):
+          fh.write(ec[ei][ej] + ' ')
+        fh.write('\n')
+      fh.write("" + '\n')
+
+    fh.write("" + '\n')
+    fh.write("" + '\n')
+    fh.write("" + '\n')
+
+    fh.write("RSS Details:  " + '\n')
+    fh.write("===============================  " + '\n')
+    fh.write("Total:      " + str(g.top_parameters[0][0]) + '\n')
+    fh.write("a0:         " + str(bp.rss_by_type[0]) + '\n')
+    fh.write("e0:         " + str(bp.rss_by_type[1]) + '\n')
+    fh.write("b0:         " + str(bp.rss_by_type[2]) + '\n')
+    fh.write("ec:         " + str(bp.rss_by_type[3]) + '\n')
+    fh.write("g:          " + str(bp.rss_by_type[4]) + '\n')
+    fh.write("e:          " + str(bp.rss_by_type[5]) + '\n')
+    fh.write("v:          " + str(bp.rss_by_type[6]) + '\n')
+    fh.write("a0 (w):     " + str(bp.rss_by_type_w[0]) + '\n')
+    fh.write("e0 (w):     " + str(bp.rss_by_type_w[1]) + '\n')
+    fh.write("b0 (w):     " + str(bp.rss_by_type_w[2]) + '\n')
+    fh.write("ec (w):     " + str(bp.rss_by_type_w[3]) + '\n')
+    fh.write("g (w):      " + str(bp.rss_by_type_w[4]) + '\n')
+    fh.write("e (w):      " + str(bp.rss_by_type_w[5]) + '\n')
+    fh.write("v (w):      " + str(bp.rss_by_type_w[6]) + '\n')
+
+    fh.write("" + '\n')
+    fh.write("" + '\n')
+    fh.close()   
+
+#potential.output(pot_dir, g.pfdata['p']['best'])
+    """
+    """
     p = numpy.copy(g.top_parameters[0][1])
-    pf_potential.update(p)
+    potential.update(p)
     rss = pf.get_rss()
 
     fh = open(dir_out + 'summary.txt', 'w')
@@ -9400,10 +9660,11 @@ class pf_save:
     fh.write("" + '\n')
     fh.close()
 
-    potential.plot_python_potentials(plot_dir)
-    potential_output.full(pot_dir)
+#potential.plot_python_potentials(plot_dir)
+    potential.output(pot_dir)
 
     pf_top.save(dir_out, 'top_parameters.txt')
+    """
 
 ###########################################
 #  CLASS pf_fina
@@ -9592,6 +9853,87 @@ class relax_calc:
 #es.init()
 #potential.es_add_potentials()
 #es_calc.es_add()
+
+###########################################
+#  CLASS pgra
+###########################################
+class pgrad:
+
+  def run():  
+  
+    print("Parameter Gradient") 
+
+# Setup EFS
+    efs.init()                         # Initialise (allocate arrays)
+    efs_calc.set_weights()
+    potential.load_to_efs()
+    configs.efs_add_config()           # Add configs
+
+# Setup BP
+    bp_calc.init()
+    bp_calc.set_weights()
+    potential.load_to_bp()
+    b_props.bp_add()
+
+# Run EFS and BP
+    rss = rss_calc.run_calc()
+
+    p = numpy.copy(potential.pot['p'])
+
+    a = 0
+    for fn in range(len(potential.pot['functions'])):
+      print()
+      print(potential.pot['functions'][fn]['file'])
+      print("==============================================")
+      print('{:3s}'.format(""), end=" ")
+      print('{:17s}'.format("     RSS B"), end=" ")
+      print('{:17s}'.format("     RSS"), end=" ")
+      print('{:17s}'.format("     RSS F"), end=" ")
+      print('{:17s}'.format("     PARAM B"), end=" ")
+      print('{:17s}'.format("     PARAM"), end=" ")
+      print('{:17s}'.format("     PARAM F"), end=" ")
+      print('{:17s}'.format("     GRAD"), end=" ")
+      print('{:17s}'.format("     PFIXED"), end=" ")
+      print()
+      if(potential.pot['functions'][fn]['f_on'] == 1):
+        b = a + len(potential.pot['functions'][fn]['params'])
+        c = 0
+        for i in range(a, b,1):
+          if(p[i] == 0.0):
+            dh =1.0E-8
+          else:
+            dh = min(1.0E-8,1.0E-6 * p[i])
+
+# Forward
+          p_f = numpy.copy(p)
+          p_f[i] = p[i] + dh
+          potential.update(p_f)
+          rss_f = rss_calc.run_calc()
+
+# Backward
+          p_b = numpy.copy(p)
+          p_b[i] = p[i] - dh
+          potential.update(p_b)
+          rss_b = rss_calc.run_calc()
+
+          p_grad = (rss_f - rss_b) / (2.0 * dh)
+
+          print('{:3n}'.format(i), end=" ")
+          print('{:17.9e}'.format(rss_b), end=" ")
+          print('{:17.9e}'.format(rss), end=" ")
+          print('{:17.9e}'.format(rss_f), end=" ")
+          print('{:17.9e}'.format(p_b[i]), end=" ")
+          print('{:17.9e}'.format(p[i]), end=" ")
+          print('{:17.9e}'.format(p_f[i]), end=" ")
+          print('{:17.9e}'.format(p_grad), end=" ")
+
+          if(len(potential.pot['functions'][fn]['params_fixed'])>= len(potential.pot['functions'][fn]['params'])):
+            print('{:17.9e}'.format(potential.pot['functions'][fn]['params_fixed'][c]), end=" ")
+          print()
+          c = c + 1
+        a = b
+
+    potential.update(p)
 
 ###########################################
 #  CLASS main(

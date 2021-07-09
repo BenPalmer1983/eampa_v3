@@ -48,5 +48,4 @@ END DO
 
 CALL end_t(nl_timer)
 nl_timer_sum = nl_timer_sum + nl_timer
-
 END SUBROUTINE make_nl

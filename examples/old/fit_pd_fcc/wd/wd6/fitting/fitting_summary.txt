@@ -1,0 +1,3 @@
+RANDOM SEARCH 1                 1.9134e+02    -->    1.9134e+02      6586.622        
+RANDOM SEARCH 2                 1.9134e+02    -->    1.9134e+02      7102.130        
+GENETIC ALGORITHM 1             1.9134e+02    -->    4.6601e+00      22473.997       

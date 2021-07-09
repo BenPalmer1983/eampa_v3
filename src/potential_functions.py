@@ -73,12 +73,29 @@ class potential_functions:
   # DENSITY FUNCTIONS
   ##############################################
 
-  # Embedding Finnis-Sinclair
+  # Quadratic
+  # y = a * (r - b)**2 
   @staticmethod
   def quadratic_density(r, p, pf):
     return fnc.quadratic_density_v(r, p, pf)
     
-    
+  # Slater 4S
+  @staticmethod
+  def slater_4s(r, p, pf):
+    return fnc.slater_4s_v(r, p, pf)
+
+  # Double Slater 4S With Cutoff
+  @staticmethod
+  def double_slater_4s_cutoff(r, p, pf, rs=False):
+    if(rs == False):
+      return fnc.double_slater_4s_cutoff_v(r, p, pf)
+    else:    
+      p_out = []
+      for i in range(len(p)):
+        p_out.append(p[i])   
+      p_out[0] = r * p[0] 
+      p_out[2] = r * p[2]
+      return p_out
     
   ##############################################
   # EMBEDDING FUNCTIONS
@@ -106,7 +123,7 @@ class potential_functions:
     return fnc.triple_embedding_v(r, p, pf)
 
 
-  # Triple Embedding
+  # 4 Term Embedding
   # f(x) = A + B * sqrt(r) + C * r**2 + D * r**4
   @staticmethod
   def quad_embedding(r, p, pf):
@@ -164,6 +181,10 @@ class potential_functions:
   def cubic_knot_spline_fixed_end(r, p, pf):
     return fnc.cubic_knot_spline_fixed_end_v(r, p, pf)
 
+
+  @staticmethod
+  def cubic_knot_spline_fixed_end_pair(r, p, pf):
+    return fnc.cubic_knot_spline_fixed_end_pair_v(r, p, pf)
 
 
 

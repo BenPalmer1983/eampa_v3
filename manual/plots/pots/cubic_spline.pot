@@ -1,0 +1,7 @@
+#TYPE cubic_spline
+#P -165.0 -78.5 -78.15 1.868
+#PF 0.976 1.15 1.216 1.650
+#TITLE Cubic Spline
+#X Distance/Angs
+#Y Energy/eV
+#PLOT cubic_spline.eps

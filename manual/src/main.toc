@@ -56,46 +56,54 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {chapter}{\numberline {4}How To Use}{17}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.1}Set Up Working Directory}{17}
+\contentsline {section}{\numberline {4.1}Python Program \& Library Files}{17}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.2}}{17}
+\contentsline {section}{\numberline {4.2}Energy, Force and Stress Calculation}{17}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{Appendices}{18}
+\contentsline {subsection}{\numberline {4.2.1}Creating a Project Directory}{17}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {A}Functions}{19}
+\contentsline {subsection}{\numberline {4.2.2}Creating the Input File}{18}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {A.1}Introduction}{19}
+\contentsline {subsection}{\numberline {4.2.3}Creating the Potential Files - Analytic Iron Potential}{18}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {A.2}Pair Functions}{19}
+\contentsline {subsection}{\numberline {4.2.4}Creating the Config Files}{20}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {A.2.1}Lennard-Jones}{19}
+\contentsline {chapter}{Appendices}{21}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {A.2.2}Morse}{19}
+\contentsline {chapter}{\numberline {A}Functions}{22}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {A.2.3}Buckingham}{20}
+\contentsline {section}{\numberline {A.1}Introduction}{22}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {A.2.4}ZBL}{20}
+\contentsline {section}{\numberline {A.2}Functions}{22}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {A.2.5}Quartic Polynomial Plus Exponential Repulsion}{21}
+\contentsline {subsection}{\numberline {A.2.1}Ackland-Mendelev Pair}{22}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {A.3}Density Functions}{21}
+\contentsline {subsection}{\numberline {A.2.2}Buckingham}{23}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {A.3.1}Quadratic Density}{21}
+\contentsline {subsection}{\numberline {A.2.3}Cubic Knot Spline}{24}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {A.3.2}Slater 4S (Squared)}{22}
+\contentsline {subsection}{\numberline {A.2.4}Cubic Knot Spline Fixed End}{24}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {A.4}Embedding Functions}{23}
+\contentsline {subsection}{\numberline {A.2.5}Cubic Knot Spline Fixed End Pair}{25}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {A.4.1}Finnis-Sinclair Embedding}{23}
+\contentsline {subsection}{\numberline {A.2.6}Cubic Splines}{26}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {A.4.2}Mendelev Embedding}{23}
+\contentsline {subsection}{\numberline {A.2.7}Embedding A - Finnis Sinclair}{27}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {A.4.3}Triple Embedding}{24}
+\contentsline {subsection}{\numberline {A.2.8}Embedding B - Mendelev}{28}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {A.4.4}Ackland Embedding}{25}
+\contentsline {subsection}{\numberline {A.2.9}Embedding C}{28}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {A.5}Generic Functions}{26}
+\contentsline {subsection}{\numberline {A.2.10}Embedding D - Ackland-Mendelev}{29}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {A.5.1}Cubic Splines}{26}
+\contentsline {subsection}{\numberline {A.2.11}Embedding E}{30}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {A.5.2}Quintic Splines}{27}
+\contentsline {subsection}{\numberline {A.2.12}Lennard-Jones}{30}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {A.2.13}Morse}{31}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {A.2.14}Slater 4S (Squared)}{31}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {A.2.15}ZBL}{32}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {A.2.16}Zero}{33}

@@ -1,0 +1,4 @@
+#TYPE fs_embedding
+#P 0.000823342458644 
+#PF 0.0 
+#VR 1.0

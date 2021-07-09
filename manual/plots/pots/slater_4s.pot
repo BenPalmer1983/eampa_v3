@@ -1,0 +1,6 @@
+#TYPE slater_4s
+#P 5.0 1.323
+#TITLE Slater 4S (Squared)
+#X Distance/Angs
+#Y Density
+#PLOT slater_4s.eps

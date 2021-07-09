@@ -1,0 +1,4 @@
+RANDOM SEARCH 1                 6.5563e+04    -->    6.5563e+04      76.086          
+RANDOM SEARCH 2                 6.5563e+04    -->    6.5563e+04      74.569          
+SIMULATED ANNEALING 1           6.5563e+04    -->    2.6202e+04      15255.107       
+SIMULATED ANNEALING 2           2.6202e+04    -->    2.4733e+04      15294.686       

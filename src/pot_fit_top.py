@@ -24,7 +24,7 @@ class pf_top:
         for bi in range(len(bp_calculations)):
           fh.write("a0 " + str(bp_calculations[bi]['a0']) + "\n")
           fh.write("e0 " + str(bp_calculations[bi]['e0']) + "\n")
-          fh.write("b0 " + str(bp_calculations[bi]['b0']) + "\n")
+          fh.write("b0 " + str(bp_calculations[bi]['b0_gpa']) + "\n")
       except:
         pass
       fh.write("---END---" + "\n")

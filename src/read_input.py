@@ -13,6 +13,7 @@ class read_input:
     main.log_title("Read Input")
   
     read_input.run_type()
+    read_input.random()
     read_input.wd()
     read_input.rss_weights()
     read_input.rss_max_density()
@@ -52,6 +53,21 @@ class read_input:
         g.wd_type[k] = float(g.inp['wd'][k])
       except:
         pass
+
+
+
+  # READ TYPE
+  def random():
+    g.random = {
+    'seed': 100,
+    }    
+    # TRY READING
+    for k in g.random.keys():
+      try:
+        g.random[k] = float(g.inp['random'][k])
+      except:
+        pass
+
 
 
   # READ 
@@ -146,6 +162,7 @@ class read_input:
     
     fit_data = {
     'type': None,
+    'repeat': 1,
     'random_size': 100,
     'cycles': 0,
     'gens': 0,
@@ -165,6 +182,7 @@ class read_input:
     'mutate_scale': 1.0,
     'no_clones': True,
     'no_clone_var': 0.05,
+    'oversized_parameters': False,
     'fresh_ws': 0.1,
     'fresh_we': 1.5,
     'enhance_every': 10,
@@ -178,14 +196,25 @@ class read_input:
     'sa_loops_i': 100,
     'sa_temp_start': 10,
     'sa_temp_end': 0.1,
-    'sa_step': 0.01,
-    'sa_step_factor': 0.3,
+    'sa_var': 0.01,
+    'sa_var_factor': 0.3,
+    'fit_params_that_change': True,
+    'nm_maxiter': 100,
+    'nm_xatol': 1.0E-8,
+    'bfgs_maxiter': 100,
+    'bfgs_gtol': 1.0E-8,
+    'bh_niter': 10,
     }
 
     # TRY READING
     for k in fit_data.keys():
       try:
-        fit_data[k] = g.inp[inp_key][k]
+        if(type(fit_data[k]) == bool):
+          fit_data[k] = False
+          if(g.inp[inp_key][k].upper()[0] == 'T'):
+            fit_data[k] = True
+        else:
+          fit_data[k] = g.inp[inp_key][k]
       except:
         pass
         

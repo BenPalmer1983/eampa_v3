@@ -41,7 +41,7 @@ REAL(kind=DoubleReal) :: c_r(:,:)
 !###########################################################
 INTEGER(KIND=StandardInteger) :: i, j, n, f, fn, dn
 INTEGER(KIND=StandardInteger) :: cc, nc
-REAL(kind=DoubleReal) :: fx
+REAL(kind=DoubleReal) :: fx, dfxdx
 REAL(kind=DoubleReal) :: fx_arr(1:2)
 REAL(kind=DoubleReal) :: fv(1:3)
 REAL(kind=DoubleReal), ALLOCATABLE :: density(:,:)
@@ -71,85 +71,75 @@ density = 0.0D0
 density_grad_ab = 0.0D0
 density_grad_ba = 0.0D0
 
+
 DO n = 1, nc
   ! PAIR ENERGY
-  CALL pot_search_pair_arr(nl_l(n, 2), nl_l(n, 4), nl_r(n, 1), fx_arr)
-  config_energy(cn, 1) = config_energy(cn, 1) + fx_arr(1)
-  
+  CALL search_f(1, nl_l(n, 2), nl_l(n, 4), 0, nl_r(n, 1), fx)
+  config_energy(cn, 1) = config_energy(cn, 1) + fx  
   ! PAIR FORCE
-  fv(:) = fx_arr(2) * nl_r(n, 2:4)
+  CALL search_grad(1, nl_l(n, 2), nl_l(n, 4), 0, nl_r(n, 1), dfxdx)
+  fv(:) = dfxdx * nl_r(n, 2:4)
   config_forces(cn, nl_l(n, 1), :) = config_forces(cn, nl_l(n, 1), :) - fv(:)
   config_forces(cn, nl_l(n, 3), :) = config_forces(cn, nl_l(n, 3), :) + fv(:)
   nl_force(n,:) = - fv(:)
-  
-  ! A DENSITY AT B
-  f = 1
-  DO WHILE(fgroups_dens(nl_l(n, 2), f) .NE. 0)
-    fn = fgroups_dens(nl_l(n, 2), f)
-    CALL pot_search_dens_arr(nl_l(n, 2), fn, nl_r(n, 1), fx_arr)  
-    density(nl_l(n, 3), fn) = density(nl_l(n, 3), fn) + fx_arr(1) 
-    density_grad_ab(n, fn) = density_grad_ab(n, fn) + fx_arr(2) 
-    f = f + 1
-  END DO 
-  
-  ! B DENSITY AT A
-  f = 1
-  DO WHILE(fgroups_dens(nl_l(n, 4), f) .NE. 0)
-    fn = fgroups_dens(nl_l(n, 4), f)
-    CALL pot_search_dens_arr(nl_l(n, 4), fn, nl_r(n, 1), fx_arr)
-    density(nl_l(n, 1), fn) = density(nl_l(n, 1), fn) + fx_arr(1)
-    density_grad_ba(n, fn) = density_grad_ba(n, fn) + fx_arr(2) 
-    f = f + 1
-  END DO 
-END DO
 
-f = 1
-DO WHILE(fgroups_embe(nl_l(1, 4), f) .NE. 0)
-  fn = fgroups_embe(nl_l(1, 2), f)
-  f = f + 1    
+  ! LOOP THROUGH DENSITY GROUPS
+  DO fn = 1, fgroup_max
+    ! DENSITY OF ATOM B AT A (B with any atom)
+    CALL search_f(2, nl_l(n, 2), 0, fn, nl_r(n, 1), fx)
+    CALL search_grad(2, nl_l(n, 2), 0, fn, nl_r(n, 1), dfxdx)
+    density(nl_l(n, 1), fn) = density(nl_l(n, 1), fn) + fx 
+    density_grad_ab(n, fn) = density_grad_ab(n, fn) + dfxdx
+    ! DENSITY OF ATOM B AT A (B with only atom A)
+    CALL search_f(2, nl_l(n, 2), nl_l(n, 4), fn, nl_r(n, 1), fx)
+    CALL search_grad(2, nl_l(n, 2), nl_l(n, 4), fn, nl_r(n, 1), dfxdx)
+    density(nl_l(n, 1), fn) = density(nl_l(n, 1), fn) + fx 
+    density_grad_ab(n, fn) = density_grad_ab(n, fn) + dfxdx
+    ! DENSITY OF ATOM A AT B (A with any atom)
+    CALL search_f(2, nl_l(n, 4), 0, fn, nl_r(n, 1), fx)
+    CALL search_grad(2, nl_l(n, 4), 0, fn, nl_r(n, 1), dfxdx)
+    density(nl_l(n, 3), fn) = density(nl_l(n, 3), fn) + fx 
+    density_grad_ba(n, fn) = density_grad_ba(n, fn) + dfxdx
+    ! DENSITY OF ATOM A AT B (A with only atom B)
+    CALL search_f(2, nl_l(n, 4), nl_l(n, 2), fn, nl_r(n, 1), fx)
+    CALL search_grad(2, nl_l(n, 4), nl_l(n, 2), fn, nl_r(n, 1), dfxdx)
+    density(nl_l(n, 3), fn) = density(nl_l(n, 3), fn) + fx  
+    density_grad_ba(n, fn) = density_grad_ba(n, fn) + dfxdx  
+  END DO   
 END DO
 
 
 ! EMBED ENERGY
 DO n = 1, cc
-  f = 1
-  DO WHILE(fgroups_embe(nl_l(n, 4), f) .NE. 0)
-    fn = fgroups_embe(nl_l(n, 2), f)
-    CALL pot_search_embe(c_l(n), fn, density(n, fn), fx)
+  ! LOOP THROUGH DENSITY GROUPS
+  DO fn = 1, fgroup_max    
+    CALL search_f(3, nl_l(n, 4), 0, fn, density(n, fn), fx)
     config_energy(cn, 2) = config_energy(cn, 2) + fx
-    f = f + 1    
   END DO
 END DO
 
 
-! EMBED FORCE
-DO n = 1, nc
-  f = 1
-  DO WHILE(fgroups_embe(nl_l(n, 4), f) .NE. 0)
 
-    fn = fgroups_embe(nl_l(n, 2), f)
+DO n = 1, nc
+  DO fn = 1, fgroup_max      
+    ! @Fi(p)/@p    Gradient of embedding energy for atom A
+    CALL search_grad(3, nl_l(n, 2), 0, fn, density(nl_l(n, 1), fn), dfxdx)
+    epA = dfxdx
   
     ! @Fi(p)/@p    Gradient of embedding energy for atom A
-    CALL pot_search_embe_arr(nl_l(n, 2), fn, density(nl_l(n, 1), fn), fx_arr)
-    epA = fx_arr(2)
-  
-    ! @Fi(p)/@p    Gradient of embedding energy for atom A
-    CALL pot_search_embe_arr(nl_l(n, 4), fn, density(nl_l(n, 3), fn), fx_arr)
-    epB = fx_arr(2)
+    CALL search_grad(3, nl_l(n, 4), 0, fn, density(nl_l(n, 3), fn), dfxdx)
+    epB = dfxdx
     
     ! @Pij(r)/@r   Gradient of density function at A due to atom B
     dpAB = density_grad_ab(n,fn)
       
     ! @Pji(r)/@r   Gradient of density function at B due to atom A
     dpBA = density_grad_ba(n,fn)
-
   
     fv(:) = (epA * dpBA + epB * dpAB) * nl_r(n, 2:4)
     config_forces(cn, nl_l(n, 1), :) = config_forces(cn, nl_l(n, 1), :) - fv(:)
     config_forces(cn, nl_l(n, 3), :) = config_forces(cn, nl_l(n, 3), :) + fv(:)
-  
     nl_force(n,:) = nl_force(n,:) - fv(:)
-    f = f + 1    
   END DO
 END DO
 
@@ -166,6 +156,7 @@ DO n = 1, nc
   END IF
 END DO
 config_stresses(cn, 1:3, 1:3) = config_stresses(cn, 1:3, 1:3) / (2.0D0 * volume(cn))
+stresses_calculated(cn) = 1
 
 max_density = MAX(max_density, MAXVAL(density))
 

@@ -63,32 +63,36 @@ END IF
 IF(ALLOCATED(config_stresses))THEN
   DEALLOCATE(config_stresses)
 END IF
+IF(ALLOCATED(stresses_calculated))THEN
+  DEALLOCATE(stresses_calculated)
+END IF
 
 
 
 ! ALLOCATE  
-ALLOCATE(rcut(1:1000))                     ! 8KB
-ALLOCATE(alat(1:1000))                     ! 8KB
-ALLOCATE(volume(1:1000))                   ! 8KB
-ALLOCATE(uv(1:3000, 1:3))                  ! 74KB
-ALLOCATE(ids(1:2000000))                   ! 16MB
-ALLOCATE(labels(1:2000000))                ! 16MB
-ALLOCATE(coords(1:2000000,1:6))            ! 32MB
-ALLOCATE(energies(1:2000000))             
-ALLOCATE(forces(1:100, 1:20000, 1:3))      ! 48MB
-ALLOCATE(stresses(1:1000,1:3,1:3))         ! 74KB
+ALLOCATE(rcut(1:max_configs))                     ! 8KB
+ALLOCATE(alat(1:max_configs))                     ! 8KB
+ALLOCATE(volume(1:max_configs))                   ! 8KB
+ALLOCATE(uv(1:3*max_configs, 1:3))                         ! 74KB
+ALLOCATE(ids(1:2000*max_configs))                          ! 16MB
+ALLOCATE(labels(1:2000*max_configs))                       ! 16MB
+ALLOCATE(coords(1:2000*max_configs,1:6))                   ! 32MB
+ALLOCATE(energies(1:2000*max_configs))             
+ALLOCATE(forces(1:max_configs, 1:20000, 1:3))      ! 48MB
+ALLOCATE(stresses(1:max_configs,1:3,1:3))         ! 74KB
+ALLOCATE(stresses_calculated(1:max_configs))
 
-ALLOCATE(ghostids(1:2000000))              ! 16MB
-ALLOCATE(ghostlabels(1:2000000))           ! 16MB
-ALLOCATE(ghostcoords(1:2000000, 1:3))      ! 48MB
-ALLOCATE(ghosthalo(1:2000000))             ! 16MB
+ALLOCATE(ghostids(1:10000*max_configs))              ! 16MB
+ALLOCATE(ghostlabels(1:10000*max_configs))           ! 16MB
+ALLOCATE(ghostcoords(1:10000*max_configs, 1:3))      ! 48MB
+ALLOCATE(ghosthalo(1:10000*max_configs))             ! 16MB
 
-ALLOCATE(nlist_l(1:2000000, 1:4))
-ALLOCATE(nlist_r(1:2000000, 1:4))
-ALLOCATE(nlisthalo(1:2000000))
+ALLOCATE(nlist_l(1:20000*max_configs, 1:4))
+ALLOCATE(nlist_r(1:20000*max_configs, 1:4))
+ALLOCATE(nlisthalo(1:20000*max_configs))
 
-ALLOCATE(config_forces(1:100, 1:20000, 1:3))     ! 48MB
-ALLOCATE(config_stresses(1:1000,1:3,1:3))        ! 74KB
+ALLOCATE(config_forces(1:max_configs, 1:20000, 1:3))     ! 48MB
+ALLOCATE(config_stresses(1:max_configs,1:3,1:3))        ! 74KB
 
 rcut = 0.0D0
 alat = 0.0D0
@@ -109,6 +113,7 @@ nlist_r = 0.0D0
 nlisthalo = .TRUE.
 config_forces = 0.0D0
 config_stresses = 0.0D0
+stresses_calculated = 0
 
 
 

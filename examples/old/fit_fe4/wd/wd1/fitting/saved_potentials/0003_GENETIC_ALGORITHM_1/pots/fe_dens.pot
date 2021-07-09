@@ -1,0 +1,4 @@
+#TYPE double_slater_4s_cutoff
+#P 12.8539 62.0658 0.224832 2.07657 
+#PF 0.0 
+#VR 1.5

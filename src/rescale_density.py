@@ -16,9 +16,12 @@ class rescale_density:
         a_id = g.pot_functions['functions'][fn]['a']
         f_id = g.pot_functions['functions'][fn]['f_group']
         m_rho = rescale_density.estimate_density(fn)
-        m[fn] = 1.0 / m_rho
-        fn_emb = potential.find_fn(3, a_id, f_id)
-        m[fn_emb] = 1.0 / m_rho
+
+        print(fn, m_rho)
+
+        #m[fn] = 1.0 / m_rho
+        #fn_emb = potential.find_fn(3, a_id, f_id)
+        #m[fn_emb] = 1.0 / m_rho
 
 
     """

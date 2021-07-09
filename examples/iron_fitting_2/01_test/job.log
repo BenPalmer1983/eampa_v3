@@ -1,0 +1,232 @@
+#############################################################################
+5.924E-01 ###   Mon, 05 Jul 2021 22:43:25 +0000
+#############################################################################
+
+####TIME#############LOG#####################################################
+8.016E-01 ###   Script: /cloud/Code/python/eampa/eampa.py
+8.229E-01 ###   Loaded: input.in
+#############################################
+  Read Input
+  Time: 9.061E-01
+#############################################
+9.108E-01 ###   rss
+9.163E-01 ###   a0: 5.0
+9.163E-01 ###   b0: 1.0
+9.163E-01 ###   bp: 100.0
+9.163E-01 ###   config: 0.0001
+9.163E-01 ###   e: 1.0
+9.163E-01 ###   e0: 25.0
+9.163E-01 ###   ec: 1.0
+9.163E-01 ###   energy: 20.0
+9.163E-01 ###   force: 1.0
+9.163E-01 ###   g: 1.0
+9.163E-01 ###   negec: 1000.0
+9.163E-01 ###   stress: 1.0
+9.163E-01 ###   v: 1.0
+9.163E-01 ###   
+1.003E+00 ###   max: 100.0
+1.003E+00 ###   min: 0.1
+1.003E+00 ###   scale_exponent: 4.0
+1.003E+00 ###   scale_factor: 10.0
+1.003E+00 ###   zero_density_factor: 100000000.0
+1.003E+00 ###   
+1.237E+00 ###   pot_dir: None
+1.237E+00 ###   pot_name: None
+1.237E+00 ###   results_dir: results
+1.237E+00 ###   
+1.439E+00 ###   bp_file: bp.dat
+1.439E+00 ###   dir: bp
+1.439E+00 ###   ec_size: 11
+1.439E+00 ###   ec_strain: 0.05
+1.439E+00 ###   eos_size: 9
+1.439E+00 ###   eos_strain: 0.1
+1.439E+00 ###   
+1.672E+00 ###   
+1.906E+00 ###   1: {'label_id': 1, 'label_text': 'AL', 'atom_count': 32, 'relaxed_energy': -1264.06398979, 'relaxed_energy_unit': 'Ry', 'coh_energy': -3.36, 'coh_energy_unit': 'eV', 'calc_relaxed_dft_ev': -537.454181036, 'calc_coh_ev': -3.36, 'calc_apaev': 534.094181036}
+1.906E+00 ###   2: {'label_id': 2, 'label_text': 'FE', 'atom_count': 16, 'relaxed_energy': -5268.188, 'relaxed_energy_unit': 'Ry', 'coh_energy': -4.316, 'coh_energy_unit': 'eV', 'calc_relaxed_dft_ev': -4479.851795407, 'calc_coh_ev': -4.316, 'calc_apaev': 4475.5357954070005}
+1.906E+00 ###   3: {'label_id': 3, 'label_text': 'PD', 'atom_count': 32, 'relaxed_energy': -16384.958, 'relaxed_energy_unit': 'Ry', 'coh_energy': -3.91, 'coh_energy_unit': 'eV', 'calc_relaxed_dft_ev': -6966.549363269, 'calc_coh_ev': -3.91, 'calc_apaev': 6962.639363269001}
+1.906E+00 ###   
+#############################################
+  Setup Directories
+  Time: 2.139E+00
+#############################################
+2.373E+00 ###   WD: wd/wd
+#############################################
+  Memory
+  Time: 2.496E+00
+#############################################
+2.503E+00 ###   EFS 2000000000.0
+2.701E+00 ###   config size       255102
+2.935E+00 ###   ghost size        3061224
+3.169E+00 ###   nl size           25510204
+3.403E+00 ###   BP 2000000000.0
+3.637E+00 ###   config size       255102
+3.870E+00 ###   ghost size        3061224
+4.104E+00 ###   nl size           25510204
+#############################################
+  Potential Load
+  Time: 4.337E+00
+#############################################
+4.649E+00 ###   Potential file: pot/fe.pot
+4.883E+00 ###   Loading: pot/fe.pot
+2.869E+01 ###   std  configs/fcc/ec_5_006.out
+2.878E+01 ###   std  configs/fcc/ec_1_006.out
+2.895E+01 ###   std  configs/fcc/ec_9_001.out
+2.938E+01 ###   std  configs/fcc/ec_1_001.out
+2.966E+01 ###   std  configs/fcc/ec_9_006.out
+2.990E+01 ###   std  configs/fcc/ec_5_001.out
+3.041E+01 ###   std  configs/fcc/ec_2_003.out
+3.076E+01 ###   std  configs/fcc/ec_6_003.out
+3.077E+01 ###   std  configs/fcc/ec_6_004.out
+3.078E+01 ###   std  configs/fcc/ec_2_004.out
+3.092E+01 ###   std  configs/fcc/ec_3_002.out
+3.093E+01 ###   std  configs/fcc/ec_7_002.out
+3.110E+01 ###   std  configs/fcc/ec_7_005.out
+3.161E+01 ###   std  configs/fcc/coords_256_fe2.dat
+3.204E+01 ###   std  configs/fcc/ec_3_005.out
+3.247E+01 ###   std  configs/fcc/eos_002.out
+3.297E+01 ###   std  configs/fcc/eos_005.out
+3.340E+01 ###   std  configs/fcc/ec_4_007.out
+3.383E+01 ###   std  configs/fcc/ec_8_007.out
+3.400E+01 ###   std  configs/fcc/ec_6_005.out
+3.443E+01 ###   std  configs/fcc/ec_2_005.out
+3.486E+01 ###   std  configs/fcc/ec_2_002.out
+3.537E+01 ###   std  configs/fcc/fe_config_0001.out
+3.576E+01 ###   std  configs/fcc/ec_6_002.out
+3.577E+01 ###   std  configs/fcc/ec_9_007.out
+3.578E+01 ###   std  configs/fcc/ec_5_007.out
+3.594E+01 ###   std  configs/fcc/ec_1_007.out
+3.595E+01 ###   std  configs/fcc/coords_256_fe.dat
+3.608E+01 ###   std  configs/fcc/ec_8_006.out
+3.621E+01 ###   std  configs/fcc/ec_4_001.out
+3.664E+01 ###   std  configs/fcc/ec_4_006.out
+3.707E+01 ###   std  configs/fcc/ec_8_001.out
+3.758E+01 ###   std  configs/fcc/eos_004.out
+3.801E+01 ###   std  configs/fcc/eos_003.out
+3.844E+01 ###   std  configs/fcc/ec_7_004.out
+3.895E+01 ###   std  configs/fcc/ec_3_004.out
+3.938E+01 ###   std  configs/fcc/ec_3_003.out
+3.980E+01 ###   std  configs/fcc/ec_7_003.out
+4.031E+01 ###   std  configs/fcc/ec_4_005.out
+4.074E+01 ###   std  configs/fcc/ec_8_002.out
+4.083E+01 ###   std  configs/fcc/ec_8_005.out
+4.084E+01 ###   std  configs/fcc/ec_4_002.out
+4.098E+01 ###   std  configs/fcc/eos_007.out
+4.104E+01 ###   std  configs/fcc/ec_7_007.out
+4.109E+01 ###   std  configs/fcc/ec_3_007.out
+4.118E+01 ###   std  configs/fcc/ec_2_001.out
+4.150E+01 ###   std  configs/fcc/ec_6_001.out
+4.192E+01 ###   std  configs/fcc/ec_6_006.out
+4.243E+01 ###   std  configs/fcc/ec_2_006.out
+4.286E+01 ###   std  configs/fcc/ec_5_004.out
+4.321E+01 ###   std  configs/fcc/ec_1_004.out
+4.342E+01 ###   std  configs/fcc/ec_9_003.out
+4.385E+01 ###   std  configs/fcc/ec_1_003.out
+4.428E+01 ###   std  configs/fcc/ec_9_004.out
+4.479E+01 ###   std  configs/fcc/ec_5_003.out
+4.500E+01 ###   std  configs/fcc/ec_7_006.out
+4.509E+01 ###   std  configs/fcc/ec_3_006.out
+4.548E+01 ###   std  configs/fcc/ec_3_001.out
+4.566E+01 ###   std  configs/fcc/ec_7_001.out
+4.578E+01 ###   std  configs/fcc/eos_006.out
+4.580E+01 ###   std  configs/fcc/eos_001.out
+4.594E+01 ###   std  configs/fcc/ec_8_004.out
+4.634E+01 ###   std  configs/fcc/ec_4_003.out
+4.676E+01 ###   std  configs/fcc/ec_4_004.out
+4.727E+01 ###   std  configs/fcc/ec_8_003.out
+4.762E+01 ###   std  configs/fcc/ec_1_002.out
+4.805E+01 ###   std  configs/fcc/ec_9_005.out
+4.860E+01 ###   std  configs/fcc/ec_5_002.out
+4.903E+01 ###   std  configs/fcc/ec_5_005.out
+4.946E+01 ###   std  configs/fcc/ec_1_005.out
+4.996E+01 ###   std  configs/fcc/ec_9_002.out
+5.013E+01 ###   std  configs/fcc/ec_6_007.out
+5.025E+01 ###   std  configs/fcc/ec_2_007.out
+5.027E+01 ###   std  configs/bcc/ec_6_004.out
+5.045E+01 ###   std  configs/bcc/ec_2_004.out
+5.054E+01 ###   std  configs/bcc/eos_014.out
+5.071E+01 ###   std  configs/bcc/ec_2_003.out
+5.095E+01 ###   std  configs/bcc/eos_013.out
+####TIME#############LOG#####################################################
+5.113E+01 ###   std  configs/bcc/ec_6_003.out
+5.123E+01 ###   std  configs/bcc/ec_1_001.out
+5.124E+01 ###   std  configs/bcc/ec_9_006.out
+5.142E+01 ###   std  configs/bcc/ec_5_001.out
+5.174E+01 ###   std  configs/bcc/ec_5_006.out
+5.211E+01 ###   std  configs/bcc/ec_1_006.out
+5.247E+01 ###   std  configs/bcc/ec_9_001.out
+5.267E+01 ###   std  configs/bcc/ec_8_007.out
+5.268E+01 ###   std  configs/bcc/ec_4_007.out
+5.269E+01 ###   std  configs/bcc/eos_002.out
+5.288E+01 ###   std  configs/bcc/ec_7_005.out
+5.289E+01 ###   std  configs/bcc/ec_3_005.out
+5.289E+01 ###   std  configs/bcc/ec_3_002.out
+5.290E+01 ###   std  configs/bcc/eos_005.out
+5.290E+01 ###   std  configs/bcc/ec_7_002.out
+5.300E+01 ###   std  configs/bcc/ec_5_007.out
+5.300E+01 ###   std  configs/bcc/ec_1_007.out
+5.301E+01 ###   std  configs/bcc/ec_9_007.out
+5.302E+01 ###   std  configs/bcc/bcc2.dat
+5.316E+01 ###   std  configs/bcc/ec_2_002.out
+5.317E+01 ###   std  configs/bcc/eos_012.out
+5.318E+01 ###   std  configs/bcc/ec_6_002.out
+5.318E+01 ###   std  configs/bcc/ec_6_005.out
+5.324E+01 ###   std  configs/bcc/ec_2_005.out
+5.333E+01 ###   std  configs/bcc/eos_015.out
+5.349E+01 ###   std  configs/bcc/ec_3_003.out
+5.369E+01 ###   std  configs/bcc/eos_004.out
+5.382E+01 ###   std  configs/bcc/ec_7_003.out
+5.413E+01 ###   std  configs/bcc/eos_003.out
+5.414E+01 ###   std  configs/bcc/ec_7_004.out
+5.424E+01 ###   std  configs/bcc/ec_3_004.out
+5.425E+01 ###   std  configs/bcc/ec_4_006.out
+5.434E+01 ###   std  configs/bcc/ec_8_001.out
+5.439E+01 ###   std  configs/bcc/ec_8_006.out
+5.448E+01 ###   std  configs/bcc/ec_4_001.out
+5.491E+01 ###   std  configs/bcc/eos_009.out
+5.530E+01 ###   std  configs/bcc/ec_7_007.out
+5.539E+01 ###   std  configs/bcc/ec_3_007.out
+5.549E+01 ###   std  configs/bcc/eos_007.out
+5.558E+01 ###   std  configs/bcc/ec_8_005.out
+5.567E+01 ###   std  configs/bcc/ec_4_002.out
+5.568E+01 ###   std  configs/bcc/ec_4_005.out
+5.577E+01 ###   std  configs/bcc/ec_8_002.out
+5.579E+01 ###   std  configs/bcc/ec_1_003.out
+5.596E+01 ###   std  configs/bcc/ec_9_004.out
+5.643E+01 ###   std  configs/bcc/ec_5_003.out
+5.686E+01 ###   std  configs/bcc/ec_5_004.out
+5.695E+01 ###   std  configs/bcc/ec_1_004.out
+5.705E+01 ###   std  configs/bcc/ec_9_003.out
+5.706E+01 ###   std  configs/bcc/bcc1.dat
+5.720E+01 ###   std  configs/bcc/ec_6_006.out
+5.764E+01 ###   std  configs/bcc/ec_2_006.out
+5.811E+01 ###   std  configs/bcc/ec_2_001.out
+5.842E+01 ###   std  configs/bcc/eos_011.out
+5.871E+01 ###   std  configs/bcc/ec_6_001.out
+5.918E+01 ###   std  configs/bcc/ec_4_004.out
+5.964E+01 ###   std  configs/bcc/ec_8_003.out
+6.011E+01 ###   std  configs/bcc/ec_8_004.out
+6.050E+01 ###   std  configs/bcc/ec_4_003.out
+6.078E+01 ###   std  configs/bcc/ec_3_001.out
+6.079E+01 ###   std  configs/bcc/eos_006.out
+6.085E+01 ###   std  configs/bcc/ec_7_001.out
+6.090E+01 ###   std  configs/bcc/eos_001.out
+6.091E+01 ###   std  configs/bcc/ec_7_006.out
+6.117E+01 ###   std  configs/bcc/ec_3_006.out
+6.149E+01 ###   std  configs/bcc/eos_008.out
+6.150E+01 ###   std  configs/bcc/eos_010.out
+6.151E+01 ###   std  configs/bcc/ec_6_007.out
+6.164E+01 ###   std  configs/bcc/ec_2_007.out
+6.170E+01 ###   std  configs/bcc/ec_5_005.out
+6.179E+01 ###   std  configs/bcc/ec_1_005.out
+6.186E+01 ###   std  configs/bcc/ec_9_002.out
+6.217E+01 ###   std  configs/bcc/ec_1_002.out
+6.260E+01 ###   std  configs/bcc/ec_9_005.out
+6.311E+01 ###   std  configs/bcc/ec_5_002.out
+6.645E+01 ###   BP Allocated Memory
+6.645E+01 ###   
+6.668E+01 ###   2GB
+6.668E+01 ###   
+6.684E+01 ###   255102 3061224 25510204
+6.684E+01 ###   
+6.896E+01 ###   Best rss: None (since last: 1)

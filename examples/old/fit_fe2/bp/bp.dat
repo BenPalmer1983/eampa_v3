@@ -1,0 +1,6 @@
+# Bulk Properties File
+
+units pressure=GPA length=ang energy=ev
+
+FEFCC1 potlabel=FE b0=211 alat=3.42 uv=1.0 e0=-4.27 ec=365,137,186 type=fcc expansion=4 rcut=6.5 amu_per_crystal=224.00
+FEBCC1 potlabel=FE b0=170 alat=2.86 uv=1.0 e0=-4.32 ec=243,145,116 type=bcc expansion=4 rcut=6.5 amu_per_crystal=112.00

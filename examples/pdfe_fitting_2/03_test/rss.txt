@@ -1,0 +1,1580 @@
+07/09/2021, 20:01:01
+RUNNING
+Load Potential
+
+DATA
+################################
+Function Count:     7
+Label max:          3
+Fgroup max:         1
+Pair max:           6
+Dens Offset:        6
+Embe Offset:        15
+Key Max:            18
+
+Pair
+################################
+1 AL AL
+2 AL FE
+4 AL PD
+2 FE AL
+3 FE FE
+5 FE PD
+4 PD AL
+5 PD FE
+6 PD PD
+
+Density
+################################
+7 D1 AL Any
+8 D1 FE Any
+9 D1 PD Any
+10 D1 AL AL
+11 D1 AL FE
+13 D1 AL PD
+11 D1 FE AL
+12 D1 FE FE
+14 D1 FE PD
+13 D1 PD AL
+14 D1 PD FE
+15 D1 PD PD
+
+Embedding
+################################
+16 D1 AL
+17 D1 FE
+18 D1 PD
+
+RUN TYPE: rss
+Calc RSS
+
+Config 1    configs/fe_fcc/ec_2_005.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.46368                    -127.79092636                 
+Pair:                                                       -254.241347727                
+Embedding:                                                  126.450421367                 
+
+Config 2    configs/fe_fcc/ec_6_005.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.3712                     -129.504980365                
+Pair:                                                       -256.341935649                
+Embedding:                                                  126.836955284                 
+
+Config 3    configs/fe_fcc/ec_6_002.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.40352                    -129.577971406                
+Pair:                                                       -256.400066395                
+Embedding:                                                  126.822094989                 
+
+Config 4    configs/fe_fcc/ec_2_002.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.42272                    -129.149867032                
+Pair:                                                       -255.879237666                
+Embedding:                                                  126.729370633                 
+
+Config 5    configs/fe_fcc/eos_002.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -135.5888                     -132.071803439                
+Pair:                                                       -261.285300306                
+Embedding:                                                  129.213496867                 
+
+Config 6    configs/fe_fcc/ec_9_007.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.36448                    -126.656458499                
+Pair:                                                       -253.475674927                
+Embedding:                                                  126.819216428                 
+
+Config 7    configs/fe_fcc/ec_1_007.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.47392                    -129.404460752                
+Pair:                                                       -255.656164769                
+Embedding:                                                  126.251704017                 
+
+Config 8    configs/fe_fcc/eos_005.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.52864                    -127.704096062                
+Pair:                                                       -253.331535401                
+Embedding:                                                  125.627439339                 
+
+Config 9    configs/fe_fcc/ec_5_007.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.29216                    -129.310678613                
+Pair:                                                       -256.08918331                 
+Embedding:                                                  126.778504697                 
+
+Config 10    configs/fe_fcc/ec_4_001.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.40544                    -129.581697142                
+Pair:                                                       -256.404300495                
+Embedding:                                                  126.822603354                 
+
+Config 11    configs/fe_fcc/ec_8_006.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.3872                     -129.374309538                
+Pair:                                                       -256.187705516                
+Embedding:                                                  126.813395978                 
+
+Config 12    configs/fe_fcc/ec_8_001.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.40544                    -129.581697142                
+Pair:                                                       -256.404300495                
+Embedding:                                                  126.822603354                 
+
+Config 13    configs/fe_fcc/ec_4_006.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.35136                    -129.481728459                
+Pair:                                                       -256.309893459                
+Embedding:                                                  126.828165001                 
+
+Config 14    configs/fe_fcc/ec_3_004.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.4496                     -129.526052121                
+Pair:                                                       -256.070407106                
+Embedding:                                                  126.544354985                 
+
+Config 15    configs/fe_fcc/ec_7_004.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.39328                    -130.750174889                
+Pair:                                                       -257.572801843                
+Embedding:                                                  126.822626954                 
+
+Config 16    configs/fe_fcc/ec_7_003.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.39936                    -130.382238458                
+Pair:                                                       -257.204846763                
+Embedding:                                                  126.822608305                 
+
+Config 17    configs/fe_fcc/ec_3_003.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.4368                     -129.553026278                
+Pair:                                                       -256.190173398                
+Embedding:                                                  126.63714712                  
+
+Config 18    configs/fe_fcc/ec_9_001.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.40544                    -129.581697142                
+Pair:                                                       -256.404300495                
+Embedding:                                                  126.822603354                 
+
+Config 19    configs/fe_fcc/ec_1_006.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.46752                    -129.460551894                
+Pair:                                                       -255.804225983                
+Embedding:                                                  126.343674089                 
+
+Config 20    configs/fe_fcc/eos_004.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.40544                    -129.581697142                
+Pair:                                                       -256.404300495                
+Embedding:                                                  126.822603354                 
+
+Config 21    configs/fe_fcc/ec_5_006.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.32672                    -129.412277308                
+Pair:                                                       -256.191222662                
+Embedding:                                                  126.778945355                 
+
+Config 22    configs/fe_fcc/eos_003.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.0976                     -131.118235477                
+Pair:                                                       -259.061154147                
+Embedding:                                                  127.94291867                  
+
+Config 23    configs/fe_fcc/ec_5_001.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.40544                    -129.581697142                
+Pair:                                                       -256.404300495                
+Embedding:                                                  126.822603354                 
+
+Config 24    configs/fe_fcc/ec_9_006.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.37696                    -127.203088979                
+Pair:                                                       -254.022666007                
+Embedding:                                                  126.819577028                 
+
+Config 25    configs/fe_fcc/ec_1_001.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.40544                    -129.581697142                
+Pair:                                                       -256.404300495                
+Embedding:                                                  126.822603354                 
+
+Config 26    configs/fe_fcc/ec_6_003.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.39712                    -129.566878832                
+Pair:                                                       -256.389011275                
+Embedding:                                                  126.822132443                 
+
+Config 27    configs/fe_fcc/ec_2_003.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.4384                     -128.707692522                
+Pair:                                                       -255.34382012                 
+Embedding:                                                  126.636127598                 
+
+Config 28    configs/fe_fcc/ec_2_004.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.45184                    -128.255730545                
+Pair:                                                       -254.798725017                
+Embedding:                                                  126.542994472                 
+
+Config 29    configs/fe_fcc/ec_6_004.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.38624                    -129.548527619                
+Pair:                                                       -256.370169435                
+Embedding:                                                  126.821641816                 
+
+Config 30    configs/fe_fcc/ec_7_002.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.40288                    -129.991816196                
+Pair:                                                       -256.814079276                
+Embedding:                                                  126.82226308                  
+
+Config 31    configs/fe_fcc/ec_3_002.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.42208                    -129.571659056                
+Pair:                                                       -256.301740404                
+Embedding:                                                  126.730081348                 
+
+Config 32    configs/fe_fcc/ec_3_005.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.45952                    -129.50691654                 
+Pair:                                                       -255.942676144                
+Embedding:                                                  126.435759604                 
+
+Config 33    configs/fe_fcc/ec_7_005.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.38464                    -131.114255717                
+Pair:                                                       -257.919830537                
+Embedding:                                                  126.805574821                 
+
+Config 34    configs/fe_fcc/ec_4_007.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.32736                    -129.436045598                
+Pair:                                                       -256.268897852                
+Embedding:                                                  126.832852253                 
+
+Config 35    configs/fe_fcc/ec_8_007.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.37888                    -129.285427404                
+Pair:                                                       -256.090987133                
+Embedding:                                                  126.805559729                 
+
+Config 36    configs/fe_fcc/ec_3_006.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.46752                    -129.460817437                
+Pair:                                                       -255.804480909                
+Embedding:                                                  126.343663472                 
+
+Config 37    configs/fe_fcc/ec_7_006.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.37376                    -131.436391549                
+Pair:                                                       -258.241603002                
+Embedding:                                                  126.805211453                 
+
+Config 38    configs/fe_fcc/ec_7_001.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.40544                    -129.581697142                
+Pair:                                                       -256.404300495                
+Embedding:                                                  126.822603354                 
+
+Config 39    configs/fe_fcc/ec_3_001.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.40544                    -129.581697142                
+Pair:                                                       -256.404300495                
+Embedding:                                                  126.822603354                 
+
+Config 40    configs/fe_fcc/ec_4_003.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.39712                    -129.566884553                
+Pair:                                                       -256.389017225                
+Embedding:                                                  126.822132672                 
+
+Config 41    configs/fe_fcc/ec_8_004.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.39904                    -129.504095267                
+Pair:                                                       -256.326731057                
+Embedding:                                                  126.822635791                 
+
+Config 42    configs/fe_fcc/ec_8_003.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.40256                    -129.54659374                 
+Pair:                                                       -256.368615097                
+Embedding:                                                  126.822021357                 
+
+Config 43    configs/fe_fcc/ec_4_004.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.38624                    -129.54814992                 
+Pair:                                                       -256.369788499                
+Embedding:                                                  126.821638579                 
+
+Config 44    configs/fe_fcc/coords_256_fe2.dat
+###############################################################
+Atom Count:                   256
+Energy (known/calculated):    0.0                           0.0                           
+Pair:                                                       0.0                           
+Embedding:                                                  0.0                           
+
+Config 45    configs/fe_fcc/ec_5_002.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.40256                    -129.572873202                
+Pair:                                                       -256.394970808                
+Embedding:                                                  126.822097605                 
+
+Config 46    configs/fe_fcc/ec_9_005.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.38752                    -127.724677025                
+Pair:                                                       -254.545314583                
+Embedding:                                                  126.820637559                 
+
+Config 47    configs/fe_fcc/ec_1_002.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.42208                    -129.57155883                 
+Pair:                                                       -256.301083989                
+Embedding:                                                  126.729525158                 
+
+Config 48    configs/fe_fcc/ec_9_002.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.40512                    -129.150308549                
+Pair:                                                       -255.972885455                
+Embedding:                                                  126.822576906                 
+
+Config 49    configs/fe_fcc/ec_1_005.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.45952                    -129.506614943                
+Pair:                                                       -255.941826692                
+Embedding:                                                  126.435211749                 
+
+Config 50    configs/fe_fcc/eos_007.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.27776                    -122.40018126                 
+Pair:                                                       -245.763718317                
+Embedding:                                                  123.363537057                 
+
+Config 51    configs/fe_fcc/ec_5_005.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.3552                     -129.482836155                
+Pair:                                                       -256.270160653                
+Embedding:                                                  126.787324497                 
+
+Config 52    configs/fe_fcc/ec_2_007.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.48224                    -126.827005815                
+Pair:                                                       -253.09140446                 
+Embedding:                                                  126.264398644                 
+
+Config 53    configs/fe_fcc/ec_6_007.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.32736                    -129.436361148                
+Pair:                                                       -256.269214295                
+Embedding:                                                  126.832853147                 
+
+Config 54    configs/fe_fcc/fe_config_0001.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.42432                    -129.719182856                
+Pair:                                                       -256.418030215                
+Embedding:                                                  126.698847358                 
+
+Config 55    configs/fe_fcc/ec_8_002.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.40512                    -129.572305892                
+Pair:                                                       -256.394507203                
+Embedding:                                                  126.822201311                 
+
+Config 56    configs/fe_fcc/ec_4_005.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.3712                     -129.505416289                
+Pair:                                                       -256.342388876                
+Embedding:                                                  126.836972587                 
+
+Config 57    configs/fe_fcc/ec_4_002.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.40352                    -129.57833533                 
+Pair:                                                       -256.400433161                
+Embedding:                                                  126.822097831                 
+
+Config 58    configs/fe_fcc/ec_8_005.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.39424                    -129.452316144                
+Pair:                                                       -256.266540752                
+Embedding:                                                  126.814224608                 
+
+Config 59    configs/fe_fcc/coords_256_fe.dat
+###############################################################
+Atom Count:                   256
+Energy (known/calculated):    -1093.12                      -1085.76867195                
+Pair:                                                       -2098.4890924                 
+Embedding:                                                  1012.72042046                 
+
+Config 60    configs/fe_fcc/ec_3_007.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.47392                    -129.404807907                
+Pair:                                                       -255.65650183                 
+Embedding:                                                  126.251693923                 
+
+Config 61    configs/fe_fcc/ec_7_007.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.36032                    -131.734237066                
+Pair:                                                       -258.539748241                
+Embedding:                                                  126.805511175                 
+
+Config 62    configs/fe_fcc/ec_6_001.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.40544                    -129.581697142                
+Pair:                                                       -256.404300495                
+Embedding:                                                  126.822603354                 
+
+Config 63    configs/fe_fcc/ec_2_001.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.40544                    -129.581697142                
+Pair:                                                       -256.404300495                
+Embedding:                                                  126.822603354                 
+
+Config 64    configs/fe_fcc/ec_2_006.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.47392                    -127.315301409                
+Pair:                                                       -253.672686878                
+Embedding:                                                  126.357385469                 
+
+Config 65    configs/fe_fcc/ec_6_006.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.35136                    -129.480876347                
+Pair:                                                       -256.309027736                
+Embedding:                                                  126.828151389                 
+
+Config 66    configs/fe_fcc/ec_9_003.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.40128                    -128.698342994                
+Pair:                                                       -255.520488519                
+Embedding:                                                  126.822145525                 
+
+Config 67    configs/fe_fcc/ec_1_004.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.4496                     -129.525889023                
+Pair:                                                       -256.070247916                
+Embedding:                                                  126.544358892                 
+
+Config 68    configs/fe_fcc/eos_006.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.48096                    -125.275878601                
+Pair:                                                       -249.738050941                
+Embedding:                                                  124.46217234                  
+
+Config 69    configs/fe_fcc/ec_5_004.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.37696                    -129.516835168                
+Pair:                                                       -256.330318709                
+Embedding:                                                  126.813483541                 
+
+Config 70    configs/fe_fcc/eos_001.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -134.86464                    -132.672087692                
+Pair:                                                       -263.098676429                
+Embedding:                                                  130.426588737                 
+
+Config 71    configs/fe_fcc/ec_5_003.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.39296                    -129.548818286                
+Pair:                                                       -256.370980872                
+Embedding:                                                  126.822162586                 
+
+Config 72    configs/fe_fcc/ec_9_004.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.39552                    -128.22263631                 
+Pair:                                                       -255.043971983                
+Embedding:                                                  126.821335673                 
+
+Config 73    configs/fe_fcc/ec_1_003.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -136.4368                     -129.552923836                
+Pair:                                                       -256.190074253                
+Embedding:                                                  126.637150417                 
+
+Config 74    configs/pd_fcc/eos_003.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.09024                    -124.718617829                
+Pair:                                                       -73.5874029078                
+Embedding:                                                  -51.1312149216                
+
+Config 75    configs/pd_fcc/eos_004.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.12224                    -124.597781724                
+Pair:                                                       -73.2324864808                
+Embedding:                                                  -51.3652952436                
+
+Config 76    configs/pd_fcc/ec_4_004.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.11872                    -124.591669967                
+Pair:                                                       -73.22668951                  
+Embedding:                                                  -51.3649804573                
+
+Config 77    configs/pd_fcc/ec_8_003.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.12128                    -124.593461831                
+Pair:                                                       -73.2291466065                
+Embedding:                                                  -51.3643152241                
+
+Config 78    configs/pd_fcc/ec_8_004.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.12064                    -124.588066166                
+Pair:                                                       -73.2249817284                
+Embedding:                                                  -51.3630844379                
+
+Config 79    configs/pd_fcc/ec_4_003.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.12064                    -124.595058928                
+Pair:                                                       -73.2299041346                
+Embedding:                                                  -51.3651547932                
+
+Config 80    configs/pd_fcc/config_0004.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.13024                    -124.525526132                
+Pair:                                                       -73.0430768253                
+Embedding:                                                  -51.4824493064                
+
+Config 81    configs/pd_fcc/config_0003.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.12768                    -124.544361231                
+Pair:                                                       -73.0927563825                
+Embedding:                                                  -51.4516048485                
+
+Config 82    configs/pd_fcc/ec_3_001.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.12224                    -124.597781724                
+Pair:                                                       -73.2324864808                
+Embedding:                                                  -51.3652952436                
+
+Config 83    configs/pd_fcc/ec_7_001.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.12224                    -124.597781724                
+Pair:                                                       -73.2324864808                
+Embedding:                                                  -51.3652952436                
+
+Config 84    configs/pd_fcc/ec_7_006.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.11808                    -124.570273071                
+Pair:                                                       -73.2102051756                
+Embedding:                                                  -51.3600678958                
+
+Config 85    configs/pd_fcc/ec_3_006.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.13664                    -124.470912112                
+Pair:                                                       -72.9203153913                
+Embedding:                                                  -51.5505967206                
+
+Config 86    configs/pd_fcc/ec_6_007.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.10912                    -124.572535021                
+Pair:                                                       -73.2071264005                
+Embedding:                                                  -51.3654086205                
+
+Config 87    configs/pd_fcc/ec_2_007.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.13824                    -124.441648419                
+Pair:                                                       -72.8554792462                
+Embedding:                                                  -51.5861691728                
+
+Config 88    configs/pd_fcc/ec_5_005.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.11616                    -124.586919881                
+Pair:                                                       -73.2221831194                
+Embedding:                                                  -51.3647367612                
+
+Config 89    configs/pd_fcc/ec_1_005.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.13472                    -124.49908489                 
+Pair:                                                       -72.9849629833                
+Embedding:                                                  -51.5141219064                
+
+Config 90    configs/pd_fcc/ec_9_002.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.1216                     -124.596702997                
+Pair:                                                       -73.2316547227                
+Embedding:                                                  -51.3650482741                
+
+Config 91    configs/pd_fcc/ec_1_002.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.12576                    -124.575188127                
+Pair:                                                       -73.1721483026                
+Embedding:                                                  -51.4030398243                
+
+Config 92    configs/pd_fcc/ec_9_005.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.11936                    -124.580241804                
+Pair:                                                       -73.218422329                 
+Embedding:                                                  -51.3618194755                
+
+Config 93    configs/pd_fcc/ec_5_002.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.1216                     -124.597103681                
+Pair:                                                       -73.2318432559                
+Embedding:                                                  -51.3652604255                
+
+Config 94    configs/pd_fcc/ec_7_007.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.11648                    -124.558132575                
+Pair:                                                       -73.2003085613                
+Embedding:                                                  -51.3578240134                
+
+Config 95    configs/pd_fcc/ec_3_007.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.13824                    -124.441688891                
+Pair:                                                       -72.8555110943                
+Embedding:                                                  -51.5861777969                
+
+Config 96    configs/pd_fcc/config_0002.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.13504                    -124.484668706                
+Pair:                                                       -72.9370117172                
+Embedding:                                                  -51.5476569888                
+
+Config 97    configs/pd_fcc/config_0005.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.13248                    -124.50742493                 
+Pair:                                                       -72.9958057439                
+Embedding:                                                  -51.5116191857                
+
+Config 98    configs/pd_fcc/ec_8_005.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.11936                    -124.580241804                
+Pair:                                                       -73.218422329                 
+Embedding:                                                  -51.3618194755                
+
+Config 99    configs/pd_fcc/ec_4_002.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.1216                     -124.597103681                
+Pair:                                                       -73.2318432559                
+Embedding:                                                  -51.3652604255                
+
+Config 100    configs/pd_fcc/ec_4_005.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.11616                    -124.586919881                
+Pair:                                                       -73.2221831194                
+Embedding:                                                  -51.3647367612                
+
+Config 101    configs/pd_fcc/ec_8_002.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.1216                     -124.596702997                
+Pair:                                                       -73.2316547227                
+Embedding:                                                  -51.3650482741                
+
+Config 102    configs/pd_fcc/eos_005.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.14016                    -124.454101781                
+Pair:                                                       -72.8645451058                
+Embedding:                                                  -51.5895566751                
+
+Config 103    configs/pd_fcc/eos_002.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.04448                    -124.815383533                
+Pair:                                                       -73.9268401155                
+Embedding:                                                  -50.8885434173                
+
+Config 104    configs/pd_fcc/ec_1_003.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.12928                    -124.55096619                 
+Pair:                                                       -73.1101624982                
+Embedding:                                                  -51.4408036919                
+
+Config 105    configs/pd_fcc/ec_9_004.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.12064                    -124.588066166                
+Pair:                                                       -73.2249817284                
+Embedding:                                                  -51.3630844379                
+
+Config 106    configs/pd_fcc/ec_5_003.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.12064                    -124.595058928                
+Pair:                                                       -73.2299041346                
+Embedding:                                                  -51.3651547932                
+
+Config 107    configs/pd_fcc/ec_5_004.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.11872                    -124.591669967                
+Pair:                                                       -73.22668951                  
+Embedding:                                                  -51.3649804573                
+
+Config 108    configs/pd_fcc/ec_1_004.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.13216                    -124.525708114                
+Pair:                                                       -73.0480237187                
+Embedding:                                                  -51.4776843952                
+
+Config 109    configs/pd_fcc/ec_9_003.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.12128                    -124.593461831                
+Pair:                                                       -73.2291466065                
+Embedding:                                                  -51.3643152241                
+
+Config 110    configs/pd_fcc/fcc_002.dat
+###############################################################
+Atom Count:                   256
+Energy (known/calculated):    0.0                           0.0                           
+Pair:                                                       0.0                           
+Embedding:                                                  0.0                           
+
+Config 111    configs/pd_fcc/ec_6_006.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.11296                    -124.579981949                
+Pair:                                                       -73.2141902538                
+Embedding:                                                  -51.3657916953                
+
+Config 112    configs/pd_fcc/ec_2_006.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.13664                    -124.470912051                
+Pair:                                                       -72.9203153515                
+Embedding:                                                  -51.5505966992                
+
+Config 113    configs/pd_fcc/ec_2_001.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.12224                    -124.597781724                
+Pair:                                                       -73.2324864808                
+Embedding:                                                  -51.3652952436                
+
+Config 114    configs/pd_fcc/ec_6_001.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.12224                    -124.597781724                
+Pair:                                                       -73.2324864808                
+Embedding:                                                  -51.3652952436                
+
+Config 115    configs/pd_fcc/ec_5_007.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.10912                    -124.572535021                
+Pair:                                                       -73.2071264005                
+Embedding:                                                  -51.3654086205                
+
+Config 116    configs/pd_fcc/ec_1_007.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.13824                    -124.441648419                
+Pair:                                                       -72.8554792462                
+Embedding:                                                  -51.5861691728                
+
+Config 117    configs/pd_fcc/ec_9_007.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.11648                    -124.558132575                
+Pair:                                                       -73.2003085613                
+Embedding:                                                  -51.3578240134                
+
+Config 118    configs/pd_fcc/config_0010.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.12224                    -124.580521758                
+Pair:                                                       -73.1896143797                
+Embedding:                                                  -51.3909073782                
+
+Config 119    configs/pd_fcc/fcc_001.dat
+###############################################################
+Atom Count:                   256
+Energy (known/calculated):    -1000.96                      -1000.97778367                
+Pair:                                                       -600.694266536                
+Embedding:                                                  -400.283517135                
+
+Config 120    configs/pd_fcc/ec_2_002.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.12576                    -124.575188127                
+Pair:                                                       -73.1721483026                
+Embedding:                                                  -51.4030398243                
+
+Config 121    configs/pd_fcc/ec_6_002.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.1216                     -124.597103681                
+Pair:                                                       -73.2318432559                
+Embedding:                                                  -51.3652604255                
+
+Config 122    configs/pd_fcc/ec_6_005.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.11616                    -124.586923215                
+Pair:                                                       -73.2221864388                
+Embedding:                                                  -51.3647367765                
+
+Config 123    configs/pd_fcc/ec_2_005.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.13472                    -124.49908489                 
+Pair:                                                       -72.9849629833                
+Embedding:                                                  -51.5141219064                
+
+Config 124    configs/pd_fcc/ec_3_003.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.12928                    -124.550966244                
+Pair:                                                       -73.1101625328                
+Embedding:                                                  -51.4408037108                
+
+Config 125    configs/pd_fcc/ec_7_003.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.12128                    -124.593460703                
+Pair:                                                       -73.2291473125                
+Embedding:                                                  -51.3643133909                
+
+Config 126    configs/pd_fcc/ec_7_004.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.12064                    -124.588066166                
+Pair:                                                       -73.2249817284                
+Embedding:                                                  -51.3630844379                
+
+Config 127    configs/pd_fcc/config_0008.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.13376                    -124.497218786                
+Pair:                                                       -72.9693511471                
+Embedding:                                                  -51.5278676394                
+
+Config 128    configs/pd_fcc/ec_3_004.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.13216                    -124.525708167                
+Pair:                                                       -73.0480237532                
+Embedding:                                                  -51.477684414                 
+
+Config 129    configs/pd_fcc/config_0006.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.11168                    -124.633480621                
+Pair:                                                       -73.3352884401                
+Embedding:                                                  -51.2981921806                
+
+Config 130    configs/pd_fcc/config_0001.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.13024                    -124.526055386                
+Pair:                                                       -73.0444658422                
+Embedding:                                                  -51.4815895441                
+
+Config 131    configs/pd_fcc/ec_4_006.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.11296                    -124.579981949                
+Pair:                                                       -73.2141902538                
+Embedding:                                                  -51.3657916953                
+
+Config 132    configs/pd_fcc/ec_8_001.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.12224                    -124.597781724                
+Pair:                                                       -73.2324864808                
+Embedding:                                                  -51.3652952436                
+
+Config 133    configs/pd_fcc/ec_8_006.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.11808                    -124.570273071                
+Pair:                                                       -73.2102051756                
+Embedding:                                                  -51.3600678958                
+
+Config 134    configs/pd_fcc/ec_4_001.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.12224                    -124.597781724                
+Pair:                                                       -73.2324864808                
+Embedding:                                                  -51.3652952436                
+
+Config 135    configs/pd_fcc/eos_001.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -124.98432                    -124.888895914                
+Pair:                                                       -74.254647512                 
+Embedding:                                                  -50.6342484016                
+
+Config 136    configs/pd_fcc/eos_006.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.14496                    -124.289079265                
+Pair:                                                       -72.4861905374                
+Embedding:                                                  -51.802888728                 
+
+Config 137    configs/pd_fcc/ec_6_004.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.11872                    -124.591664744                
+Pair:                                                       -73.2266843288                
+Embedding:                                                  -51.3649804152                
+
+Config 138    configs/pd_fcc/ec_2_004.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.13216                    -124.525708114                
+Pair:                                                       -73.0480237187                
+Embedding:                                                  -51.4776843952                
+
+Config 139    configs/pd_fcc/ec_2_003.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.12928                    -124.55096619                 
+Pair:                                                       -73.1101624982                
+Embedding:                                                  -51.4408036919                
+
+Config 140    configs/pd_fcc/ec_6_003.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.12064                    -124.595058877                
+Pair:                                                       -73.2299041111                
+Embedding:                                                  -51.365154766                 
+
+Config 141    configs/pd_fcc/ec_1_001.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.12224                    -124.597781724                
+Pair:                                                       -73.2324864808                
+Embedding:                                                  -51.3652952436                
+
+Config 142    configs/pd_fcc/ec_9_006.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.11808                    -124.570273071                
+Pair:                                                       -73.2102051756                
+Embedding:                                                  -51.3600678958                
+
+Config 143    configs/pd_fcc/ec_5_001.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.12224                    -124.597781724                
+Pair:                                                       -73.2324864808                
+Embedding:                                                  -51.3652952436                
+
+Config 144    configs/pd_fcc/ec_5_006.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.11296                    -124.579981949                
+Pair:                                                       -73.2141902538                
+Embedding:                                                  -51.3657916953                
+
+Config 145    configs/pd_fcc/ec_1_006.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.13664                    -124.470912051                
+Pair:                                                       -72.9203153515                
+Embedding:                                                  -51.5505966992                
+
+Config 146    configs/pd_fcc/ec_9_001.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.12224                    -124.597781724                
+Pair:                                                       -73.2324864808                
+Embedding:                                                  -51.3652952436                
+
+Config 147    configs/pd_fcc/eos_007.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.13632                    -124.101535362                
+Pair:                                                       -72.093387824                 
+Embedding:                                                  -52.0081475379                
+
+Config 148    configs/pd_fcc/ec_8_007.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.11648                    -124.558132575                
+Pair:                                                       -73.2003085613                
+Embedding:                                                  -51.3578240134                
+
+Config 149    configs/pd_fcc/ec_4_007.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.10912                    -124.572535021                
+Pair:                                                       -73.2071264005                
+Embedding:                                                  -51.3654086205                
+
+Config 150    configs/pd_fcc/config_0007.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.12672                    -124.550518809                
+Pair:                                                       -73.1091098862                
+Embedding:                                                  -51.441408923                 
+
+Config 151    configs/pd_fcc/ec_7_005.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.11936                    -124.580241858                
+Pair:                                                       -73.2184223637                
+Embedding:                                                  -51.3618194945                
+
+Config 152    configs/pd_fcc/config_0009.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.13408                    -124.490955812                
+Pair:                                                       -72.9531865107                
+Embedding:                                                  -51.5377693014                
+
+Config 153    configs/pd_fcc/ec_3_005.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.13472                    -124.499084951                
+Pair:                                                       -72.9849630232                
+Embedding:                                                  -51.5141219278                
+
+Config 154    configs/pd_fcc/ec_3_002.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.12576                    -124.57518818                 
+Pair:                                                       -73.1721483372                
+Embedding:                                                  -51.4030398432                
+
+Config 155    configs/pd_fcc/ec_7_002.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -125.1216                     -124.596702997                
+Pair:                                                       -73.2316547227                
+Embedding:                                                  -51.3650482741                
+
+Config 156    configs/pdfe_fcc/fepd_config_0002.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -135.42048                    -116.586873014                
+Pair:                                                       -244.328392931                
+Embedding:                                                  127.741519918                 
+
+Config 157    configs/pdfe_fcc/fepd_config_0001.out
+###############################################################
+Atom Count:                   32
+Energy (known/calculated):    -135.4448                     -116.575770453                
+Pair:                                                       -244.159723869                
+Embedding:                                                  127.583953416                 
+
+   
+   
+   
+############################################################################################################  
+BP KEY          PDFCC1  
+LABEL           PD  
+TYPE            Face Centered Cubic  
+############################################################################################################  
+   
+######################################################  
+Known Properties  
+######################################################  
+   
+All units are in ev/Ang unless specified  
+Energy: eV  
+Length: ang  
+Force: eV/ang  
+Pressure: eV/ang3  
+   
+Label (element):              3                  
+Structure type:               3                  
+Atoms per crystal:            4                  
+Expansion:                    4                  
+AMU per crystal:              425.68             
+   
+Equation of State  
+#################  
+alat:                         3.89               
+e0:                           -3.91              
+b0:                           1.12338            
+b0/GPA:                       179.999999999      
+   
+Stiffness Matrix  
+#################  
+Stiffness:                    1.460394           1.098416           1.098416           0.0                0.0                0.0                
+                              1.098416           1.460394           1.098416           0.0                0.0                0.0                
+                              1.098416           1.098416           1.460394           0.0                0.0                0.0                
+                              0.0                0.0                0.0                0.4443592          0.0                0.0                
+                              0.0                0.0                0.0                0.0                0.4443592          0.0                
+                              0.0                0.0                0.0                0.0                0.0                0.4443592          
+   
+Stiffness (GPA):              233.999999999      176.0              176.0              0.0                0.0                0.0                
+                              176.0              233.999999999      176.0              0.0                0.0                0.0                
+                              176.0              176.0              233.999999999      0.0                0.0                0.0                
+                              0.0                0.0                0.0                71.1999999998      0.0                0.0                
+                              0.0                0.0                0.0                0.0                71.1999999998      0.0                
+                              0.0                0.0                0.0                0.0                0.0                71.1999999998      
+   
+   
+######################################################  
+Calculated Properties  
+######################################################  
+   
+Equation of State  
+#################  
+alat:                         3.86553660229      
+v0:                           14.4400726552      
+e0:                           -3.91091648683     
+b0:                           1.15910950981      
+b0/GPA:                       185.724965519      
+   
+Stiffness Matrix  
+#################  
+Stiffness:                    1.45374845912      1.10289324172      1.10289324172      0.0                0.0                0.0                
+                              1.10289324172      1.45374845912      1.10289324172      0.0                0.0                0.0                
+                              1.10289324172      1.10289324172      1.45374845912      0.0                0.0                0.0                
+                              0.0                0.0                0.0                0.429599632797     0.0                0.0                
+                              0.0                0.0                0.0                0.0                0.429599632797     0.0                
+                              0.0                0.0                0.0                0.0                0.0                0.429599632797     
+   
+Stiffness (GPA):              232.935180119      176.717391718      176.717391718      0.0                0.0                0.0                
+                              176.717391718      232.935180118      176.717391718      0.0                0.0                0.0                
+                              176.717391718      176.717391718      232.935180118      0.0                0.0                0.0                
+                              0.0                0.0                0.0                68.8350637391      0.0                0.0                
+                              0.0                0.0                0.0                0.0                68.8350637391      0.0                
+                              0.0                0.0                0.0                0.0                0.0                68.8350637392      
+   
+   
+   
+   
+   
+############################################################################################################  
+BP KEY          FEFCC1  
+LABEL           FE  
+TYPE            Face Centered Cubic  
+############################################################################################################  
+   
+######################################################  
+Known Properties  
+######################################################  
+   
+All units are in ev/Ang unless specified  
+Energy: eV  
+Length: ang  
+Force: eV/ang  
+Pressure: eV/ang3  
+   
+Label (element):              2                  
+Structure type:               3                  
+Atoms per crystal:            4                  
+Expansion:                    4                  
+AMU per crystal:              224.0              
+   
+Equation of State  
+#################  
+alat:                         3.42               
+e0:                           -4.27              
+b0:                           1.385502           
+b0/GPA:                       221.999999999      
+   
+Stiffness Matrix  
+#################  
+Stiffness:                    2.2817096          0.8837256          1.4591458          0.0                0.0                0.0                
+                              0.8837256          1.8641867          0.8138264          0.0                0.0                0.0                
+                              1.4591458          0.8138264          2.2754686          0.0                0.0                0.0                
+                              0.0                0.0                0.0                1.1626983          0.0                0.0                
+                              0.0                0.0                0.0                0.0                1.6650988          0.0                
+                              0.0                0.0                0.0                0.0                0.0                1.1626983          
+   
+Stiffness (GPA):              365.599999999      141.6              233.799999999      0.0                0.0                0.0                
+                              141.6              298.699999999      130.4              0.0                0.0                0.0                
+                              233.799999999      130.4              364.599999999      0.0                0.0                0.0                
+                              0.0                0.0                0.0                186.299999999      0.0                0.0                
+                              0.0                0.0                0.0                0.0                266.799999999      0.0                
+                              0.0                0.0                0.0                0.0                0.0                186.299999999      
+   
+   
+######################################################  
+Calculated Properties  
+######################################################  
+   
+Equation of State  
+#################  
+alat:                         3.40157856386      
+v0:                           9.83969250394      
+e0:                           -4.28655371589     
+b0:                           1.42970757708      
+b0/GPA:                       229.083091985      
+   
+Stiffness Matrix  
+#################  
+Stiffness:                    2.28336341136      0.880909016845     1.48611718714      0.0                0.0                0.0                
+                              0.880909016845     1.86350422389      0.778861184129     0.0                0.0                0.0                
+                              1.48611718714      0.778861184129     2.28336341136      0.0                0.0                0.0                
+                              0.0                0.0                0.0                1.17082448019      0.0                0.0                
+                              0.0                0.0                0.0                0.0                1.61317653345      0.0                
+                              0.0                0.0                0.0                0.0                0.0                1.17082448019      
+   
+Stiffness (GPA):              365.864991404      141.148696818      238.121645111      0.0                0.0                0.0                
+                              141.148696818      298.590646353      124.797497857      0.0                0.0                0.0                
+                              238.121645111      124.797497857      365.864991404      0.0                0.0                0.0                
+                              0.0                0.0                0.0                187.602063802      0.0                0.0                
+                              0.0                0.0                0.0                0.0                258.480457209      0.0                
+                              0.0                0.0                0.0                0.0                0.0                187.602063801      
+   
+   
+
+CONFIGS
+             e known         e calc         e_rss         e_rss_w       f_rss       f_rss_w       s_rss       s_rss_w
+Config 1:       -136.463680       -127.790926         75.216656          0.150433          0.000000          0.000000          0.000906          0.000000
+Config 2:       -136.371200       -129.504980         47.144972          0.094290          0.000000          0.000000          0.000571          0.000000
+Config 3:       -136.403520       -129.577971         46.588114          0.093176          0.000000          0.000000          0.000359          0.000000
+Config 4:       -136.422720       -129.149867         52.894390          0.105789          0.000000          0.000000          0.000421          0.000000
+Config 5:       -135.588800       -132.071803         12.369265          0.024739          0.000000          0.000000          0.007032          0.000001
+Config 6:       -136.364480       -126.656458         94.245681          0.188491          0.000000          0.000000          0.000424          0.000000
+Config 7:       -136.473920       -129.404461         49.977254          0.099955          0.000000          0.000000          0.000461          0.000000
+Config 8:       -136.528640       -127.704096         77.872576          0.155745          0.000000          0.000000          0.001286          0.000000
+Config 9:       -136.292160       -129.310679         48.741082          0.097482          0.000000          0.000000          0.002468          0.000000
+Config 10:       -136.405440       -129.581697         46.563467          0.093127          0.000000          0.000000          0.000292          0.000000
+Config 11:       -136.387200       -129.374310         49.180633          0.098361          0.000000          0.000000          0.000146          0.000000
+Config 12:       -136.405440       -129.581697         46.563467          0.093127          0.000000          0.000000          0.000292          0.000000
+Config 13:       -136.351360       -129.481728         47.191838          0.094384          0.000000          0.000000          0.001048          0.000000
+Config 14:       -136.449600       -129.526052         47.935515          0.095871          0.000000          0.000000          0.000732          0.000000
+Config 15:       -136.393280       -130.750175         31.844635          0.063689          0.000000          0.000000          0.000225          0.000000
+Config 16:       -136.399360       -130.382238         36.205752          0.072412          0.000000          0.000000          0.000242          0.000000
+Config 17:       -136.436800       -129.553026         47.386341          0.094773          0.000000          0.000000          0.000501          0.000000
+Config 18:       -136.405440       -129.581697         46.563467          0.093127          0.000000          0.000000          0.000292          0.000000
+Config 19:       -136.467520       -129.460552         49.097602          0.098195          0.000000          0.000000          0.000361          0.000000
+Config 20:       -136.405440       -129.581697         46.563467          0.093127          0.000000          0.000000          0.000292          0.000000
+Config 21:       -136.326720       -129.412277         47.809518          0.095619          0.000000          0.000000          0.001770          0.000000
+Config 22:       -136.097600       -131.118235         24.794071          0.049588          0.000000          0.000000          0.001342          0.000000
+Config 23:       -136.405440       -129.581697         46.563467          0.093127          0.000000          0.000000          0.000292          0.000000
+Config 24:       -136.376960       -127.203089         84.159910          0.168320          0.000000          0.000000          0.000378          0.000000
+Config 25:       -136.405440       -129.581697         46.563467          0.093127          0.000000          0.000000          0.000292          0.000000
+Config 26:       -136.397120       -129.566879         46.652194          0.093304          0.000000          0.000000          0.000457          0.000000
+Config 27:       -136.438400       -128.707693         59.763838          0.119528          0.000000          0.000000          0.000539          0.000000
+Config 28:       -136.451840       -128.255731         67.176210          0.134352          0.000000          0.000000          0.000691          0.000000
+Config 29:       -136.386240       -129.548528         46.754311          0.093509          0.000000          0.000000          0.000599          0.000000
+Config 30:       -136.402880       -129.991816         41.101739          0.082203          0.000000          0.000000          0.000260          0.000000
+Config 31:       -136.422080       -129.571659         46.928267          0.093857          0.000000          0.000000          0.000389          0.000000
+Config 32:       -136.459520       -129.506917         48.338695          0.096677          0.000000          0.000000          0.000219          0.000000
+Config 33:       -136.384640       -131.114256         27.776950          0.055554          0.000000          0.000000          0.000310          0.000000
+Config 34:       -136.327360       -129.436046         47.490214          0.094980          0.000000          0.000000          0.001097          0.000000
+Config 35:       -136.378880       -129.285427         50.317070          0.100634          0.000000          0.000000          0.000123          0.000000
+Config 36:       -136.467520       -129.460817         49.093881          0.098188          0.000000          0.000000          0.000362          0.000000
+Config 37:       -136.373760       -131.436392         24.377607          0.048755          0.000000          0.000000          0.000372          0.000000
+Config 38:       -136.405440       -129.581697         46.563467          0.093127          0.000000          0.000000          0.000292          0.000000
+Config 39:       -136.405440       -129.581697         46.563467          0.093127          0.000000          0.000000          0.000292          0.000000
+Config 40:       -136.397120       -129.566885         46.652116          0.093304          0.000000          0.000000          0.000462          0.000000
+Config 41:       -136.399040       -129.504095         47.540263          0.095081          0.000000          0.000000          0.000189          0.000000
+Config 42:       -136.402560       -129.546594         47.004273          0.094009          0.000000          0.000000          0.000221          0.000000
+Config 43:       -136.386240       -129.548150         46.759476          0.093519          0.000000          0.000000          0.000637          0.000000
+Config 44:          0.000000          0.000000          0.000000          0.000000          0.000000          0.000000          0.000000          0.000000
+Config 45:       -136.402560       -129.572873         46.644622          0.093289          0.000000          0.000000          0.000393          0.000000
+Config 46:       -136.387520       -127.724677         75.044848          0.150090          0.000000          0.000000          0.000329          0.000000
+Config 47:       -136.422080       -129.571559         46.929640          0.093859          0.000000          0.000000          0.000354          0.000000
+Config 48:       -136.405120       -129.150309         52.632289          0.105265          0.000000          0.000000          0.000337          0.000000
+Config 49:       -136.459520       -129.506615         48.342889          0.096686          0.000000          0.000000          0.000206          0.000000
+Config 50:       -136.277760       -122.400181        192.587192          0.385174          0.000000          0.000000          0.011465          0.000001
+Config 51:       -136.355200       -129.482836         47.229385          0.094459          0.000000          0.000000          0.001316          0.000000
+Config 52:       -136.482240       -126.827006         93.223547          0.186447          0.000000          0.000000          0.001238          0.000000
+Config 53:       -136.327360       -129.436361         47.485865          0.094972          0.000000          0.000000          0.001132          0.000000
+Config 54:       -136.424320       -129.719183         44.958864          0.089918          0.000000          0.000000          0.000296          0.000000
+Config 55:       -136.405120       -129.572306         46.687349          0.093375          0.000000          0.000000          0.000276          0.000000
+Config 56:       -136.371200       -129.505416         47.138986          0.094278          0.000000          0.000000          0.000726          0.000000
+Config 57:       -136.403520       -129.578335         46.583146          0.093166          0.000000          0.000000          0.000348          0.000000
+Config 58:       -136.394240       -129.452316         48.190307          0.096381          0.000000          0.000000          0.000185          0.000000
+Config 59:      -1093.120000      -1085.768672         54.042024          0.108084          0.000000          0.000000          0.000353          0.000000
+Config 60:       -136.473920       -129.404808         49.972346          0.099945          0.000000          0.000000          0.000500          0.000000
+Config 61:       -136.360320       -131.734237         21.400643          0.042801          0.000000          0.000000          0.000492          0.000000
+Config 62:       -136.405440       -129.581697         46.563467          0.093127          0.000000          0.000000          0.000292          0.000000
+Config 63:       -136.405440       -129.581697         46.563467          0.093127          0.000000          0.000000          0.000292          0.000000
+Config 64:       -136.473920       -127.315301         83.880295          0.167761          0.000000          0.000000          0.000974          0.000000
+Config 65:       -136.351360       -129.480876         47.203546          0.094407          0.000000          0.000000          0.000916          0.000000
+Config 66:       -136.401280       -128.698343         59.335239          0.118670          0.000000          0.000000          0.000288          0.000000
+Config 67:       -136.449600       -129.525889         47.937774          0.095876          0.000000          0.000000          0.000519          0.000000
+Config 68:       -136.480960       -125.275879        125.553849          0.251108          0.000000          0.000000          0.006292          0.000001
+Config 69:       -136.376960       -129.516835         47.061313          0.094123          0.000000          0.000000          0.000946          0.000000
+Config 70:       -134.864640       -132.672088          4.807286          0.009615          0.000000          0.000000          0.020798          0.000002
+Config 71:       -136.392960       -129.548818         46.842276          0.093685          0.000000          0.000000          0.000580          0.000000
+Config 72:       -136.395520       -128.222636         66.796028          0.133592          0.000000          0.000000          0.000330          0.000000
+Config 73:       -136.436800       -129.552924         47.387751          0.094776          0.000000          0.000000          0.000415          0.000000
+Config 74:       -125.090240       -124.718618          0.138103          0.000276          0.000000          0.000000          0.002895          0.000000
+Config 75:       -125.122240       -124.597782          0.275056          0.000550          0.000000          0.000000          0.001953          0.000000
+Config 76:       -125.118720       -124.591670          0.277782          0.000556          0.000000          0.000000          0.002039          0.000000
+Config 77:       -125.121280       -124.593462          0.278592          0.000557          0.000000          0.000000          0.002057          0.000000
+Config 78:       -125.120640       -124.588066          0.283635          0.000567          0.000000          0.000000          0.002068          0.000000
+Config 79:       -125.120640       -124.595059          0.276235          0.000552          0.000000          0.000000          0.002025          0.000000
+Config 80:       -125.130240       -124.525526          0.365679          0.000731          0.000000          0.000000          0.001967          0.000000
+Config 81:       -125.127680       -124.544361          0.340261          0.000681          0.000000          0.000000          0.001994          0.000000
+Config 82:       -125.122240       -124.597782          0.275056          0.000550          0.000000          0.000000          0.001953          0.000000
+Config 83:       -125.122240       -124.597782          0.275056          0.000550          0.000000          0.000000          0.001953          0.000000
+Config 84:       -125.118080       -124.570273          0.300092          0.000600          0.000000          0.000000          0.002154          0.000000
+Config 85:       -125.136640       -124.470912          0.443194          0.000886          0.000000          0.000000          0.001692          0.000000
+Config 86:       -125.109120       -124.572535          0.287923          0.000576          0.000000          0.000000          0.002142          0.000000
+Config 87:       -125.138240       -124.441648          0.485240          0.000970          0.000000          0.000000          0.001666          0.000000
+Config 88:       -125.116160       -124.586920          0.280095          0.000560          0.000000          0.000000          0.002104          0.000000
+Config 89:       -125.134720       -124.499085          0.404032          0.000808          0.000000          0.000000          0.001887          0.000000
+Config 90:       -125.121600       -124.596703          0.275517          0.000551          0.000000          0.000000          0.002050          0.000000
+Config 91:       -125.125760       -124.575188          0.303129          0.000606          0.000000          0.000000          0.001913          0.000000
+Config 92:       -125.119360       -124.580242          0.290648          0.000581          0.000000          0.000000          0.002062          0.000000
+Config 93:       -125.121600       -124.597104          0.275096          0.000550          0.000000          0.000000          0.002051          0.000000
+Config 94:       -125.116480       -124.558133          0.311752          0.000624          0.000000          0.000000          0.002197          0.000000
+Config 95:       -125.138240       -124.441689          0.485183          0.000970          0.000000          0.000000          0.001657          0.000000
+Config 96:       -125.135040       -124.484669          0.422983          0.000846          0.000000          0.000000          0.001920          0.000000
+Config 97:       -125.132480       -124.507425          0.390694          0.000781          0.000000          0.000000          0.001944          0.000000
+Config 98:       -125.119360       -124.580242          0.290648          0.000581          0.000000          0.000000          0.002101          0.000000
+Config 99:       -125.121600       -124.597104          0.275096          0.000550          0.000000          0.000000          0.002016          0.000000
+Config 100:       -125.116160       -124.586920          0.280095          0.000560          0.000000          0.000000          0.002057          0.000000
+Config 101:       -125.121600       -124.596703          0.275517          0.000551          0.000000          0.000000          0.002056          0.000000
+Config 102:       -125.140160       -124.454102          0.470676          0.000941          0.000000          0.000000          0.001726          0.000000
+Config 103:       -125.044480       -124.815384          0.052485          0.000105          0.000000          0.000000          0.004055          0.000000
+Config 104:       -125.129280       -124.550966          0.334447          0.000669          0.000000          0.000000          0.001899          0.000000
+Config 105:       -125.120640       -124.588066          0.283635          0.000567          0.000000          0.000000          0.002059          0.000000
+Config 106:       -125.120640       -124.595059          0.276235          0.000552          0.000000          0.000000          0.002064          0.000000
+Config 107:       -125.118720       -124.591670          0.277782          0.000556          0.000000          0.000000          0.002084          0.000000
+Config 108:       -125.132160       -124.525708          0.367784          0.000736          0.000000          0.000000          0.001891          0.000000
+Config 109:       -125.121280       -124.593462          0.278592          0.000557          0.000000          0.000000          0.002057          0.000000
+Config 110:          0.000000          0.000000          0.000000          0.000000          0.000000          0.000000          0.000000          0.000000
+Config 111:       -125.112960       -124.579982          0.284066          0.000568          0.000000          0.000000          0.002112          0.000000
+Config 112:       -125.136640       -124.470912          0.443194          0.000886          0.000000          0.000000          0.001701          0.000000
+Config 113:       -125.122240       -124.597782          0.275056          0.000550          0.000000          0.000000          0.001953          0.000000
+Config 114:       -125.122240       -124.597782          0.275056          0.000550          0.000000          0.000000          0.001953          0.000000
+Config 115:       -125.109120       -124.572535          0.287923          0.000576          0.000000          0.000000          0.002158          0.000000
+Config 116:       -125.138240       -124.441648          0.485240          0.000970          0.000000          0.000000          0.001900          0.000000
+Config 117:       -125.116480       -124.558133          0.311752          0.000624          0.000000          0.000000          0.002046          0.000000
+Config 118:       -125.122240       -124.580522          0.293459          0.000587          0.000000          0.000000          0.002126          0.000000
+Config 119:      -1000.960000      -1000.977784          0.000316          0.000001          0.000000          0.000000          0.001932          0.000000
+Config 120:       -125.125760       -124.575188          0.303129          0.000606          0.000000          0.000000          0.001921          0.000000
+Config 121:       -125.121600       -124.597104          0.275096          0.000550          0.000000          0.000000          0.002045          0.000000
+Config 122:       -125.116160       -124.586923          0.280092          0.000560          0.000000          0.000000          0.002088          0.000000
+Config 123:       -125.134720       -124.499085          0.404032          0.000808          0.000000          0.000000          0.001741          0.000000
+Config 124:       -125.129280       -124.550966          0.334447          0.000669          0.000000          0.000000          0.001824          0.000000
+Config 125:       -125.121280       -124.593461          0.278593          0.000557          0.000000          0.000000          0.002056          0.000000
+Config 126:       -125.120640       -124.588066          0.283635          0.000567          0.000000          0.000000          0.002066          0.000000
+Config 127:       -125.133760       -124.497219          0.405185          0.000810          0.000000          0.000000          0.001933          0.000000
+Config 128:       -125.132160       -124.525708          0.367784          0.000736          0.000000          0.000000          0.001775          0.000000
+Config 129:       -125.111680       -124.633481          0.228675          0.000457          0.000000          0.000000          0.002494          0.000000
+Config 130:       -125.130240       -124.526055          0.365039          0.000730          0.000000          0.000000          0.001967          0.000000
+Config 131:       -125.112960       -124.579982          0.284066          0.000568          0.000000          0.000000          0.002081          0.000000
+Config 132:       -125.122240       -124.597782          0.275056          0.000550          0.000000          0.000000          0.001953          0.000000
+Config 133:       -125.118080       -124.570273          0.300092          0.000600          0.000000          0.000000          0.002142          0.000000
+Config 134:       -125.122240       -124.597782          0.275056          0.000550          0.000000          0.000000          0.001953          0.000000
+Config 135:       -124.984320       -124.888896          0.009106          0.000018          0.000000          0.000000          0.005447          0.000001
+Config 136:       -125.144960       -124.289079          0.732532          0.001465          0.000000          0.000000          0.001719          0.000000
+Config 137:       -125.118720       -124.591665          0.277787          0.000556          0.000000          0.000000          0.002068          0.000000
+Config 138:       -125.132160       -124.525708          0.367784          0.000736          0.000000          0.000000          0.001785          0.000000
+Config 139:       -125.129280       -124.550966          0.334447          0.000669          0.000000          0.000000          0.001835          0.000000
+Config 140:       -125.120640       -124.595059          0.276236          0.000552          0.000000          0.000000          0.002054          0.000000
+Config 141:       -125.122240       -124.597782          0.275056          0.000550          0.000000          0.000000          0.001953          0.000000
+Config 142:       -125.118080       -124.570273          0.300092          0.000600          0.000000          0.000000          0.002045          0.000000
+Config 143:       -125.122240       -124.597782          0.275056          0.000550          0.000000          0.000000          0.001953          0.000000
+Config 144:       -125.112960       -124.579982          0.284066          0.000568          0.000000          0.000000          0.002128          0.000000
+Config 145:       -125.136640       -124.470912          0.443194          0.000886          0.000000          0.000000          0.001891          0.000000
+Config 146:       -125.122240       -124.597782          0.275056          0.000550          0.000000          0.000000          0.001953          0.000000
+Config 147:       -125.136320       -124.101535          1.070779          0.002142          0.000000          0.000000          0.001857          0.000000
+Config 148:       -125.116480       -124.558133          0.311752          0.000624          0.000000          0.000000          0.002184          0.000000
+Config 149:       -125.109120       -124.572535          0.287923          0.000576          0.000000          0.000000          0.002109          0.000000
+Config 150:       -125.126720       -124.550519          0.332008          0.000664          0.000000          0.000000          0.002004          0.000000
+Config 151:       -125.119360       -124.580242          0.290648          0.000581          0.000000          0.000000          0.002111          0.000000
+Config 152:       -125.134080       -124.490956          0.413609          0.000827          0.000000          0.000000          0.001926          0.000000
+Config 153:       -125.134720       -124.499085          0.404032          0.000808          0.000000          0.000000          0.001731          0.000000
+Config 154:       -125.125760       -124.575188          0.303129          0.000606          0.000000          0.000000          0.001894          0.000000
+Config 155:       -125.121600       -124.596703          0.275517          0.000551          0.000000          0.000000          0.002049          0.000000
+Config 156:       -135.420480       -116.586873        354.704752          0.709410          0.000000          0.000000          0.000113          0.000000
+Config 157:       -135.444800       -116.575770        356.040276          0.712081          0.000000          0.000000          0.000090          0.000000
+
+All configs:                   4502.97151837
+All configs (energy):          4502.72177706
+All configs (force):           1.40999999988e-08
+All configs (stress):          0.249741292717
+All configs weighted:          9.00546852826
+All configs weighted (energy): 9.00544355413
+All configs weighted (force):  1.40999999988e-12
+All configs weighted (stress): 2.49741292717e-05
+
+
+========================================================================================
+========================================================================================
+BP  0
+========================================================================================
+========================================================================================
+a0                  3.890000      3.865537      0.000598
+v0                               14.440073
+e0                 -3.910000     -3.910916      0.000001
+b0                  1.123380      1.159110      0.001277
+
+Calculated Stiffness Matrix (GPA)
+    232.935180    176.717392    176.717392      0.000000      0.000000      0.000000
+    176.717392    232.935180    176.717392      0.000000      0.000000      0.000000
+    176.717392    176.717392    232.935180      0.000000      0.000000      0.000000
+      0.000000      0.000000      0.000000     68.835064      0.000000      0.000000
+      0.000000      0.000000      0.000000      0.000000     68.835064      0.000000
+      0.000000      0.000000      0.000000      0.000000      0.000000     68.835064
+Known Stiffness Matrix (GPA)
+    234.000000    176.000000    176.000000      0.000000      0.000000      0.000000
+    176.000000    234.000000    176.000000      0.000000      0.000000      0.000000
+    176.000000    176.000000    234.000000      0.000000      0.000000      0.000000
+      0.000000      0.000000      0.000000     71.200000      0.000000      0.000000
+      0.000000      0.000000      0.000000      0.000000     71.200000      0.000000
+      0.000000      0.000000      0.000000      0.000000      0.000000     71.200000
+
+Other calculated properties
+===========================
+Bulk Modulus B0 (Reuss):             1.219845    (    195.456655) GPA
+Bulk Modulus B0 (Voigt):             1.219845    (    195.456655) GPA
+Tetragonal Shear:                    0.175428    (      0.175428) GPA
+Shear Modulus G:                     0.429600    (     68.835064) GPA
+Shear Modulus G (Reuss):             0.271976    (     43.578949) GPA
+Shear Modulus G (Voigt):             0.327931    (     52.544596) GPA
+Young's Modulus E:                   0.831691    (    133.262468) GPA
+Poisson Ratio                        0.277230
+Cachy Pressure:                      0.673294    (    107.882328) GPA
+Melting Point:                    3787.057349K
+Cubic Stability:                     1.000000 (1=Stable, 0=Unstable)
+Stability:                           1.000000 (1=Stable, 0=Unstable)
+
+
+
+========================================================================================
+========================================================================================
+BP  1
+========================================================================================
+========================================================================================
+a0                  3.420000      3.401579      0.000339
+v0                                9.839693
+e0                 -4.270000     -4.286554      0.000274
+b0                  1.385502      1.429708      0.001954
+
+Calculated Stiffness Matrix (GPA)
+    365.864991    141.148697    238.121645      0.000000      0.000000      0.000000
+    141.148697    298.590646    124.797498      0.000000      0.000000      0.000000
+    238.121645    124.797498    365.864991      0.000000      0.000000      0.000000
+      0.000000      0.000000      0.000000    187.602064      0.000000      0.000000
+      0.000000      0.000000      0.000000      0.000000    258.480457      0.000000
+      0.000000      0.000000      0.000000      0.000000      0.000000    187.602064
+Known Stiffness Matrix (GPA)
+    365.600000    141.600000    233.800000      0.000000      0.000000      0.000000
+    141.600000    298.700000    130.400000      0.000000      0.000000      0.000000
+    233.800000    130.400000    364.600000      0.000000      0.000000      0.000000
+      0.000000      0.000000      0.000000    186.300000      0.000000      0.000000
+      0.000000      0.000000      0.000000      0.000000    266.800000      0.000000
+      0.000000      0.000000      0.000000      0.000000      0.000000    186.300000
+
+Other calculated properties
+===========================
+Bulk Modulus B0 (Reuss):             1.350278    (    216.356085) GPA
+Bulk Modulus B0 (Voigt):             1.413556    (    226.495145) GPA
+Tetragonal Shear:                    0.701227    (      0.701227) GPA
+Shear Modulus G:                     1.170824    (    187.602064) GPA
+Shear Modulus G (Reuss):             0.786729    (    126.058189) GPA
+Shear Modulus G (Voigt):             1.009921    (    161.820436) GPA
+Young's Modulus E:                   2.215014    (    354.913292) GPA
+Poisson Ratio                        0.738338
+Cachy Pressure:                     -0.289915    (    -46.453367) GPA
+Melting Point:                    4275.253594K
+Cubic Stability:                     1.000000 (1=Stable, 0=Unstable)
+Stability:                           1.000000 (1=Stable, 0=Unstable)
+
+
+RSS:
+a0: 0.0009378071370120207    w:  0.46890356850601034
+e0: 0.0002748654579964373    w:  0.6871636449910933
+b0: 0.0032307309160663385    w:  0.32307309160663383
+ec: 0.00771572893002161    w:  0.771572893002161
+g: 0.0    w:  0.0
+e: 0.0    w:  0.0
+v: 0.0    w:  0.0
+
+
+
+
+RSS: 11.256181726363588
+
+
+Max Density: 0.2705909021689978 0.26791416185960776
+
+
+
+End of Program
+Run time:  11.031491994857788

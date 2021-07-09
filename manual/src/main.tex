@@ -982,17 +982,31 @@ The program takes advantage of multicore processors.  The amount of RAM needed b
 
 \section{How To Install}
 
+Assuming a Debian distro (Ubuntu, Mint etc) is installed, first install the required packages:
+
 \begin{lstlisting}
 sudo apt install gfortran libomp-dev
 sudo apt install python3 python3-matplotlib python3-numpy python3-tk
+\end{lstlisting}
 
+Now, make a directory to clone the project into.
+
+\begin{lstlisting}
 cd ~/
 mkdir eampa && cd ~/eampa
 git clone https://github.com/BenPalmer1983/eampa_v3
-cd eampa_v3
-cd f2py_src
-./build.sh
 \end{lstlisting}
+
+The Fortran library files must be compiled and installed for use by Python.
+
+\begin{lstlisting}
+cd ~/eampa/eampa_v3
+./install.sh
+\end{lstlisting}
+
+The library files will have been compiled and copied to a subdirectory in your home directory, /home/user/pylib/eampa\_lib and you can change this location by editing the install.sh file before running it.
+
+The location of the library files is important, and will need to be included when running the program.
 
 
 
@@ -1006,13 +1020,229 @@ cd f2py_src
 
 \chapter{How To Use}
 
+\section{Python Program \& Library Files}
 
-\section{Set Up Working Directory}
+This assumes the library files have been compiled and are available on the computer, and that the python program as well as Python3 and the other required packages are already installed.
+
+
+\section{Energy, Force and Stress Calculation}
+
+The first example will calculate the energy, force and stress of configurations with a given potential.  This particular example will be for the following:
+
+\begin{itemize}
+\item An analytic Iron potential
+\item A 256 atom FCC configuration with the atoms in their exact FCC locations in the crystal
+\end{itemize}
+
+
+
+\subsection{Creating a Project Directory}
+
+All calculations will need a project directory.
+
+Create a directory and change to it:
+
+\begin{lstlisting}
+mkdir -p ~/eampa_examples/fe_efs
+cd ~/eampa_examples/fe_efs
+\end{lstlisting}
+
+Create a batch file to load the library files and set other parameters, such as the threads available to use.
+
+\begin{lstlisting}
+nano ~/eampa_examples/fe_efs/run.sh
+\end{lstlisting}
+
+\begin{lstlisting}
+#!/bin/bash
+# Export the path to the python library files for the EAMPA program
+export PYTHONPATH=$PYTHONPATH:"/home/user/pylib"
+
+# Set the number of threads to 1
+export OMP_NUM_THREADS=5
+
+# Run the program and pass the name of the input file
+python3 /home/user/eampa/eampa_v3/eampa.py input.in
+\end{lstlisting}
+
+Now make the batch file executable:
+
+\begin{lstlisting}
+chmod +x ~/eampa_examples/fe_efs/run.sh
+\end{lstlisting}
+
+The above may also be completed in your desktop environment using a text editor and the file manager to set the script as an executable.
 
 
 
 
-\section{}
+\subsection{Creating the Input File}
+
+The input file may contain comments, and these are lines that begin with a hash.
+
+\begin{lstlisting}
+nano ~/eampa_examples/fe_efs/input.in
+\end{lstlisting}
+
+\begin{lstlisting}
+# Run types:   efs, bp, rss, fit   (future: es - energy-surface)
+run type=efs
+
+# Working Directory Option - 1 to replace each calculation
+wd option=1
+
+# Display Option
+display output=1
+
+# Memory
+mem bp=2GB efs=2GB
+
+# Potential
+potential dir="pot/fe" index_file="fe.pot"
+
+# Config Directory
+configs dir="configs"
+\end{lstlisting}
+
+\subsection{Creating the Potential Files - Analytic Iron Potential}
+
+The potential is made up of a main overall file that lists all the individual potential functions, and then individual files that contain either tabulated/numeric functions or analytic functions.
+
+First, create a directory for the potential.
+
+\begin{lstlisting}
+mkdir -p ~/eampa_examples/fe_efs/pot
+\end{lstlisting}
+
+Use a text editor to make the main potential file.
+
+\begin{lstlisting}
+nano ~/eampa_examples/fe_efs/pot/fe.pot
+\end{lstlisting}
+
+
+\begin{lstlisting}
+POTNAME fe_pot
+
+!###########################
+!# IRON
+!###########################
+
+! Pair FE FE
+START
+FILE              fe_pair.pot
+LABEL             FE   FE
+F_ON true
+F_TYPE            PAIR            ! PAIR DENS EMBE
+F_GROUP
+R_CUT              6.5
+ZOOR     true  ! zero out of range
+END
+
+! FE Density
+START
+FILE              fe_dens.pot
+LABEL             FE
+F_ON true
+F_TYPE            DENS            ! PAIR DENS EMBE
+F_GROUP           1
+R_CUT             6.5
+END
+
+! FE Embedding
+START
+FILE              fe_embe.pot
+LABEL             FE
+F_ON true
+F_TYPE            EMBE            ! PAIR DENS EMBE
+F_GROUP           1
+ZOOR     true  ! zero out of range
+END
+\end{lstlisting}
+
+
+Create each of the three function files:
+
+\begin{lstlisting}
+nano ~/eampa_examples/fe_efs/pot/fe_pair.pot
+\end{lstlisting}
+
+\begin{lstlisting}
+#A
+#TYPE pair_spline
+#P -1.55173502598 -3.8475418565 -0.134613637503 0.0952261702053 -0.112953365944 0.0596402322423 0.0354974878539 0.0155828512688 -0.0486110135942 -0.118825451755 -0.157394296033 -0.211422128286 -0.0617748904124
+#PF 1.4 1.9 2.2 2.4 2.7 3.0 3.2 3.4 3.7 4.0 4.3 5.0 5.7 26.0 26.0 1.0 6.5
+#L 0.0
+#U 7.0
+\end{lstlisting}
+
+\begin{lstlisting}
+nano ~/eampa_examples/fe_efs/pot/fe_dens.pot
+\end{lstlisting}
+
+\begin{lstlisting}
+#A
+#TYPE cubic_spline
+#P -2.95002249973 -0.0583172760002 0.0181936861066
+#PF 2.4 3.2 4.2
+#L 0.0
+#U 6.5
+\end{lstlisting}
+
+\begin{lstlisting}
+nano ~/eampa_examples/fe_efs/pot/fe_embe.pot
+\end{lstlisting}
+
+\begin{lstlisting}
+#A
+#TYPE ackland_embedding
+#P 4.92599561874 0.0249446096808 -0.100214145666
+#PF 0.0
+#L 0.0
+#U 0.21680505968974992
+\end{lstlisting}
+
+The function types are specified from a list of available functions, and the parameters, "fixed parameters" and cut-offs are set.  Examples of these functions are listed in the appendix, and they may be added to by editing the program.
+
+
+
+\subsection{Creating the Config Files}
+
+Create a directory for all the configuration files to be dropped into.  
+
+\begin{lstlisting}
+mkdir -p ~/eampa_examples/fe_efs/configs
+\end{lstlisting}
+
+For this example, there is just one configuration of FCC Iron, with the primitive 4 atom cell copied 4 times in the x, y and z direction giving a total of $4 \times 4^4 = 256$ atoms.  Create the file and input the config data.
+
+\begin{lstlisting}
+nano ~/eampa_examples/fe_efs/configs/fe256.pot
+\end{lstlisting}
+
+\begin{lstlisting}
+/* A sample input file */
+#L_UNITS ang
+#E_UNITS eV
+#S_UNITS GPA
+#F_UNITS EV/ANG
+#ALAT 	3.43  // alat comment
+#X 1.0 0.0 0.0
+#Y 0.0 1.0 0.0
+#Z 0.0 0.0 1.0
+#C 4 4 4
+#sx 0.0 0.0 0.0
+#sy 0.0 0.0 0.0
+#sz 0.0 0.0 0.0
+#RCUT 6.5
+#EPA -4.27
+#M FE  56.0
+FE 0.0     0.0     0.0     0.0   0.0   0.0
+FE 0.0     0.5     0.5     0.0  0.0  0.0 
+FE 0.5     0.0     0.5     0.0  0.0  0.0
+FE 0.5     0.5     0.0     0.0  0.0  0.0
+\end{lstlisting}
+
 
 
 
@@ -1035,76 +1265,52 @@ cd f2py_src
 This section of the appendix covers the types of potential function and common choices of function used and details on how to use these in the potential fitting code.
 
 
-\section{Pair Functions}
 
-\subsection{Lennard-Jones}
+\section{Functions}
 
-\begin{figure}[h]
-  \begin{center}
-    \includegraphics{img/plots/lennard_jones.eps}[scale=0.6]
-    \caption{Lennard-Jones}
-    \label{graph:graph1}
-  \end{center}
-\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Ackland-Mendelev Pair
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Ackland-Mendelev Pair}
 
 \begin{equation}
 \begin{split}
-V(r) = e \left(\left(\frac{r_m}{r}\right)^12 - 2 \left(\frac{r_m}{r}\right)^6\right)
+v(r) = \sum_{i=1}^N (a_i (r - r_i)^3 H(r_i - r)
 \end{split}
-\label{eq:eqLennardJones}
+\label{eq:ackland_mendelev_pair}
 \end{equation}
 
-\begin{lstlisting}[style=pseudocode,caption={Lennard-Jones}]
-#A
-#TYPE lennard_jones
-#P 2.3 3.5
-#L 0.0
-#U 7.0
+\begin{lstlisting}[style=pseudocode,caption={Ackland Mendelev Pair}]
+#TYPE ackland_mendelev_pair
+#P   1.0
+#PF  0.0
 \end{lstlisting}
 
-
-
-
-
-
-\subsection{Morse}
-
+\FloatBarrier
 \begin{figure}[h]
   \begin{center}
-    \includegraphics{img/plots/morse.eps}[scale=0.6]
-    \caption{Morse}
+    \includegraphics[scale=0.5]{img/plots/ackland_mendelev_pair.eps}
+    \caption{Ackland Mendelev Pair}
     \label{graph:graph1}
   \end{center}
 \end{figure}
-
-\begin{equation}
-\begin{split}
-V(r) = exp(-2 a (r - re)) - 2 exp (-a*(r - re))
-\end{split}
-\label{eq:eqMorse}
-\end{equation}
-
-\begin{lstlisting}[style=pseudocode,caption={Morse}]
-#A
-#TYPE morse
-#P 4.669 1.256 2.8
-#L 0.0
-#U 7.0
-\end{lstlisting}
+\FloatBarrier
 
 
 
 
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Buckingham
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Buckingham}
-
-\begin{figure}[h]
-  \begin{center}
-    \includegraphics{img/plots/buckingham.eps}[scale=0.6]
-    \caption{Buckingham}
-    \label{graph:graph1}
-  \end{center}
-\end{figure}
 
 \begin{equation}
 \begin{split}
@@ -1114,252 +1320,137 @@ V(r) = A * exp(-B * r) - \frac{C}{r**6}
 \end{equation}
 
 \begin{lstlisting}[style=pseudocode,caption={Buckingham}]
-#A
 #TYPE buckingham
 #P 6.0 0.5 12.0
-#L 0.0
-#U 7.0
 \end{lstlisting}
 
-
-
-
-
-\subsection{ZBL}
-
-\begin{equation}
-\begin{split}
-\phi(x) = 0.181 e^{-3.2x} + 0.5099 e^{-0.9423x} + 0.2802 e^{-0.4029x} + 0.02817 e^{-0.2016x} \\
-\text{where } a_{ij} = \frac{0.8854 a_0}{Z^{0.23}_i + Z^{0.23}_j} \\
-\text{and } a_0 = 0.529 \text{angstrom}
-\end{split}
-\label{eq:screeningPotential}
-\end{equation}
-
-
-
-
-
-
-\subsection{Quartic Polynomial Plus Exponential Repulsion}
-
+\FloatBarrier
 \begin{figure}[h]
   \begin{center}
-    \includegraphics{img/plots/quartic_poly_rep.eps}[scale=0.6]
-    \caption{Quartic Polynomial Plus Exponential Repulsion}
+    \includegraphics[scale=0.5]{img/plots/buckingham.eps}
+    \caption{Buckingham Potential}
     \label{graph:graph1}
   \end{center}
 \end{figure}
+\FloatBarrier
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Cubic Knot Spline
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Cubic Knot Spline}
 
 \begin{equation}
 \begin{split}
-H(x) = \left\{ \begin{matrix} (r - r_c)^2 (c_1 + c_1 r + c_2 r^2) + D exp(- \frac{r}{q}) & r <= r_c \\  0 & r > r_c \end{matrix} \right . 
+V(r) = \sum_i^N a_i (r - r_i)^3 H(r_i - r) \\
+\text{where } \\
+H(x) = \left\{ \begin{matrix} 0 & x<0 \\  1 & x >= 0 \end{matrix} \right . 
 \end{split}
-\label{eq:simpleSpline}
+\label{eq:cubicKnotSpline}
 \end{equation}
 
-\begin{lstlisting}[style=pseudocode,caption={Quartic Polynomial with Repulsive Term}]
-#A
-#TYPE quartic_poly_rep
-#P -4.5377 4.0659 -0.8548 9.5272e7 0.1193
-#L 0.0
-#U 7.0
+
+\begin{lstlisting}[style=pseudocode,caption={Cubic Knot Spline}]
+#TYPE cubic_knot_spline
+#P  0.0 1.0 0.02 -0.01 0.002  0.0
+#PF 0.0 1.0 2.0   3.0  4.0    5.0
 \end{lstlisting}
 
-
-
-
-
-
-
-\section{Density Functions}
-
-\subsection{Quadratic Density}
-
+\FloatBarrier
 \begin{figure}[h]
   \begin{center}
-    \includegraphics{img/plots/quadratic_density.eps}[scale=0.6]
-    \caption{Quadratic Density}
+    \includegraphics[scale=0.5]{img/plots/cubic_knot_spline.eps}
+    \caption{Cubic Knot Spline}
     \label{graph:graph1}
   \end{center}
 \end{figure}
+\FloatBarrier
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Cubic Knot Spline Fixed End
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Cubic Knot Spline Fixed End}
 
 \begin{equation}
 \begin{split}
-\rho(r) = (r - r_c)^2 
+V(r) = \sum_i^N a_i (r - r_i)^3 H(r_i - r) \\
+\text{where } \\
+H(x) = \left\{ \begin{matrix} 0 & x<0 \\  1 & x >= 0 \end{matrix} \right . 
 \end{split}
-\label{eq:quadraticDensity}
+\label{eq:cubicKnotSplineFixedEnd}
 \end{equation}
 
-\begin{lstlisting}[style=pseudocode,caption={Quadratic Density}]
-#A
-#TYPE quadratic_density
-#P 3.816
-#L 0.0
-#U 7.0
+
+\begin{lstlisting}[style=pseudocode,caption={Cubic Knot Spline Fixed End}]
+#TYPE cubic_knot_spline_fixed_end
+#P  0.0 1.0 0.02 -0.01 0.002  0.0
+#PF 0.0 1.0 2.0   3.0  4.0    5.0   6.5   0.0   0.0
 \end{lstlisting}
 
-
-\subsection{Slater 4S (Squared)}
-
+\FloatBarrier
 \begin{figure}[h]
   \begin{center}
-    \includegraphics{img/plots/slater_4s.eps}[scale=0.6]
-    \caption{Quadratic Density}
+    \includegraphics[scale=0.5]{img/plots/cubic_knot_spline_fixed_end.eps}
+    \caption{Cubic Knot Spline Fixed End}
     \label{graph:graph1}
   \end{center}
 \end{figure}
+\FloatBarrier
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Cubic Knot Spline Fixed End Pair
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Cubic Knot Spline Fixed End Pair}
 
 \begin{equation}
 \begin{split}
-\rho(r) = (N_s r^3 exp(-\eta r))^2 
+V(r) = \sum_i^N a_i (r - r_i)^3 H(r_i - r) \\
+\text{where } \\
+H(x) = \left\{ \begin{matrix} 0 & x<0 \\  1 & x >= 0 \end{matrix} \right . 
 \end{split}
-\label{eq:slater4S}
+\label{eq:cubicKnotSplineFixedEndPair}
 \end{equation}
 
-\begin{lstlisting}[style=pseudocode,caption={Slater 4S}]
-#A
-#TYPE slater_4s
-#P 5.0 1.323
-#L 0.0
-#U 7.0
+\begin{lstlisting}[style=pseudocode,caption={Cubic Knot Spline Fixed End Pair}]
+#TYPE cubic_knot_spline_fixed_end_pair
+#P   0.5 0.007 -0.3 0.000001 0.002  0.0
+#PF  2.0  2.5    3.0  3.5      4.0    5.0   26.0  26.0  1.0  6.5   0.0   0.0
 \end{lstlisting}
 
-
-
-
-
-
-
-
-\section{Embedding Functions}
-
-\subsection{Finnis-Sinclair Embedding}
-
+\FloatBarrier
 \begin{figure}[h]
   \begin{center}
-    \includegraphics{img/plots/fs_embedding.eps}[scale=0.6]
-    \caption{Finnis-Sinclair Embedding}
+    \includegraphics[scale=0.5]{img/plots/cubic_knot_spline_fixed_end_pair.eps}
+    \caption{Cubic Knot Spline Fixed End Pair}
     \label{graph:graph1}
   \end{center}
 \end{figure}
-
-\begin{equation}
-\begin{split}
-F[\rho] = -A \sqrt(\rho)
-\end{split}
-\label{eq:fsEmbedding}
-\end{equation}
-
-\begin{lstlisting}[style=pseudocode,caption={Finnis-Sinclair Embedding}]
-#A
-#TYPE fs_embedding
-#P 10.0
-#L 0.0
-#U 7.0
-\end{lstlisting}
-
-
-\subsection{Mendelev Embedding}
-
-\begin{figure}[h]
-  \begin{center}
-    \includegraphics{img/plots/mendelev_embedding.eps}[scale=0.6]
-    \caption{Mendelev Embedding}
-    \label{graph:graph1}
-  \end{center}
-\end{figure}
-
-\begin{equation}
-\begin{split}
-F[\rho] = - \sqrt(\rho) + A \rho^2
-\end{split}
-\label{eq:mendelevEmbedding}
-\end{equation}
-
-\begin{lstlisting}[style=pseudocode,caption={Mendelev Embedding}]
-#A
-#TYPE mendelev_embedding
-#P 10.0
-#L 0.0
-#U 7.0
-\end{lstlisting}
-
-
-\subsection{Triple Embedding}
-
-\begin{figure}[h]
-  \begin{center}
-    \includegraphics{img/plots/triple_embedding.eps}[scale=0.6]
-    \caption{Triple Embedding}
-    \label{graph:graph1}
-  \end{center}
-\end{figure}
-
-\begin{equation}
-\begin{split}
-F[\rho] = A \sqrt(\rho) + B \rho + C \rho^2
-\end{split}
-\label{eq:tripleEmbedding}
-\end{equation}
-
-\begin{lstlisting}[style=pseudocode,caption={Triple Embedding}]
-#A
-#TYPE triple_embedding
-#P 1.0 1.0 1.0
-#L 0.0
-#U 7.0
-\end{lstlisting}
-
-
-
-\subsection{Ackland Embedding}
-
-\begin{figure}[h]
-  \begin{center}
-    \includegraphics{img/plots/ackland_embedding.eps}[scale=0.6]
-    \caption{Ackland Embedding}
-    \label{graph:graph1}
-  \end{center}
-\end{figure}
-
-\begin{equation}
-\begin{split}
-F[\rho] = A \sqrt(\rho) + B \rho^2 + C \rho^4
-\end{split}
-\label{eq:acklandEmbedding}
-\end{equation}
-
-\begin{lstlisting}[style=pseudocode,caption={Ackland Embedding}]
-#A
-#TYPE ackland_embedding
-#P 1.0 1.0 1.0
-#L 0.0
-#U 7.0
-\end{lstlisting}
+\FloatBarrier
 
 
 
 
 
-
-
-
-
-
-
-\section{Generic Functions}
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Cubic Splines
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Cubic Splines}
-
-\begin{figure}[h]
-  \begin{center}
-    \includegraphics{img/plots/cubic_spline.eps}[scale=0.6]
-    \caption{Ackland Embedding}
-    \label{graph:graph1}
-  \end{center}
-\end{figure}
 
 \begin{equation}
 \begin{split}
@@ -1373,45 +1464,381 @@ H(x) = \left\{ \begin{matrix} 0 & x<0 \\  1 & x >= 0 \end{matrix} \right .
 This function requires two sets of parameters.  P is a list of N coefficients and PF is a list of N cutoffs.  The cubic polynomials are summed and individually scaled by the coefficients, and by virtue of its form and the heaviside step function, they cut off at the desired radius. 
 
 \begin{lstlisting}[style=pseudocode,caption={Cubic Splines}]
-#A
 #TYPE cubic_spline
 #P -165.0 -78.5 -78.15 1.868
 #PF 0.976 1.15 1.216 1.650
-#L 0.0
-#U 7.0
 \end{lstlisting}
 
-
-
-
-
-\subsection{Quintic Splines}
-
+\FloatBarrier
 \begin{figure}[h]
   \begin{center}
-    \includegraphics{img/plots/quintic_spline.eps}[scale=0.6]
+    \includegraphics[scale=0.5]{img/plots/cubic_spline.eps}
     \caption{Ackland Embedding}
     \label{graph:graph1}
   \end{center}
 \end{figure}
+\FloatBarrier
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Embedding A
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Embedding A - Finnis Sinclair}
 
 \begin{equation}
 \begin{split}
-V(r) = \sum_i^N a_i (r - r_i)^5 H(r_i - r) \\
-\text{where } \\
-H(x) = \left\{ \begin{matrix} 0 & x<0 \\  1 & x >= 0 \end{matrix} \right . 
+F(\rho) = -a * \sqrt{\rho}
 \end{split}
-\label{eq:quinticSpline}
+\label{eq:finnisSinclair}
 \end{equation}
 
-\begin{lstlisting}[style=pseudocode,caption={Quintic Splines}]
-#A
-#TYPE quintic_spline
-#P -165.0 -78.5 -78.15 1.868
-#PF 0.976 1.15 1.216 1.650
-#L 0.0
-#U 7.0
+This function requires one parameter. 
+Finnis MW and Sinclair J E 1984 Phil. Mag. A 50 45
+
+\begin{lstlisting}[style=pseudocode,caption={Embedding A}]
+#TYPE embedding_a
+#P 0.1
 \end{lstlisting}
+
+\FloatBarrier
+\begin{figure}[h]
+  \begin{center}
+    \includegraphics[scale=0.5]{img/plots/embedding_a.eps}
+    \caption{Embedding A}
+    \label{graph:graph1}
+  \end{center}
+\end{figure}
+\FloatBarrier
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Embedding B
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Embedding B - Mendelev}
+
+\begin{equation}
+\begin{split}
+F(\rho) = -\sqrt{\rho} + a \rho**2
+\end{split}
+\label{eq:mendelevEmbedding}
+\end{equation}
+
+This function requires one parameter. 
+Development of new interatomic potentials appropriate for crystalline and liquid iron, 2003.
+
+\begin{lstlisting}[style=pseudocode,caption={Embedding B}]
+#TYPE embedding_b
+#P 0.1
+\end{lstlisting}
+
+\FloatBarrier
+\begin{figure}[h]
+  \begin{center}
+    \includegraphics[scale=0.5]{img/plots/embedding_b.eps}
+    \caption{Embedding B}
+    \label{graph:graph1}
+  \end{center}
+\end{figure}
+\FloatBarrier
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Embedding C
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Embedding C}
+
+\begin{equation}
+\begin{split}
+F(\rho) = a \sqrt{\rho} + b \rho**2
+\end{split}
+\label{eq:embeddingC}
+\end{equation}
+
+
+\begin{lstlisting}[style=pseudocode,caption={Embedding C}]
+#TYPE embedding_c
+#P 0.1 0.1
+\end{lstlisting}
+
+\FloatBarrier
+\begin{figure}[h]
+  \begin{center}
+    \includegraphics[scale=0.5]{img/plots/embedding_c.eps}
+    \caption{Embedding C}
+    \label{graph:graph1}
+  \end{center}
+\end{figure}
+\FloatBarrier
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Embedding D
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Embedding D - Ackland-Mendelev}
+
+\begin{equation}
+\begin{split}
+F(\rho) = -sqrt({\rho} + a \rho**2 + b \rho**4
+\end{split}
+\label{eq:embeddingD}
+\end{equation}
+
+This function requires one parameter. 
+Development of an interatomic potential for phosphorus impurities in α-iron, 2004.
+
+
+\begin{lstlisting}[style=pseudocode,caption={Embedding D}]
+#TYPE embedding_d
+#P 0.05 -0.00001
+\end{lstlisting}
+
+\FloatBarrier
+\begin{figure}[h]
+  \begin{center}
+    \includegraphics[scale=0.5]{img/plots/embedding_d.eps}
+    \caption{Embedding D}
+    \label{graph:graph1}
+  \end{center}
+\end{figure}
+\FloatBarrier
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Embedding E
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Embedding E}
+
+\begin{equation}
+\begin{split}
+F(\rho) = a * sqrt{\rho} + b \rho**2 + c \rho**4
+\end{split}
+\label{eq:embeddingE}
+\end{equation}
+
+\begin{lstlisting}[style=pseudocode,caption={Embedding E}]
+#TYPE embedding_e
+#P -0.8 0.05 -0.00001
+\end{lstlisting}
+
+\FloatBarrier
+\begin{figure}[h]
+  \begin{center}
+    \includegraphics[scale=0.5]{img/plots/embedding_e.eps}
+    \caption{Ackland Embedding}
+    \label{graph:graph1}
+  \end{center}
+\end{figure}
+\FloatBarrier
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Lennard-Jones
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Lennard-Jones}
+
+\begin{equation}
+\begin{split}
+V(r) = e \left(\left(\frac{r_m}{r}\right)^12 - 2 \left(\frac{r_m}{r}\right)^6\right)
+\end{split}
+\label{eq:eqLennardJones}
+\end{equation}
+
+\begin{lstlisting}[style=pseudocode,caption={Lennard-Jones}]
+#TYPE lennard_jones
+#P 2.3 3.5
+\end{lstlisting}
+
+\FloatBarrier
+\begin{figure}[h]
+  \begin{center}
+    \includegraphics[scale=0.5]{img/plots/lennard_jones.eps}
+    \caption{Lennard-Jones}
+    \label{graph:Lennard-Jones}
+  \end{center}
+\end{figure}
+\FloatBarrier
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Morse
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Morse}
+
+\begin{equation}
+\begin{split}
+V(r) = exp(-2 a (r - re)) - 2 exp (-a*(r - re))
+\end{split}
+\label{eq:eqMorse}
+\end{equation}
+
+\begin{lstlisting}[style=pseudocode,caption={Morse}]
+#TYPE morse
+#P 4.669 1.256 2.8
+\end{lstlisting}
+
+\FloatBarrier
+\begin{figure}[h]
+  \begin{center}
+    \includegraphics[scale=0.5]{img/plots/morse.eps}
+    \caption{Morse}
+    \label{graph:graph1}
+  \end{center}
+\end{figure}
+\FloatBarrier
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Slater 4S (Squared)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Slater 4S (Squared)}
+
+\begin{equation}
+\begin{split}
+\rho(r) = (N_s r^3 exp(-\eta r))^2 
+\end{split}
+\label{eq:slater4S}
+\end{equation}
+
+\begin{lstlisting}[style=pseudocode,caption={Slater 4S}]
+#TYPE slater_4s
+#P 5.0 1.323
+\end{lstlisting}
+
+\FloatBarrier
+\begin{figure}[h]
+  \begin{center}
+    \includegraphics[scale=0.5]{img/plots/slater_4s.eps}
+    \caption{Quadratic Density}
+    \label{graph:graph1}
+  \end{center}
+\end{figure}
+\FloatBarrier
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ZBL
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{ZBL}
+
+\begin{equation}
+\begin{split}
+\phi(x) = 0.181 e^{-3.2x} + 0.5099 e^{-0.9423x} + 0.2802 e^{-0.4029x} + 0.02817 e^{-0.2016x} \\
+\text{where } a_{ij} = \frac{0.8854 a_0}{Z^{0.23}_i + Z^{0.23}_j} \\
+\text{and } a_0 = 0.529 \text{angstrom}
+\end{split}
+\label{eq:ZBL}
+\end{equation}
+
+\begin{lstlisting}[style=pseudocode,caption={ZBL}]
+#TYPE zbl
+#P 26.0 26.0
+\end{lstlisting}
+
+\FloatBarrier
+\begin{figure}[h]
+  \begin{center}
+    \includegraphics[scale=0.5]{img/plots/zbl.eps}
+    \caption{ZBL}
+    \label{graph:graph1}
+  \end{center}
+\end{figure}
+\FloatBarrier
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ZERO
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Zero}
+
+\begin{equation}
+\begin{split}
+f(x) = 0
+\end{split}
+\label{eq:zero}
+\end{equation}
+
+\begin{lstlisting}[style=pseudocode,caption={Zero}]
+#TYPE zero
+#P 0.0
+\end{lstlisting}
+
+\FloatBarrier
+\begin{figure}[h]
+  \begin{center}
+    \includegraphics[scale=0.5]{img/plots/zero.eps}
+    \caption{Zero}
+    \label{graph:graph1}
+  \end{center}
+\end{figure}
+\FloatBarrier
+
+
+
+
+
+
+
+
+
+
 
 
 

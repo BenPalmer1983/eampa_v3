@@ -11,6 +11,7 @@ import time
 
 class rss_calc:
 
+
   def run():
     print("Calc RSS") 
 
@@ -21,18 +22,18 @@ class rss_calc:
     # Setup EFS
     efs.init()                         # Initialise (allocate arrays)
     efs_calc.set_weights()
-    potential.efs_add_potentials()     # Load potentials
+    potential.load_to_efs()
     configs.efs_add_config()           # Add configs
 
     # Setup BP
     bp_calc.init()
     bp_calc.set_weights()
-    potential.bp_add_potentials()
+    potential.load_to_bp()
     b_props.bp_add()
+
 
     # Run EFS and BP
     rss = rss_calc.run_calc()
-    
     
     
     efs_calc.output()
@@ -67,6 +68,7 @@ class rss_calc:
     s_rss_w = sum(efs.config_rss[:,6])
     t_rss_w = e_rss_w + f_rss_w + s_rss_w
 
+    print()
     print('All configs:                   ' + str(t_rss))
     print('All configs (energy):          ' + str(e_rss))
     print('All configs (force):           ' + str(f_rss))
@@ -81,8 +83,11 @@ class rss_calc:
     for bp_id in range(bp.bp_configs_count):  
       print('')   
  
+      print('========================================================================================') 
+      print('========================================================================================') 
       print('BP  ' + str(bp_id)) 
-      print('================') 
+      print('========================================================================================') 
+      print('========================================================================================') 
 
       rss_calc.print_line('a0', bp.known_alat[bp_id], bp.calc_alat[bp_id])
       rss_calc.print_line('v0', None, bp.calc_v0[bp_id])
@@ -101,7 +106,50 @@ class rss_calc:
           print(str('{:14.6f}'.format(float(160.230732254e0 * bp.known_ec[bp_id,i,j]))), end="")
         print()
         #print(160.230732254e0 * bp.known_ec[bp_id,i,:])
-      
+
+      print('')   
+      print('Other calculated properties') 
+      print('===========================')     
+      print('{:30s}'.format('Bulk Modulus B0 (Reuss):'), end=" ")
+      print('{:14.6f}'.format(bp.calc_b0_r[bp_id]), end="    ")
+      print("(", '{:14.6f}'.format(bp.calc_b0_r_gpa[bp_id]),") GPA", sep="")
+      print('{:30s}'.format('Bulk Modulus B0 (Voigt):'), end=" ")
+      print('{:14.6f}'.format(bp.calc_b0_v[bp_id]), end="    ")
+      print("(", '{:14.6f}'.format(bp.calc_b0_v_gpa[bp_id]),") GPA", sep="")
+
+      print('{:30s}'.format('Tetragonal Shear:'), end=" ")
+      print('{:14.6f}'.format(bp.calc_cubic_tetragonal_shear[bp_id]), end="    ")
+      print("(", '{:14.6f}'.format(bp.calc_cubic_tetragonal_shear[bp_id]),") GPA", sep="")
+
+      print('{:30s}'.format('Shear Modulus G:'), end=" ")
+      print('{:14.6f}'.format(bp.calc_cubic_shear_modulus[bp_id]), end="    ")
+      print("(", '{:14.6f}'.format(bp.calc_cubic_shear_modulus_gpa[bp_id]),") GPA", sep="")
+      print('{:30s}'.format('Shear Modulus G (Reuss):'), end=" ")
+      print('{:14.6f}'.format(bp.calc_g_r[bp_id]), end="    ")
+      print("(", '{:14.6f}'.format(bp.calc_g_r_gpa[bp_id]),") GPA", sep="")
+      print('{:30s}'.format('Shear Modulus G (Voigt):'), end=" ")
+      print('{:14.6f}'.format(bp.calc_g_v[bp_id]), end="    ")
+      print("(", '{:14.6f}'.format(bp.calc_g_v_gpa[bp_id]),") GPA", sep="")
+
+      print('{:30s}'.format('Young\'s Modulus E:'), end=" ")
+      print('{:14.6f}'.format(bp.calc_e[bp_id]), end="    ")
+      print("(", '{:14.6f}'.format(bp.calc_e_gpa[bp_id]),") GPA", sep="")
+
+      print('{:30s}'.format('Poisson Ratio'), end=" ")
+      print('{:14.6f}'.format(bp.calc_v[bp_id]))
+
+      print('{:30s}'.format('Cachy Pressure:'), end=" ")
+      print('{:14.6f}'.format(bp.calc_cubic_cauchy_pressure[bp_id]), end="    ")
+      print("(", '{:14.6f}'.format(bp.calc_cubic_cauchy_pressure_gpa[bp_id]),") GPA", sep="")
+
+      print('{:30s}'.format('Melting Point:'), end=" ")
+      print('{:14.6f}'.format(bp.calc_melting[bp_id]), "K", sep="")
+
+      print('{:30s}'.format('Cubic Stability:'), end=" ")
+      print('{:14.6f}'.format(bp.calc_cubic_stability[bp_id]), " (1=Stable, 0=Unstable)", sep="")
+      print('{:30s}'.format('Stability:'), end=" ")
+      print('{:14.6f}'.format(bp.calc_stability[bp_id]), " (1=Stable, 0=Unstable)", sep="")
+      print('')         
       print('')   
   
     print('RSS:')    
@@ -114,6 +162,8 @@ class rss_calc:
     print('v:', g.rss['bp']['v'], "   w: ",g.rss['bp']['v_weighted'])
     print('')
     print('')
+    print('')
+    print('')
     print('RSS: ' + str(rss))
     print('')
     print('')
@@ -123,21 +173,18 @@ class rss_calc:
     #print(g.rss)
     print('')
     
+    potential.plot(g.dirs['wd'] + '/rss/potential_function_plots')
 
-
-
-
-
-    exit()
+    std.make_dir(g.dirs['wd'] + '/rss/eos_ec')  
+    b_props.bp_eos_plot(g.dirs['wd'] + '/rss/eos_ec')
 
     # Plots
     #potential.plot_fortran_potentials()
     #potential.plot_python_potentials()
-    potential.plot_python_potentials(g.dirs['wd'] + '/rss/plots/potential_python')
-    potential.plot_fortran_potentials(g.dirs['wd'] + '/rss/plots/potential_fortran')
-    
-    b_props.bp_output()
-    b_props.bp_eos_plot(g.dirs['wd'] + '/rss/plots')
+    #potential.plot_python_potentials(g.dirs['wd'] + '/rss/plots/potential_python')
+    #potential.plot_fortran_potentials(g.dirs['wd'] + '/rss/plots/potential_fortran')
+    #b_props.bp_output()
+    #b_props.bp_eos_plot(g.dirs['wd'] + '/rss/plots')
 
 
     
@@ -154,7 +201,7 @@ class rss_calc:
     
     
   # ASSUMES EFS AND BP ALREADY SET UP
-  def run_calc(save_in_top=True): 
+  def run_calc(save_in_top=True, log=False): 
     # START TIME
     s = time.time()  
   
@@ -168,9 +215,7 @@ class rss_calc:
     try:
       bp_cc = int(bp.cc)
     except:  
-      bp_cc = 0
-
-    
+      bp_cc = 0    
   
     # RUN CALCULATIONS
     efs.rss_calc()
@@ -182,9 +227,14 @@ class rss_calc:
     efs_calc.get_rss()   
     bp_calc.get_results()
     bp_calc.get_rss()
+
+    # Log
+    if(log == True):
+      rss_calc.log()
  
+    # Save residual
     g.rss['residual'] = numpy.asarray(g.rss['residual'])
-    
+  
 
     # SUM WEIGHTED RSS
     rss = 0.0
@@ -217,53 +267,25 @@ class rss_calc:
     if(g.rss['since_improvement'] == None):
       g.rss['since_improvement'] = 0
     g.rss['since_improvement'] = g.rss['since_improvement'] + 1
-    g.rss['current_bp_max_density'] = copy.deepcopy(bp.max_density)
-    g.rss['current_efs_max_density'] = copy.deepcopy(efs.max_density)
+    g.rss['current_bp_max_density'] = numpy.copy(bp.max_density)
+    g.rss['current_efs_max_density'] = numpy.copy(efs.max_density)
     if(g.rss['best'] == None or g.rss['current'] < g.rss['best']):
       main.log('Best rss: ' + str(g.rss['best']) + ' (since last: ' + str(g.rss['since_improvement']) + ')')
-      g.rss['best_bp_max_density'] = copy.deepcopy(bp.max_density)
-      g.rss['best_efs_max_density'] = copy.deepcopy(efs.max_density)
+      g.rss['best_bp_max_density'] = numpy.copy(bp.max_density)
+      g.rss['best_efs_max_density'] = numpy.copy(efs.max_density)
       g.rss['best'] = g.rss['current']
       g.rss['since_improvement'] = 0
       
-      g.efs_results_best = copy.deepcopy(g.efs_results)
-      g.bp_results_best = copy.deepcopy(g.bp_results)
-    
+      g.efs_results_best = numpy.copy(g.efs_results)
+      g.bp_results_best = numpy.copy(g.bp_results)
 
-    """
-    # TOP 100 List
-    if(save_in_top):
-      list_len = g.fitting['top_parameters']
-
-      # COPY ARRAYS
-      p_now = numpy.copy(potential.get_parameters())
-      efs_results = copy.deepcopy(g.efs_results)
-      bp_results = copy.deepcopy(g.bp_results)
-
-      if(len(g.top_parameters) == 0):
-        g.top_parameters.append([rss, p_now, efs_results, bp_results, bp.max_density, efs.max_density])
-      else:    
-        i = 0
-        while(i<len(g.top_parameters)):
-          if(rss < g.top_parameters[i][0]):
-            break
-          elif(rss == g.top_parameters[i][0] and g.top_parameters[i][1].all() == p_now.all()):
-            i = list_len
-            break
-          else:
-            i = i + 1
-        if(i < list_len):
-          g.top_parameters.insert(i, [rss, p_now, efs_results,bp_results, bp.max_density, efs.max_density])
-        if(len(g.top_parameters) > list_len):
-          g.top_parameters.pop()
-    """ 
-      
     # END TIME
     e = time.time()      
     dt = e - s
 
     
     #efs_cc bp_cc
+    g.benchmark['dt'] = dt
     g.benchmark['total_atoms'] = g.benchmark['total_atoms'] + (bp.total_atoms + efs.total_atoms)
     g.benchmark['total_interactions'] = g.benchmark['total_interactions'] + (bp.l_nl_size + efs.l_nl_size)
     g.benchmark['configs'] =  g.benchmark['configs'] + efs_cc + bp_cc
@@ -313,6 +335,9 @@ class rss_calc:
 
 
 
-    
-    
+  def log():
+    std.make_dir(g.dirs['wd'] + '/logs') 
+    fh.open(g.dirs['wd'] + '/logs/efs_calc.txt', 'a')  
+    fh.close()
+    print(g.efs_results )
     

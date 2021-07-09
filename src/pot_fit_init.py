@@ -2,22 +2,16 @@ class pf_init:
 
   def run():  
 
-    # If a spline fit, convert into a spline with the set number of nodes
-    for fn in range(len(g.pot_functions['functions'])):       
-      if(g.pot_functions['functions'][fn]['fit_type'] == 1):     
-        potential.vary_tabulated_points(fn)
-
-  
     # Setup EFS
     efs.init()                         # Initialise (allocate arrays)
-    efs_calc.set_weights()             # Set weightings
-    potential.efs_add_potentials()     # Load potentials
+    efs_calc.set_weights()
+    potential.load_to_efs()
     configs.efs_add_config()           # Add configs
-    
-    # Setup BP    
+
+    # Setup BP
     bp_calc.init()
     bp_calc.set_weights()
-    potential.bp_add_potentials()
+    potential.load_to_bp()
     b_props.bp_add()
     bp_calc.get_known()
 
@@ -35,49 +29,21 @@ class pf_init:
                        'since_improvement': 0,}
 
 
-    g.pfdata['psize'] = potential.parameter_count()
-    g.pfdata['p'] = {'current': None, 'best': None,}
-
-    g.pfdata['bp'] = {'current': None, 'best': None,}
-
-    g.pfdata['max_density'] = {'bp_current': None, 'efs_current': None, 'bp_best': None, 'efs_best': None,}
-    
+    g.pfdata['psize'] = potential.pot['p_count']
+    g.pfdata['p'] = {'current': None, 'best': None, 'known': None,}
+    g.pfdata['bp'] = {'current': None, 'best': None, 'known': None,}
+    g.pfdata['efs'] = {'current': None, 'best': None,}
+    #g.pfdata['max_density'] = {'bp_current': None, 'efs_current': None, 'bp_best': None, 'efs_best': None,}
 
 
-    # SAVE Starting Parameters
-    g.pfdata['params_start'] = numpy.zeros((g.pfdata['psize'],),)
-    a = 0
-    for fn in range(len(g.pot_functions['functions'])):        
-      if(g.pot_functions['functions'][fn]['fit_type'] == 1):     # TABULATED      
-        b = a + g.pot_functions['functions'][fn]['fit_size']     
-        g.pfdata['params_start'][a:b] = numpy.zeros((g.pot_functions['functions'][fn]['fit_size'],),)
-        a = b
-      elif(g.pot_functions['functions'][fn]['fit_type'] == 2):   # ANALYTIC  
-        b = a + g.pot_functions['functions'][fn]['fit_size'] 
-        g.pfdata['params_start'][a:b] = g.pot_functions['functions'][fn]['a_params'][:]
-        a = b    
-    
-    
-    # SAVE Variation 
-    g.pfdata['params_var'] = numpy.zeros((2,g.pfdata['psize'],),)
-    a = 0
-    for fn in range(len(g.pot_functions['functions'])):        
-      if(g.pot_functions['functions'][fn]['fit_type'] == 1):     # TABULATED      
-        b = a + g.pot_functions['functions'][fn]['fit_size']     
-        g.pfdata['params_var'][0,a:b] = g.pot_functions['functions'][fn]['fit_parameters'][0,:]  # Lower
-        g.pfdata['params_var'][1,a:b] = g.pot_functions['functions'][fn]['fit_parameters'][1,:]  # Upper
-        a = b 
-      elif(g.pot_functions['functions'][fn]['fit_type'] == 2):   # ANALYTIC  
-        b = a + g.pot_functions['functions'][fn]['fit_size'] 
-        g.pfdata['params_var'][0,a:b] = g.pot_functions['functions'][fn]['fit_parameters'][0,:]  # Lower
-        g.pfdata['params_var'][1,a:b] = g.pot_functions['functions'][fn]['fit_parameters'][1,:]  # Upper
-        a = b  
+    # SAVE Starting Parameters & Variation
+    g.pfdata['params_start']  = numpy.copy(potential.pot['p'])
+    g.pfdata['params_var'] = numpy.copy(potential.pot['p_var'])
 
 
 
-
-
-
+    g.pfdata['bp']['known'] = g.bp_known.copy()
+    g.pfdata['efs']['known'] = g.efs_known.copy()
 
 
 

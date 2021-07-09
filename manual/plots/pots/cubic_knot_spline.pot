@@ -1,0 +1,7 @@
+#TYPE cubic_knot_spline
+#P  0.0 1.0 0.02 -0.01 0.002  0.0
+#PF 0.0 1.0 2.0   3.0  4.0    5.0
+#TITLE Cubic Knot Spline
+#X Distance/Angs
+#Y Energy/eV
+#PLOT cubic_knot_spline.eps

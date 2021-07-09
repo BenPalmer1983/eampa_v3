@@ -1,0 +1,1 @@
+SIMULATED ANNEALING 1           8.8028e+01    -->    8.7861e+01      895.102         

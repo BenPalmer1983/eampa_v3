@@ -23,12 +23,17 @@ from rss_calc import rss_calc
 from pot_fit import pf
 from trial import trial
 from relax_calc import relax_calc
+from pgrad import pgrad
 
 
 
 from eampa_lib.f_es import es
 from eampa_lib.f_efs import efs
+from eampa_lib.f_efs import potential as efs_potential
+
 from eampa_lib.f_bp import bp
+from eampa_lib.f_bp import potential as bp_potential
+
 from eampa_lib.f_sorting import sort
 from eampa_lib.f_interp import interp
 from eampa_lib.f_spline import spline
@@ -39,19 +44,22 @@ from eampa_lib.f_relax import relax
 
 
 class eampa:
+
+  start_time = 0.0
  
   def run():
+    eampa.start_time = time.time()
     print("RUNNING")
-        
+ 
     # Read Input
     read_input.run()    
     
+    # set seed
+    numpy.random.seed(int(g.random['seed']))
+
     # Setup Dirs
     setup_dirs.run()
-    
-    # Copy Input
-    #eampa.copy_input()   
-    
+        
     # Set memory
     memory.run() 
         
@@ -97,45 +105,18 @@ class eampa:
       trial.run()
     elif(g.run_type == 'relax'): 
       relax_calc.run()
+    elif(g.run_type == 'pgrad'): 
+      pgrad.run()
     else: 
       trial.run()
       
-   
-  def copy_input():
-    try: 
-      std.copy(g.inp['potential']['dir'], g.dirs['input'])
-    except:
-      pass
-    try: 
-      std.copy(g.inp['configs']['dir'], g.dirs['input'])
-    except:
-      pass
-    try: 
-      std.copy(g.inp['dft']['dir'], g.dirs['input'])
-    except:
-      pass
-    try: 
-      std.copy(g.inp['bp']['dir'], g.dirs['input'])
-    except:
-      pass
+    eampa.exit()
     
-    
-  """  
-  def run_type():
-    # Types
-    # config       just calculate energy/forces/stress of configs
-    # bp           calculate bulk properties (bulk modulus, elastic constants etc)
-    # rss          
-    # fit  
-  
-    # Default
-    g.run_type = g.inp['run']['type'].lower().strip()
-  """
-  
-  
   
 
   def exit():
+    eampa.end_time = time.time() - eampa.start_time
     print("End of Program")
+    print("Run time: ", eampa.end_time)
     exit()
   

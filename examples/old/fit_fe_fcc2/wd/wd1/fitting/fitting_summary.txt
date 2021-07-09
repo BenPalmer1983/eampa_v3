@@ -1,0 +1,1 @@
+SIMULATED ANNEALING 1           2.0098e+10    -->    1.8812e+04      23725.325       

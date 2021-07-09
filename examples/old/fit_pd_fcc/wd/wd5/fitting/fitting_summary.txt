@@ -1,0 +1,3 @@
+RANDOM SEARCH 1                 2.0082e+12    -->    9.7546e+04      89.420          
+RANDOM SEARCH 2                 9.7546e+04    -->    1.3583e+03      90.798          
+SIMULATED ANNEALING 1           1.3583e+03    -->    1.1387e+03      11169.163       

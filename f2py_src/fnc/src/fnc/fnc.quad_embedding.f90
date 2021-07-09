@@ -15,6 +15,9 @@ y = p(1) + p(2) * sqrt(r) + p(3) * r**2 + p(4) * r**4
 END SUBROUTINE quad_embedding
 
 
+
+
+
 SUBROUTINE quad_embedding_v(r, p, p_fixed, y)
 !############################################################
 ! f(x) = A * sqrt(r) + B * r + C * r**2

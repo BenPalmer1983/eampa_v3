@@ -17,8 +17,9 @@
 MODULE efs
 
 USE kinds
-USE interp, ONLY: fill, fill_zoor, interp4dydxn
-USE spline, ONLY: spline_array, spline_ab_poly, spline_ab_exp3, spline_ab_exp5
+USE potential, ONLY: f, search_f, search_grad, f_groups, fgroup_max
+!USE interp, ONLY: fill, fill_zoor, interp4dydxn
+!USE spline, ONLY: spline_array, spline_ab_poly, spline_ab_exp3, spline_ab_exp5
 
 IMPLICIT NONE
 
@@ -34,7 +35,6 @@ INCLUDE "efs.math.f90"
 
 INCLUDE "efs.add_config.f90"
 INCLUDE "efs.nl.f90"
-INCLUDE "efs.potential.f90"
 
 
 INCLUDE "efs.rss_calc.f90"
@@ -42,10 +42,11 @@ INCLUDE "efs.energy.f90"
 INCLUDE "efs.energy_force.f90"
 INCLUDE "efs.efs.f90"
 
-INCLUDE "efs.max_density.f90"
-
-INCLUDE "efs.get.f90"
-INCLUDE "efs.set.f90"
+!
+!INCLUDE "efs.efs.f90"
+!INCLUDE "efs.max_density.f90"
+!INCLUDE "efs.get.f90"
+!INCLUDE "efs.set.f90"
 
 
 END MODULE efs

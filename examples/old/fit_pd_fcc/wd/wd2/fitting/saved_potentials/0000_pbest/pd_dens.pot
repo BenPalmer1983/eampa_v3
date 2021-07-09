@@ -1,0 +1,4 @@
+#TYPE slater_4s_cutoff
+#P 4.27743415117 5.45376996645 
+#PF 6.5 
+#VR None

@@ -1,0 +1,2 @@
+SIMULATED ANNEALING 1           1.7705e+00    -->    1.7705e+00      91.957          
+NELDER MEAD 1                   1.7705e+00    -->    1.3199e+00      3644.787        

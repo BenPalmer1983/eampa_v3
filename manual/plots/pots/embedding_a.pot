@@ -1,0 +1,6 @@
+#TYPE embedding_a
+#P 0.1
+#TITLE Embedding A - Finnis Sinclair
+#X Density
+#Y Energy/eV
+#PLOT embedding_a.eps

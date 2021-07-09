@@ -1,0 +1,2 @@
+RANDOM SEARCH 1                 1.1616e+03    -->    1.1616e+03      474.442         
+SIMULATED ANNEALING 1           1.1616e+03    -->    1.0434e+01      19356.584       

@@ -1,0 +1,5 @@
+# Bulk Properties File
+
+units pressure=GPA length=ang energy=ev
+
+ALFCC1 potlabel=AL b0=76 alat=4.04 uv=1.0 e0=-3.36 ec=114,62,32 type=fcc expansion=4 rcut=6.5 amu_per_crystal=104.0 

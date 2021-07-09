@@ -1,0 +1,3 @@
+RANDOM SEARCH 1                 2.4591e+08    -->    9.7135e+05      10.924          
+SIMULATED ANNEALING 1           9.7135e+05    -->    6.7910e+05      8269.900        
+NELDER MEAD 1                   6.7910e+05    -->    1.7688e+00      10637.551       

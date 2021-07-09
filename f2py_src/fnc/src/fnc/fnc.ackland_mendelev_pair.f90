@@ -15,21 +15,30 @@ REAL(kind=DoubleReal), INTENT(IN) :: p(:)
 REAL(kind=DoubleReal), INTENT(IN) :: p_fixed(:)
 REAL(kind=DoubleReal), INTENT(OUT) :: y
 !############################################################
-REAL(kind=DoubleReal) :: Q1, Q2, rc1, rc2, rk, rs, x, e, ep
+REAL(kind=DoubleReal) :: Q1, Q2, rc1, rc2, rk, rs, x, e, ep, psize
 REAL(kind=DoubleReal) :: xa, ya, ypa, xb, yb, ypb, H
 INTEGER(kind=StandardInteger) :: n_p, n_pf
 REAL(kind=DoubleReal) :: xmat(1:4,1:4)
 REAL(kind=DoubleReal) :: ymat(1:4)
 REAL(kind=DoubleReal) :: c(1:4)
+REAL(kind=DoubleReal) :: pf(1:SIZE(p,1))
 !############################################################
-Q1 = p_fixed(1)
-Q2 = p_fixed(2)
-rc1 = p_fixed(3)
-rc2 = p_fixed(4)
 
+psize = SIZE(p,1)
+IF(SIZE(p_fixed,1) .NE. SIZE(p,1) + 4)THEN   !  qa, qb, rzbl, r, v(r), v'(r) ..... nsize
+  y = 0.0D0
+ELSE
+
+pf(1:psize) = p_fixed(1:psize)
+Q1 = p_fixed(psize+1)
+Q2 = p_fixed(psize+2)
+rc1 = p_fixed(psize+3)
+rc2 = p_fixed(psize+4)
 
 IF(r .EQ. 0.0D0)THEN
   y = 1.0D4
+ELSE IF(r .GT. pf(psize))THEN
+  y = 0.0D0
 ELSE IF(r .LE. rc1)THEN
   CALL heaviside(rc1 - r, H)
   rs = 0.4683766D0 / (Q1**(2.0/3.0D0) + Q2**(2.0/3.0D0))
@@ -95,15 +104,20 @@ ELSE IF(r .GT. rc1 .AND. r .LT. rc2)THEN
 ELSE IF(r .GE. rc2)THEN
   y = 0.0D0
   DO n_p = 1, SIZE(p,1)
-    n_pf = n_p + 4
-    rk = p_fixed(n_pf)
+    rk = pf(n_p)
     CALL heaviside(r - rk, H)
     y = y + p(n_p) * H * (r - rk)**3
   END DO
 END IF
 
 
+END IF
+
 END SUBROUTINE ackland_mendelev_pair
+
+
+
+
 
 
 

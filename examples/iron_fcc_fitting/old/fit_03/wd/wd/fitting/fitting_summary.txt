@@ -1,0 +1,2 @@
+RANDOM SEARCH 1                 6.9811e+02    -->    6.9811e+02      205.169         
+SIMULATED ANNEALING 1           6.9811e+02    -->    2.6683e+02      6505.149        

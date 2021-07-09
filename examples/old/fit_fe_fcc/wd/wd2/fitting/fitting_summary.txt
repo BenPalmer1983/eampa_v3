@@ -1,0 +1,5 @@
+RANDOM SEARCH 1                 1.6031e+04    -->    1.6031e+04      3853.919        
+RANDOM SEARCH 2                 1.6031e+04    -->    1.6031e+04      3778.456        
+SIMULATED ANNEALING 1           1.6031e+04    -->    1.5716e+04      4573.656        
+GENETIC ALGORITHM 1             1.5716e+04    -->    1.5487e+04      18347.529       
+SIMULATED ANNEALING 2           1.5487e+04    -->    1.5026e+04      11864.055       

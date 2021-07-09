@@ -1,0 +1,25 @@
+POTNAME fe_pot
+
+START
+F_ON true
+FILE pd_pair.pot
+LABEL PD PD
+F_TYPE PAIR
+END
+
+START
+F_ON true
+FILE pd_dens.pot
+LABEL PD
+F_TYPE DENS
+F_GROUP Group1
+END
+
+START
+F_ON true
+FILE pd_embe.pot
+LABEL PD
+F_TYPE EMBE
+F_GROUP Group1
+END
+

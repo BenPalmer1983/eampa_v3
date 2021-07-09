@@ -1,0 +1,519 @@
+#############################################################################
+2.045E-02 ###   Tue, 11 May 2021 15:11:18 +0000
+#############################################################################
+
+####TIME#############LOG#####################################################
+2.755E-02 ###   Script: /cloud/Code/python/eampa/eampa.py
+3.113E-02 ###   Loaded: input.in
+#############################################
+  Read Input
+  Time: 3.287E-02
+#############################################
+3.451E-02 ###   fit
+3.628E-02 ###   a0: 5.0
+3.629E-02 ###   b0: 1.0
+3.629E-02 ###   bp: 1000.0
+3.629E-02 ###   config: 1.7
+3.629E-02 ###   e: 1.0
+3.629E-02 ###   e0: 5.0
+3.629E-02 ###   ec: 1.0
+3.629E-02 ###   energy: 1.2
+3.630E-02 ###   force: 1.5
+3.630E-02 ###   g: 1.0
+3.630E-02 ###   negec: 1000.0
+3.630E-02 ###   stress: 1.3
+3.630E-02 ###   v: 1.0
+3.630E-02 ###   
+3.799E-02 ###   max: 100.0
+3.800E-02 ###   min: 0.1
+3.800E-02 ###   scale_exponent: 4.0
+3.800E-02 ###   scale_factor: 10.0
+3.800E-02 ###   zero_density_factor: 100000000.0
+3.800E-02 ###   
+3.992E-02 ###   pot_dir: None
+3.993E-02 ###   pot_name: None
+3.993E-02 ###   results_dir: results
+3.994E-02 ###   
+4.162E-02 ###   bp_file: bp.dat
+4.162E-02 ###   dir: bp
+4.162E-02 ###   ec_size: 6
+4.162E-02 ###   ec_strain: 0.01
+4.163E-02 ###   eos_size: 6
+4.163E-02 ###   eos_strain: 0.01
+4.163E-02 ###   
+4.325E-02 ###   
+4.501E-02 ###   1: {'label_id': 1, 'label_text': 'AL', 'atom_count': 32, 'relaxed_energy': -1264.06398979, 'relaxed_energy_unit': 'Ry', 'coh_energy': -3.36, 'coh_energy_unit': 'eV', 'calc_relaxed_dft_ev': -537.454181036, 'calc_coh_ev': -3.36, 'calc_apaev': 534.094181036}
+4.502E-02 ###   2: {'label_id': 2, 'label_text': 'FE', 'atom_count': 16, 'relaxed_energy': -5268.188, 'relaxed_energy_unit': 'Ry', 'coh_energy': -4.316, 'coh_energy_unit': 'eV', 'calc_relaxed_dft_ev': -4479.851795407, 'calc_coh_ev': -4.316, 'calc_apaev': 4475.5357954070005}
+4.502E-02 ###   3: {'label_id': 3, 'label_text': 'PD', 'atom_count': 32, 'relaxed_energy': -16384.958, 'relaxed_energy_unit': 'Ry', 'coh_energy': -3.91, 'coh_energy_unit': 'eV', 'calc_relaxed_dft_ev': -6966.549363269, 'calc_coh_ev': -3.91, 'calc_apaev': 6962.639363269001}
+4.502E-02 ###   
+#############################################
+  Setup Directories
+  Time: 4.682E-02
+#############################################
+4.863E-02 ###   WD: wd/wd
+#############################################
+  Memory
+  Time: 5.582E-02
+#############################################
+5.761E-02 ###   EFS 2000000000.0
+5.926E-02 ###   config size       255102
+6.098E-02 ###   ghost size        3061224
+6.264E-02 ###   nl size           25510204
+6.438E-02 ###   BP 2000000000.0
+6.604E-02 ###   config size       255102
+6.773E-02 ###   ghost size        3061224
+6.940E-02 ###   nl size           25510204
+#############################################
+  Potential Load
+  Time: 7.121E-02
+#############################################
+7.406E-02 ###   Potential file: pot/fe/fe.pot
+7.574E-02 ###   Loading: pot/fe/fe.pot
+8.727E-01 ###   std  configs/ec_3_006.out
+8.778E-01 ###   std  configs/ec_7_006.out
+8.833E-01 ###   std  configs/ec_7_001.out
+8.888E-01 ###   std  configs/ec_3_001.out
+8.939E-01 ###   std  configs/fe_config_0001.out
+8.989E-01 ###   std  configs/ec_4_003.out
+9.040E-01 ###   std  configs/ec_8_004.out
+9.090E-01 ###   std  configs/ec_8_003.out
+9.144E-01 ###   std  configs/ec_4_004.out
+9.194E-01 ###   std  configs/ec_5_002.out
+9.243E-01 ###   std  configs/eos_003.out
+9.293E-01 ###   std  configs/ec_1_002.out
+9.344E-01 ###   std  configs/ec_9_005.out
+9.392E-01 ###   std  configs/eos_004.out
+9.440E-01 ###   std  configs/ec_1_005.out
+9.490E-01 ###   std  configs/ec_9_002.out
+9.539E-01 ###   std  configs/ec_5_005.out
+9.589E-01 ###   std  configs/ec_2_007.out
+9.639E-01 ###   std  configs/ec_6_007.out
+9.689E-01 ###   std  configs/ec_8_002.out
+9.741E-01 ###   std  configs/ec_4_005.out
+9.792E-01 ###   std  configs/ec_4_002.out
+9.842E-01 ###   std  configs/ec_8_005.out
+9.894E-01 ###   std  configs/ec_3_007.out
+9.946E-01 ###   std  configs/ec_7_007.out
+9.997E-01 ###   std  configs/ec_6_001.out
+1.005E+00 ###   std  configs/ec_2_001.out
+1.010E+00 ###   std  configs/ec_2_006.out
+1.015E+00 ###   std  configs/ec_6_006.out
+1.020E+00 ###   std  configs/ec_1_004.out
+1.025E+00 ###   std  configs/eos_005.out
+1.030E+00 ###   std  configs/ec_9_003.out
+1.036E+00 ###   std  configs/ec_5_004.out
+1.041E+00 ###   std  configs/ec_5_003.out
+1.045E+00 ###   std  configs/ec_1_003.out
+1.050E+00 ###   std  configs/eos_002.out
+1.055E+00 ###   std  configs/ec_9_004.out
+1.060E+00 ###   std  configs/ec_2_005.out
+1.065E+00 ###   std  configs/ec_6_005.out
+1.070E+00 ###   std  configs/ec_6_002.out
+1.075E+00 ###   std  configs/ec_2_002.out
+1.080E+00 ###   std  configs/eos_001.out
+1.085E+00 ###   std  configs/ec_9_007.out
+1.090E+00 ###   std  configs/eos_006.out
+1.095E+00 ###   std  configs/ec_1_007.out
+1.100E+00 ###   std  configs/ec_5_007.out
+1.105E+00 ###   std  configs/ec_4_001.out
+1.110E+00 ###   std  configs/ec_8_006.out
+1.115E+00 ###   std  configs/ec_8_001.out
+1.120E+00 ###   std  configs/ec_4_006.out
+1.125E+00 ###   std  configs/ec_3_004.out
+1.131E+00 ###   std  configs/ec_7_004.out
+1.136E+00 ###   std  configs/ec_7_003.out
+1.141E+00 ###   std  configs/ec_3_003.out
+1.146E+00 ###   std  configs/ec_1_006.out
+1.151E+00 ###   std  configs/eos_007.out
+1.156E+00 ###   std  configs/ec_9_001.out
+1.161E+00 ###   std  configs/ec_5_006.out
+1.166E+00 ###   std  configs/ec_5_001.out
+1.171E+00 ###   std  configs/ec_1_001.out
+1.177E+00 ###   std  configs/ec_9_006.out
+1.182E+00 ###   std  configs/ec_6_003.out
+1.187E+00 ###   std  configs/ec_2_003.out
+1.192E+00 ###   std  configs/ec_2_004.out
+1.197E+00 ###   std  configs/ec_6_004.out
+1.203E+00 ###   std  configs/ec_7_002.out
+1.208E+00 ###   std  configs/ec_3_002.out
+1.213E+00 ###   std  configs/coords_256_fe.dat
+1.216E+00 ###   std  configs/ec_3_005.out
+1.222E+00 ###   std  configs/ec_7_005.out
+1.227E+00 ###   std  configs/ec_4_007.out
+1.232E+00 ###   std  configs/ec_8_007.out
+#############################################
+  Potential Fit
+  Time: 1.758E+00
+#############################################
+2.201E+00 ###   BP Allocated Memory
+2.201E+00 ###   
+2.203E+00 ###   2GB
+2.203E+00 ###   
+2.205E+00 ###   255102 3061224 25510204
+2.205E+00 ###   
+3.061E+00 ###   Best rss: None (since last: 1)
+4.048E+00 ###   Best rss: None (since last: 1)
+4.700E+00 ###   Best rss: None (since last: 1)
+####TIME#############LOG#####################################################
+5.620E+00 ###   Best rss: None (since last: 1)
+6.300E+00 ###   Best rss: None (since last: 1)
+6.995E+00 ###   Best rss: None (since last: 1)
+7.715E+00 ###   Best rss: None (since last: 1)
+8.418E+00 ###   Best rss: None (since last: 1)
+9.103E+00 ###   Best rss: None (since last: 1)
+9.811E+00 ###   Best rss: None (since last: 1)
+1.049E+01 ###   Best rss: None (since last: 1)
+1.120E+01 ###   Best rss: None (since last: 1)
+1.190E+01 ###   Best rss: None (since last: 1)
+1.260E+01 ###   Best rss: None (since last: 1)
+1.329E+01 ###   Best rss: None (since last: 1)
+1.398E+01 ###   Best rss: None (since last: 1)
+1.467E+01 ###   Best rss: None (since last: 1)
+1.537E+01 ###   Best rss: None (since last: 1)
+1.607E+01 ###   Best rss: None (since last: 1)
+1.679E+01 ###   Best rss: None (since last: 1)
+1.748E+01 ###   Best rss: None (since last: 1)
+1.818E+01 ###   Best rss: None (since last: 1)
+1.886E+01 ###   Best rss: None (since last: 1)
+1.956E+01 ###   Best rss: None (since last: 1)
+2.026E+01 ###   Best rss: None (since last: 1)
+2.097E+01 ###   Best rss: None (since last: 1)
+2.168E+01 ###   Best rss: None (since last: 1)
+2.238E+01 ###   Best rss: None (since last: 1)
+2.308E+01 ###   Best rss: None (since last: 1)
+2.376E+01 ###   Best rss: None (since last: 1)
+2.449E+01 ###   Best rss: None (since last: 1)
+2.520E+01 ###   Best rss: None (since last: 1)
+2.596E+01 ###   Best rss: None (since last: 1)
+2.665E+01 ###   Best rss: None (since last: 1)
+2.735E+01 ###   Best rss: None (since last: 1)
+2.804E+01 ###   Best rss: None (since last: 1)
+2.874E+01 ###   Best rss: None (since last: 1)
+2.945E+01 ###   Best rss: None (since last: 1)
+3.014E+01 ###   Best rss: None (since last: 1)
+3.084E+01 ###   Best rss: None (since last: 1)
+3.153E+01 ###   Best rss: None (since last: 1)
+3.225E+01 ###   Best rss: None (since last: 1)
+3.294E+01 ###   Best rss: None (since last: 1)
+3.364E+01 ###   Best rss: None (since last: 1)
+3.434E+01 ###   Best rss: None (since last: 1)
+3.506E+01 ###   Best rss: None (since last: 1)
+3.576E+01 ###   Best rss: None (since last: 1)
+3.646E+01 ###   Best rss: None (since last: 1)
+3.715E+01 ###   Best rss: None (since last: 1)
+3.783E+01 ###   Best rss: None (since last: 1)
+3.853E+01 ###   Best rss: None (since last: 1)
+3.924E+01 ###   Best rss: None (since last: 1)
+3.993E+01 ###   Best rss: None (since last: 1)
+4.064E+01 ###   Best rss: None (since last: 1)
+4.133E+01 ###   Best rss: None (since last: 1)
+4.203E+01 ###   Best rss: None (since last: 1)
+4.272E+01 ###   Best rss: None (since last: 1)
+4.343E+01 ###   Best rss: None (since last: 1)
+4.413E+01 ###   Best rss: None (since last: 1)
+4.484E+01 ###   Best rss: None (since last: 1)
+4.552E+01 ###   Best rss: None (since last: 1)
+4.621E+01 ###   Best rss: None (since last: 1)
+4.694E+01 ###   Best rss: None (since last: 1)
+4.764E+01 ###   Best rss: None (since last: 1)
+4.833E+01 ###   Best rss: None (since last: 1)
+4.901E+01 ###   Best rss: None (since last: 1)
+4.970E+01 ###   Best rss: None (since last: 1)
+5.041E+01 ###   Best rss: None (since last: 1)
+5.111E+01 ###   Best rss: None (since last: 1)
+5.180E+01 ###   Best rss: None (since last: 1)
+5.250E+01 ###   Best rss: None (since last: 1)
+5.319E+01 ###   Best rss: None (since last: 1)
+5.390E+01 ###   Best rss: None (since last: 1)
+5.468E+01 ###   Best rss: None (since last: 1)
+5.538E+01 ###   Best rss: None (since last: 1)
+5.608E+01 ###   Best rss: None (since last: 1)
+5.677E+01 ###   Best rss: None (since last: 1)
+5.746E+01 ###   Best rss: None (since last: 1)
+5.815E+01 ###   Best rss: None (since last: 1)
+5.888E+01 ###   Best rss: None (since last: 1)
+5.960E+01 ###   Best rss: None (since last: 1)
+6.028E+01 ###   Best rss: None (since last: 1)
+6.097E+01 ###   Best rss: None (since last: 1)
+6.167E+01 ###   Best rss: None (since last: 1)
+6.235E+01 ###   Best rss: None (since last: 1)
+6.305E+01 ###   Best rss: None (since last: 1)
+6.375E+01 ###   Best rss: None (since last: 1)
+6.447E+01 ###   Best rss: None (since last: 1)
+6.519E+01 ###   Best rss: None (since last: 1)
+6.592E+01 ###   Best rss: None (since last: 1)
+6.663E+01 ###   Best rss: None (since last: 1)
+6.733E+01 ###   Best rss: None (since last: 1)
+6.802E+01 ###   Best rss: None (since last: 1)
+6.873E+01 ###   Best rss: None (since last: 1)
+6.944E+01 ###   Best rss: None (since last: 1)
+7.014E+01 ###   Best rss: None (since last: 1)
+7.086E+01 ###   Best rss: None (since last: 1)
+7.155E+01 ###   Best rss: None (since last: 1)
+7.225E+01 ###   Best rss: None (since last: 1)
+7.294E+01 ###   Best rss: None (since last: 1)
+7.365E+01 ###   Best rss: None (since last: 1)
+7.439E+01 ###   Best rss: None (since last: 1)
+7.509E+01 ###   Best rss: None (since last: 1)
+####TIME#############LOG#####################################################
+7.580E+01 ###   Best rss: None (since last: 1)
+7.652E+01 ###   Best rss: None (since last: 1)
+7.722E+01 ###   Best rss: None (since last: 1)
+7.794E+01 ###   Best rss: None (since last: 1)
+7.865E+01 ###   Best rss: None (since last: 1)
+7.935E+01 ###   Best rss: None (since last: 1)
+8.008E+01 ###   Best rss: None (since last: 1)
+8.079E+01 ###   Best rss: None (since last: 1)
+8.150E+01 ###   Best rss: None (since last: 1)
+8.219E+01 ###   Best rss: None (since last: 1)
+8.290E+01 ###   Best rss: None (since last: 1)
+8.361E+01 ###   Best rss: None (since last: 1)
+8.431E+01 ###   Best rss: None (since last: 1)
+8.501E+01 ###   Best rss: None (since last: 1)
+8.570E+01 ###   Best rss: None (since last: 1)
+8.642E+01 ###   Best rss: None (since last: 1)
+8.712E+01 ###   Best rss: None (since last: 1)
+8.784E+01 ###   Best rss: None (since last: 1)
+8.861E+01 ###   Best rss: None (since last: 1)
+8.932E+01 ###   Best rss: None (since last: 1)
+9.002E+01 ###   Best rss: None (since last: 1)
+9.073E+01 ###   Best rss: None (since last: 1)
+9.144E+01 ###   Best rss: None (since last: 1)
+9.212E+01 ###   Best rss: None (since last: 1)
+9.285E+01 ###   Best rss: None (since last: 1)
+9.356E+01 ###   Best rss: None (since last: 1)
+9.424E+01 ###   Best rss: None (since last: 1)
+9.492E+01 ###   Best rss: None (since last: 1)
+9.561E+01 ###   Best rss: None (since last: 1)
+9.629E+01 ###   Best rss: None (since last: 1)
+9.698E+01 ###   Best rss: None (since last: 1)
+9.768E+01 ###   Best rss: None (since last: 1)
+9.838E+01 ###   Best rss: None (since last: 1)
+9.907E+01 ###   Best rss: None (since last: 1)
+9.979E+01 ###   Best rss: None (since last: 1)
+1.005E+02 ###   Best rss: None (since last: 1)
+1.012E+02 ###   Best rss: None (since last: 1)
+1.019E+02 ###   Best rss: None (since last: 1)
+1.026E+02 ###   Best rss: None (since last: 1)
+1.033E+02 ###   Best rss: None (since last: 1)
+1.040E+02 ###   Best rss: None (since last: 1)
+1.047E+02 ###   Best rss: None (since last: 1)
+1.054E+02 ###   Best rss: None (since last: 1)
+1.061E+02 ###   Best rss: None (since last: 1)
+1.069E+02 ###   Best rss: None (since last: 1)
+1.076E+02 ###   Best rss: None (since last: 1)
+1.083E+02 ###   Best rss: None (since last: 1)
+1.089E+02 ###   Best rss: None (since last: 1)
+1.096E+02 ###   Best rss: None (since last: 1)
+1.103E+02 ###   Best rss: None (since last: 1)
+1.110E+02 ###   Best rss: None (since last: 1)
+1.117E+02 ###   Best rss: None (since last: 1)
+1.124E+02 ###   Best rss: None (since last: 1)
+1.131E+02 ###   Best rss: None (since last: 1)
+1.139E+02 ###   Best rss: None (since last: 1)
+1.146E+02 ###   Best rss: None (since last: 1)
+1.153E+02 ###   Best rss: None (since last: 1)
+1.160E+02 ###   Best rss: None (since last: 1)
+1.167E+02 ###   Best rss: None (since last: 1)
+1.174E+02 ###   Best rss: None (since last: 1)
+1.181E+02 ###   Best rss: None (since last: 1)
+1.188E+02 ###   Best rss: None (since last: 1)
+1.196E+02 ###   Best rss: None (since last: 1)
+1.203E+02 ###   Best rss: None (since last: 1)
+1.210E+02 ###   Best rss: None (since last: 1)
+1.217E+02 ###   Best rss: None (since last: 1)
+1.224E+02 ###   Best rss: None (since last: 1)
+1.231E+02 ###   Best rss: None (since last: 1)
+1.238E+02 ###   Best rss: None (since last: 1)
+1.245E+02 ###   Best rss: None (since last: 1)
+1.252E+02 ###   Best rss: None (since last: 1)
+1.259E+02 ###   Best rss: None (since last: 1)
+1.266E+02 ###   Best rss: None (since last: 1)
+1.273E+02 ###   Best rss: None (since last: 1)
+1.280E+02 ###   Best rss: None (since last: 1)
+1.287E+02 ###   Best rss: None (since last: 1)
+1.294E+02 ###   Best rss: None (since last: 1)
+1.301E+02 ###   Best rss: None (since last: 1)
+1.308E+02 ###   Best rss: None (since last: 1)
+1.315E+02 ###   Best rss: None (since last: 1)
+1.322E+02 ###   Best rss: None (since last: 1)
+1.329E+02 ###   Best rss: None (since last: 1)
+1.336E+02 ###   Best rss: None (since last: 1)
+1.343E+02 ###   Best rss: None (since last: 1)
+1.350E+02 ###   Best rss: None (since last: 1)
+1.357E+02 ###   Best rss: None (since last: 1)
+1.364E+02 ###   Best rss: None (since last: 1)
+1.371E+02 ###   Best rss: None (since last: 1)
+1.378E+02 ###   Best rss: None (since last: 1)
+1.385E+02 ###   Best rss: None (since last: 1)
+1.392E+02 ###   Best rss: None (since last: 1)
+1.399E+02 ###   Best rss: None (since last: 1)
+1.406E+02 ###   Best rss: None (since last: 1)
+1.413E+02 ###   Best rss: None (since last: 1)
+1.420E+02 ###   Best rss: None (since last: 1)
+1.427E+02 ###   Best rss: None (since last: 1)
+1.434E+02 ###   Best rss: None (since last: 1)
+1.442E+02 ###   Best rss: None (since last: 1)
+1.449E+02 ###   Best rss: None (since last: 1)
+1.456E+02 ###   Best rss: None (since last: 1)
+####TIME#############LOG#####################################################
+1.463E+02 ###   Best rss: None (since last: 1)
+1.470E+02 ###   Best rss: None (since last: 1)
+1.477E+02 ###   Best rss: None (since last: 1)
+1.485E+02 ###   Best rss: None (since last: 1)
+1.493E+02 ###   Best rss: None (since last: 1)
+1.501E+02 ###   Best rss: None (since last: 1)
+1.508E+02 ###   Best rss: None (since last: 1)
+1.516E+02 ###   Best rss: None (since last: 1)
+1.523E+02 ###   Best rss: None (since last: 1)
+1.531E+02 ###   Best rss: None (since last: 1)
+1.539E+02 ###   Best rss: None (since last: 1)
+1.548E+02 ###   Best rss: None (since last: 1)
+1.557E+02 ###   Best rss: None (since last: 1)
+1.564E+02 ###   Best rss: None (since last: 1)
+1.572E+02 ###   Best rss: None (since last: 1)
+1.579E+02 ###   Best rss: None (since last: 1)
+1.587E+02 ###   Best rss: None (since last: 1)
+1.594E+02 ###   Best rss: None (since last: 1)
+1.602E+02 ###   Best rss: None (since last: 1)
+1.610E+02 ###   Best rss: None (since last: 1)
+1.617E+02 ###   Best rss: None (since last: 1)
+1.625E+02 ###   Best rss: None (since last: 1)
+1.632E+02 ###   Best rss: None (since last: 1)
+1.639E+02 ###   Best rss: None (since last: 1)
+1.649E+02 ###   Best rss: None (since last: 1)
+1.656E+02 ###   Best rss: None (since last: 1)
+1.663E+02 ###   Best rss: None (since last: 1)
+1.670E+02 ###   Best rss: None (since last: 1)
+1.677E+02 ###   Best rss: None (since last: 1)
+1.684E+02 ###   Best rss: None (since last: 1)
+1.691E+02 ###   Best rss: None (since last: 1)
+1.698E+02 ###   Best rss: None (since last: 1)
+1.706E+02 ###   Best rss: None (since last: 1)
+1.714E+02 ###   Best rss: None (since last: 1)
+1.724E+02 ###   Best rss: None (since last: 1)
+1.731E+02 ###   Best rss: None (since last: 1)
+1.738E+02 ###   Best rss: None (since last: 1)
+1.746E+02 ###   Best rss: None (since last: 1)
+1.753E+02 ###   Best rss: None (since last: 1)
+1.760E+02 ###   Best rss: None (since last: 1)
+1.767E+02 ###   Best rss: None (since last: 1)
+1.775E+02 ###   Best rss: None (since last: 1)
+1.783E+02 ###   Best rss: None (since last: 1)
+1.790E+02 ###   Best rss: None (since last: 1)
+1.797E+02 ###   Best rss: None (since last: 1)
+1.809E+02 ###   Best rss: None (since last: 1)
+1.816E+02 ###   Best rss: None (since last: 1)
+1.823E+02 ###   Best rss: None (since last: 1)
+1.830E+02 ###   Best rss: None (since last: 1)
+1.837E+02 ###   Best rss: None (since last: 1)
+1.844E+02 ###   Best rss: None (since last: 1)
+1.851E+02 ###   Best rss: None (since last: 1)
+1.859E+02 ###   Best rss: None (since last: 1)
+1.866E+02 ###   Best rss: None (since last: 1)
+1.878E+02 ###   Best rss: None (since last: 1)
+1.885E+02 ###   Best rss: None (since last: 1)
+1.892E+02 ###   Best rss: None (since last: 1)
+1.899E+02 ###   Best rss: None (since last: 1)
+1.907E+02 ###   Best rss: None (since last: 1)
+1.914E+02 ###   Best rss: None (since last: 1)
+1.921E+02 ###   Best rss: None (since last: 1)
+1.928E+02 ###   Best rss: None (since last: 1)
+1.936E+02 ###   Best rss: None (since last: 1)
+1.943E+02 ###   Best rss: None (since last: 1)
+1.950E+02 ###   Best rss: None (since last: 1)
+1.956E+02 ###   Best rss: None (since last: 1)
+1.964E+02 ###   Best rss: None (since last: 1)
+1.971E+02 ###   Best rss: None (since last: 1)
+1.978E+02 ###   Best rss: None (since last: 1)
+1.986E+02 ###   Best rss: None (since last: 1)
+1.993E+02 ###   Best rss: None (since last: 1)
+2.000E+02 ###   Best rss: None (since last: 1)
+2.007E+02 ###   Best rss: None (since last: 1)
+2.014E+02 ###   Best rss: None (since last: 1)
+2.021E+02 ###   Best rss: None (since last: 1)
+2.028E+02 ###   Best rss: None (since last: 1)
+2.035E+02 ###   Best rss: None (since last: 1)
+2.042E+02 ###   Best rss: None (since last: 1)
+2.049E+02 ###   Best rss: None (since last: 1)
+2.057E+02 ###   Best rss: None (since last: 1)
+2.065E+02 ###   Best rss: None (since last: 1)
+2.072E+02 ###   Best rss: None (since last: 1)
+2.079E+02 ###   Best rss: None (since last: 1)
+2.086E+02 ###   Best rss: None (since last: 1)
+2.093E+02 ###   Best rss: None (since last: 1)
+2.101E+02 ###   Best rss: None (since last: 1)
+2.108E+02 ###   Best rss: None (since last: 1)
+2.115E+02 ###   Best rss: None (since last: 1)
+2.122E+02 ###   Best rss: None (since last: 1)
+2.130E+02 ###   Best rss: None (since last: 1)
+2.137E+02 ###   Best rss: None (since last: 1)
+2.144E+02 ###   Best rss: None (since last: 1)
+2.151E+02 ###   Best rss: None (since last: 1)
+2.158E+02 ###   Best rss: None (since last: 1)
+2.165E+02 ###   Best rss: None (since last: 1)
+2.172E+02 ###   Best rss: None (since last: 1)
+2.179E+02 ###   Best rss: None (since last: 1)
+2.187E+02 ###   Best rss: None (since last: 1)
+2.194E+02 ###   Best rss: None (since last: 1)
+2.201E+02 ###   Best rss: None (since last: 1)
+####TIME#############LOG#####################################################
+2.208E+02 ###   Best rss: None (since last: 1)
+2.215E+02 ###   Best rss: None (since last: 1)
+2.223E+02 ###   Best rss: None (since last: 1)
+2.230E+02 ###   Best rss: None (since last: 1)
+2.237E+02 ###   Best rss: None (since last: 1)
+2.244E+02 ###   Best rss: None (since last: 1)
+2.251E+02 ###   Best rss: None (since last: 1)
+2.259E+02 ###   Best rss: None (since last: 1)
+2.266E+02 ###   Best rss: None (since last: 1)
+2.274E+02 ###   Best rss: None (since last: 1)
+2.281E+02 ###   Best rss: None (since last: 1)
+2.288E+02 ###   Best rss: None (since last: 1)
+2.295E+02 ###   Best rss: None (since last: 1)
+2.302E+02 ###   Best rss: None (since last: 1)
+2.309E+02 ###   Best rss: None (since last: 1)
+2.316E+02 ###   Best rss: None (since last: 1)
+2.324E+02 ###   Best rss: None (since last: 1)
+2.331E+02 ###   Best rss: None (since last: 1)
+2.338E+02 ###   Best rss: None (since last: 1)
+2.346E+02 ###   Best rss: None (since last: 1)
+2.353E+02 ###   Best rss: None (since last: 1)
+2.359E+02 ###   Best rss: None (since last: 1)
+2.367E+02 ###   Best rss: None (since last: 1)
+2.374E+02 ###   Best rss: None (since last: 1)
+2.381E+02 ###   Best rss: None (since last: 1)
+2.388E+02 ###   Best rss: None (since last: 1)
+2.395E+02 ###   Best rss: None (since last: 1)
+2.402E+02 ###   Best rss: None (since last: 1)
+2.409E+02 ###   Best rss: None (since last: 1)
+2.416E+02 ###   Best rss: None (since last: 1)
+2.424E+02 ###   Best rss: None (since last: 1)
+2.431E+02 ###   Best rss: None (since last: 1)
+2.438E+02 ###   Best rss: None (since last: 1)
+2.445E+02 ###   Best rss: None (since last: 1)
+2.452E+02 ###   Best rss: None (since last: 1)
+2.460E+02 ###   Best rss: None (since last: 1)
+2.467E+02 ###   Best rss: None (since last: 1)
+2.475E+02 ###   Best rss: None (since last: 1)
+2.482E+02 ###   Best rss: None (since last: 1)
+2.489E+02 ###   Best rss: None (since last: 1)
+2.497E+02 ###   Best rss: None (since last: 1)
+2.504E+02 ###   Best rss: None (since last: 1)
+2.511E+02 ###   Best rss: None (since last: 1)
+2.518E+02 ###   Best rss: None (since last: 1)
+2.525E+02 ###   Best rss: None (since last: 1)
+2.532E+02 ###   Best rss: None (since last: 1)
+2.539E+02 ###   Best rss: None (since last: 1)
+2.547E+02 ###   Best rss: None (since last: 1)
+2.554E+02 ###   Best rss: None (since last: 1)
+2.561E+02 ###   Best rss: None (since last: 1)
+2.568E+02 ###   Best rss: None (since last: 1)
+2.575E+02 ###   Best rss: None (since last: 1)
+2.582E+02 ###   Best rss: None (since last: 1)
+2.589E+02 ###   Best rss: None (since last: 1)
+2.595E+02 ###   Best rss: None (since last: 1)
+2.603E+02 ###   Best rss: None (since last: 1)
+2.610E+02 ###   Best rss: None (since last: 1)
+2.617E+02 ###   Best rss: None (since last: 1)
+2.624E+02 ###   Best rss: None (since last: 1)

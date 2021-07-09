@@ -1,0 +1,4 @@
+#TYPE ackland_embedding 
+#P -6.4782e+00 3.9272e+00  -1.8483e-01 
+#PF 0.0
+#VR 0.3

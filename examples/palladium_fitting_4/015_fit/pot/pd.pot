@@ -1,0 +1,25 @@
+POTNAME pd_pot
+
+START
+F_ON true
+FILE pd_pair.pot
+LABEL PD PD
+F_TYPE PAIR
+END
+
+START
+F_ON true
+FILE pd_dens_slater_4s.pot
+LABEL PD
+F_TYPE DENS
+F_GROUP D1
+END
+
+START
+F_ON true
+FILE pd_embe_ackland.pot
+LABEL PD
+F_TYPE EMBE
+F_GROUP D1
+END
+

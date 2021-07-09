@@ -466,7 +466,7 @@ class configs:
   @staticmethod
   def output(): 
     if(g.outputs):     
-      fh = open(g.dirs['output'] + '/' + 'configs.dat', 'w')
+      fh = open(g.dirs['wd'] + '/data/' + 'configs.dat', 'w')
       
       n = 0
       for c in g.configs['configs']:

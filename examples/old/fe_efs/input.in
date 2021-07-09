@@ -1,0 +1,17 @@
+# Run types:   efs, bp, rss, fit   (future: es - energy-surface)
+run type=efs
+
+# Working Directory Option - 1 to replace each calculation
+wd option=1
+
+# Display Option
+display output=1
+
+# Memory
+mem bp=2GB efs=2GB
+
+# Potential
+potential dir="pot" index_file="fe.pot"
+
+# Config Directory
+configs dir="configs"

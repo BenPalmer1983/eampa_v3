@@ -7,13 +7,18 @@ SUBROUTINE ackland_embedding(r, p, p_fixed, y)
 IMPLICIT NONE
 !############################################################
 REAL(kind=DoubleReal), INTENT(IN) :: r
-REAL(kind=DoubleReal), INTENT(IN) :: p(1:3)
+REAL(kind=DoubleReal), INTENT(IN) :: p(:)
 REAL(kind=DoubleReal), INTENT(IN) :: p_fixed(:)
 REAL(kind=DoubleReal), INTENT(OUT) :: y
 !############################################################
 !############################################################
-y = p(1) * sqrt(r) + p(2) * r**2 + p(3) * r**4
+IF(r .LT. 0.0D0)THEN
+  y = 0.0D0
+ELSE
+  y = p(1) * sqrt(r) + p(2) * (r)**2 + p(3) * (r)**4
+END IF
 END SUBROUTINE ackland_embedding
+
 
 
 SUBROUTINE ackland_embedding_v(r, p, p_fixed, y)
@@ -22,7 +27,7 @@ SUBROUTINE ackland_embedding_v(r, p, p_fixed, y)
 IMPLICIT NONE
 !############################################################
 REAL(kind=DoubleReal), INTENT(IN) :: r(:)
-REAL(kind=DoubleReal), INTENT(IN) :: p(1:3)
+REAL(kind=DoubleReal), INTENT(IN) :: p(:)
 REAL(kind=DoubleReal), INTENT(IN) :: p_fixed(:)
 REAL(kind=DoubleReal), INTENT(OUT) :: y(1:SIZE(r,1))
 INTEGER(kind=StandardInteger) :: n

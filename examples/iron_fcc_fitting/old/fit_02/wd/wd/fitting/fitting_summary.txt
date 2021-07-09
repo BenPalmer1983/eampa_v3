@@ -1,0 +1,2 @@
+RANDOM SEARCH 1                 4.6384e+03    -->    2.5445e+03      201.359         
+SIMULATED ANNEALING 1           2.5445e+03    -->    5.1766e+02      6636.577        

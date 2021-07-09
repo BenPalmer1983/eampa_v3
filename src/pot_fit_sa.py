@@ -11,7 +11,11 @@ class pf_sa:
   t = None
   count = 0
 
-  def run():
+  def run(fit):
+    for repeat in range(fit['repeat']):
+      pf_sa.run_sa(fit)
+
+  def run_sa(fit):
     pf_sa.count = pf_sa.count + 1
     t_start = time.time()
     start_best_rss = g.pfdata['rss']['best'] 
@@ -24,7 +28,7 @@ class pf_sa:
 
     # Start - use best
     p = g.pfdata['p']['best']
-    pf_potential.update(p)
+    potential.update(p)
     rss = pf.get_rss(False)
     p_count = len(p)
 
@@ -32,22 +36,22 @@ class pf_sa:
     p_best = numpy.copy(p)
     rss_best = rss
 
-    step = pf.fit['sa_step']  
+    rss_plot = []
+    rss_plot.append([time.time()-t_start, rss_best])
+
+
     for tn in range(pf.fit['sa_loops_t']):
+      pv = pf.fit['sa_var'] * pf.fit['sa_var_factor']**tn
       if(pf.fit['sa_loops_t'] == 1):
         pf_sa.t = pf.fit['sa_temp_start']
-        f = 1.0
       else:
-        pf_sa.t = pf.fit['sa_temp_start'] - tn *  (pf.fit['sa_temp_start'] - pf.fit['sa_temp_end']) / (pf.fit['sa_loops_t'] - 1)
-        f = pf.fit['sa_step_factor']**tn
-        g.pfdata['stage'] = 'Simulated Annealing ' +str(pf_sa.count) + ' Loop ' + str(tn + 1)
+        pf_sa.t = numpy.round(pf.fit['sa_temp_start'] - tn *  (pf.fit['sa_temp_start'] - pf.fit['sa_temp_end']) / (pf.fit['sa_loops_t'] - 1), 6)
+        g.pfdata['stage'] = 'Simulated Annealing ' +str(pf_sa.count) + ' Loop ' + str(tn + 1) + '  Temp: ' + str(pf_sa.t) + ' Pvar: ' + str(pv)
         rss_start_loop = rss_best
       for n in range(pf.fit['sa_loops_i']):
         loop = True
         while(loop):
-          p_new = numpy.copy(p)
-          p_new = p_new + f * step * (0.5 - numpy.random.rand(p_count))
-          pf_potential.update(p_new)
+          p_new = potential.random(p, pv, False)
           rss_new = pf.get_rss(False)
           if(rss_new is not None):
             loop = False
@@ -58,15 +62,19 @@ class pf_sa:
             if(rss_new < rss_best):
               p_best = numpy.copy(p_new)
               rss_best = rss_new
+              rss_plot.append([time.time()-t_start, rss_best])
       if(rss_best < rss_start_loop):
-        pf_potential.update(p_best)
-        rss_new = pf.get_rss(True)
+        potential.update(p_best)
+        pf.get_rss(True)
+      p = numpy.copy(p_best)  
+    rss_plot.append([time.time()-t_start, rss_best])
 
 
     pf.summary_line("SIMULATED ANNEALING " + str(pf_sa.count), t_start, time.time(), start_best_rss,  g.pfdata['rss']['best'])
     pf_save.top("SIMULATED_ANNEALING_" + str(pf_sa.count))
-
-
+    pf_save.rss_plot("SIMULATED_ANNEALING_" + str(pf_sa.count), rss_plot)
+    pf.save_rss_plot_data(t_start, "SIMULATED_ANNEALING_" + str(pf_sa.count), rss_plot)
+    
   
 
 

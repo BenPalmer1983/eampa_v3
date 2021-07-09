@@ -36,12 +36,10 @@ class setup_dirs:
     for sd in g.sub_dirs.keys():
       g.dirs[sd] = g.dirs['wd'] + '/' + g.sub_dirs[sd]
   
-    # MAKE DIRS
-    for d in g.dirs.keys():
-      std.make_dir(g.dirs[d])
-      main.log(str(d) + "   " + str(g.dirs[d]))
     
     
+    # For copies of all data to be stored in (potential etc)
+    std.make_dir(g.dirs['wd'] + '/data')
     
     
     

@@ -1,0 +1,6 @@
+#TYPE zbl
+#P 26.0 26.0
+#TITLE ZBL
+#X Distance/Angs
+#Y Energy/eV
+#PLOT zbl.eps

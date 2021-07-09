@@ -1,0 +1,9 @@
+SIMULATED ANNEALING 1           2.4202e+02    -->    2.4188e+02      9886.183        
+SIMULATED ANNEALING 2           2.4188e+02    -->    2.3612e+02      9864.079        
+GENETIC ALGORITHM 1             2.3612e+02    -->    1.9130e+02      7229.694        
+SIMULATED ANNEALING 3           1.9130e+02    -->    1.9045e+02      2494.555        
+SIMULATED ANNEALING 4           1.9045e+02    -->    1.8241e+02      2559.244        
+SIMULATED ANNEALING 5           1.8241e+02    -->    1.8105e+02      2747.724        
+SIMULATED ANNEALING 6           1.8105e+02    -->    1.8105e+02      2770.202        
+GENETIC ALGORITHM 2             1.8105e+02    -->    1.7922e+02      1193.561        
+SINGLE_PARAMETER_STEP 1         1.7922e+02    -->    1.6447e+02      4344.035        

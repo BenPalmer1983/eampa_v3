@@ -1,0 +1,52 @@
+
+# Run types:   plot, e, ef, efs, bp, es, rss, fit
+run type=e
+
+#
+wd option=1
+
+# Memory
+mem bp=2GB efs=2GB
+
+# Random settings
+random seed=100
+
+# Display
+display output=1
+
+# Input files/dirs
+potential dir="pot" index_file="fe.pot" embedding_range_factor=1.5
+configs dir="configs"
+bp dir='bp' bp_file='bp.dat' eos_size=6 eos_strain=0.1 ec_size=6 ec_strain=0.05
+
+# Rss weights
+# config * (e + f + s)   bp * (a0 + e0 + b0 + ec + g + e + v)
+# Weighting config = 0 and bp = 0 should turn off those calcs
+rss_weights config=0.0001 energy=20.0 force=1.0 stress=1.0 bp=100.0 a0=5.0 e0=25.0 b0=1.0 ec=1.0 g=1.00 e=1.00 v=1.00 negec=1000.0
+
+# Rss weights - max density, outside of accepted range
+rss_max_density min=0.1 max=100.0 scale_factor=10.0 scale_exponent=4.0 zero_density_factor=1.0e8
+
+
+# Fitting options
+fitting top_parameters=100 load_top_parameters=0 oversized_parameters=2.0,0.25,0.5,0.5,0.5
+fit1 type=random random_size=1000 oversized_parameters=True
+fit2 type=sa sa_temp_start=10.0 sa_temp_end=0.01 sa_loops_t=10 sa_loops_i=500 sa_step=0.1 sa_step_factor=0.25
+fit3 type=ga gens=7 pop_size=1000 fresh_size=250 no_clone_var=0.001 gen_variation_multiplier=0.2
+fit4 type=sa sa_temp_start=10.0 sa_temp_end=0.01 sa_loops_t=8 sa_loops_i=1000 sa_step=0.1 sa_step_factor=0.25 oversized_parameters=False
+
+#fit1 type=random random_size=1000 oversized_parameters=True
+#fit2 type=random random_size=1000 oversized_parameters=False
+#fit3 type=ga gens=10 pop_size=1000 fresh_size=250 no_clone_var=0.001 gen_variation_multiplier=0.2
+#fit4 type=sa sa_temp_start=10.0 sa_temp_end=0.01 sa_loops_t=15 sa_loops_i=2000 sa_step=0.1 sa_step_factor=0.25 oversized_parameters=True
+#fit5 type=ga gens=10 pop_size=1000 fresh_size=250 no_clone_var=0.001 gen_variation_multiplier=0.2
+#fit6 type=sa sa_temp_start=10.0 sa_temp_end=0.01 sa_loops_t=8 sa_loops_i=2000 sa_step=0.1 sa_step_factor=0.25 oversized_parameters=False
+#fit7 type=sa sa_temp_start=10.0 sa_temp_end=0.01 sa_loops_t=10 sa_loops_i=2000 sa_step=0.1 sa_step_factor=0.25 oversized_parameters=False
+
+
+
+# Fit Results
+fit_results results_dir=results
+
+# DFT
+dft Al=32,-1264.06398979,Ry,-3.36,eV Fe=16,-5268.188,Ry,-4.316,eV Pd=32,-16384.958,Ry,-3.91,eV

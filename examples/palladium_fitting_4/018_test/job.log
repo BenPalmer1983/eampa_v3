@@ -1,0 +1,161 @@
+#############################################################################
+5.863E-03 ###   Thu, 08 Jul 2021 22:21:00 +0000
+#############################################################################
+
+####TIME#############LOG#####################################################
+1.302E-02 ###   Script: /cloud/Code/python/eampa/eampa.py
+1.664E-02 ###   Loaded: input.in
+#############################################
+  Read Input
+  Time: 1.843E-02
+#############################################
+2.016E-02 ###   rss
+2.198E-02 ###   a0: 5.0
+2.199E-02 ###   b0: 1.0
+2.199E-02 ###   bp: 100.0
+2.199E-02 ###   config: 0.0001
+2.199E-02 ###   e: 1.0
+2.199E-02 ###   e0: 25.0
+2.199E-02 ###   ec: 1.0
+2.199E-02 ###   energy: 20.0
+2.199E-02 ###   force: 1.0
+2.200E-02 ###   g: 1.0
+2.200E-02 ###   negec: 1000.0
+2.200E-02 ###   stress: 1.0
+2.200E-02 ###   v: 1.0
+2.200E-02 ###   
+2.374E-02 ###   max: 100.0
+2.375E-02 ###   min: 0.1
+2.375E-02 ###   scale_exponent: 4.0
+2.375E-02 ###   scale_factor: 10.0
+2.375E-02 ###   zero_density_factor: 100000000.0
+2.375E-02 ###   
+2.563E-02 ###   pot_dir: None
+2.563E-02 ###   pot_name: None
+2.563E-02 ###   results_dir: results
+2.563E-02 ###   
+2.742E-02 ###   bp_file: bp.dat
+2.742E-02 ###   dir: bp
+2.743E-02 ###   ec_size: 11
+2.743E-02 ###   ec_strain: 0.05
+2.743E-02 ###   eos_size: 9
+2.743E-02 ###   eos_strain: 0.1
+2.743E-02 ###   
+2.914E-02 ###   
+3.097E-02 ###   1: {'label_id': 1, 'label_text': 'AL', 'atom_count': 32, 'relaxed_energy': -1264.06398979, 'relaxed_energy_unit': 'Ry', 'coh_energy': -3.36, 'coh_energy_unit': 'eV', 'calc_relaxed_dft_ev': -537.454181036, 'calc_coh_ev': -3.36, 'calc_apaev': 534.094181036}
+3.097E-02 ###   2: {'label_id': 2, 'label_text': 'FE', 'atom_count': 16, 'relaxed_energy': -5268.188, 'relaxed_energy_unit': 'Ry', 'coh_energy': -4.316, 'coh_energy_unit': 'eV', 'calc_relaxed_dft_ev': -4479.851795407, 'calc_coh_ev': -4.316, 'calc_apaev': 4475.5357954070005}
+3.097E-02 ###   3: {'label_id': 3, 'label_text': 'PD', 'atom_count': 32, 'relaxed_energy': -16384.958, 'relaxed_energy_unit': 'Ry', 'coh_energy': -3.91, 'coh_energy_unit': 'eV', 'calc_relaxed_dft_ev': -6966.549363269, 'calc_coh_ev': -3.91, 'calc_apaev': 6962.639363269001}
+3.097E-02 ###   
+#############################################
+  Setup Directories
+  Time: 3.278E-02
+#############################################
+3.449E-02 ###   WD: wd/wd
+#############################################
+  Memory
+  Time: 4.415E-02
+#############################################
+4.592E-02 ###   EFS 2000000000.0
+4.766E-02 ###   config size       255102
+5.086E-02 ###   ghost size        3061224
+5.347E-02 ###   nl size           25510204
+5.517E-02 ###   BP 2000000000.0
+5.688E-02 ###   config size       255102
+5.864E-02 ###   ghost size        3061224
+6.043E-02 ###   nl size           25510204
+#############################################
+  Potential Load
+  Time: 6.214E-02
+#############################################
+6.437E-02 ###   Potential file: pot/pd.pot
+6.609E-02 ###   Loading: pot/pd.pot
+5.555E-01 ###   std  configs/ec_7_002.out
+5.606E-01 ###   std  configs/ec_3_002.out
+5.656E-01 ###   std  configs/ec_3_005.out
+5.709E-01 ###   std  configs/ec_7_005.out
+5.763E-01 ###   std  configs/fcc_002.dat
+5.804E-01 ###   std  configs/ec_4_007.out
+5.855E-01 ###   std  configs/ec_8_007.out
+5.905E-01 ###   std  configs/eos_002.out
+5.958E-01 ###   std  configs/eos_005.out
+6.009E-01 ###   std  configs/ec_9_001.out
+6.060E-01 ###   std  configs/ec_1_006.out
+6.111E-01 ###   std  configs/ec_5_006.out
+6.163E-01 ###   std  configs/ec_5_001.out
+6.214E-01 ###   std  configs/ec_9_006.out
+6.267E-01 ###   std  configs/ec_1_001.out
+6.324E-01 ###   std  configs/ec_6_003.out
+6.379E-01 ###   std  configs/config_0004.out
+6.433E-01 ###   std  configs/ec_2_003.out
+6.485E-01 ###   std  configs/ec_2_004.out
+6.536E-01 ###   std  configs/ec_6_004.out
+6.588E-01 ###   std  configs/config_0003.out
+6.640E-01 ###   std  configs/ec_4_001.out
+6.693E-01 ###   std  configs/ec_8_006.out
+6.745E-01 ###   std  configs/ec_8_001.out
+6.797E-01 ###   std  configs/ec_4_006.out
+6.849E-01 ###   std  configs/ec_3_004.out
+6.902E-01 ###   std  configs/ec_7_004.out
+6.955E-01 ###   std  configs/ec_7_003.out
+7.007E-01 ###   std  configs/ec_3_003.out
+7.059E-01 ###   std  configs/ec_2_005.out
+7.112E-01 ###   std  configs/ec_6_005.out
+7.163E-01 ###   std  configs/config_0002.out
+7.214E-01 ###   std  configs/ec_6_002.out
+7.265E-01 ###   std  configs/config_0005.out
+7.316E-01 ###   std  configs/ec_2_002.out
+7.366E-01 ###   std  configs/ec_9_007.out
+7.416E-01 ###   std  configs/ec_1_007.out
+7.467E-01 ###   std  configs/ec_5_007.out
+7.520E-01 ###   std  configs/eos_004.out
+7.571E-01 ###   std  configs/eos_003.out
+7.623E-01 ###   std  configs/ec_6_001.out
+7.674E-01 ###   std  configs/config_0006.out
+7.725E-01 ###   std  configs/ec_2_001.out
+7.786E-01 ###   std  configs/ec_2_006.out
+7.839E-01 ###   std  configs/ec_6_006.out
+7.890E-01 ###   std  configs/config_0001.out
+7.941E-01 ###   std  configs/config_0008.out
+8.003E-01 ###   std  configs/ec_9_003.out
+8.057E-01 ###   std  configs/ec_1_004.out
+8.110E-01 ###   std  configs/ec_5_004.out
+8.164E-01 ###   std  configs/ec_5_003.out
+8.215E-01 ###   std  configs/ec_9_004.out
+8.267E-01 ###   std  configs/ec_1_003.out
+8.319E-01 ###   std  configs/eos_007.out
+8.374E-01 ###   std  configs/ec_8_002.out
+8.428E-01 ###   std  configs/ec_4_005.out
+8.482E-01 ###   std  configs/ec_4_002.out
+8.535E-01 ###   std  configs/ec_8_005.out
+8.587E-01 ###   std  configs/config_0010.out
+8.646E-01 ###   std  configs/ec_3_007.out
+8.700E-01 ###   std  configs/ec_7_007.out
+8.754E-01 ###   std  configs/eos_006.out
+8.808E-01 ###   std  configs/eos_001.out
+8.861E-01 ###   std  configs/ec_5_002.out
+8.913E-01 ###   std  configs/ec_9_005.out
+8.970E-01 ###   std  configs/ec_1_002.out
+9.023E-01 ###   std  configs/ec_9_002.out
+9.078E-01 ###   std  configs/ec_1_005.out
+9.130E-01 ###   std  configs/ec_5_005.out
+9.183E-01 ###   std  configs/config_0009.out
+9.237E-01 ###   std  configs/ec_2_007.out
+9.291E-01 ###   std  configs/ec_6_007.out
+9.344E-01 ###   std  configs/config_0007.out
+9.397E-01 ###   std  configs/ec_3_006.out
+9.454E-01 ###   std  configs/ec_7_006.out
+9.510E-01 ###   std  configs/ec_7_001.out
+9.565E-01 ###   std  configs/ec_3_001.out
+9.620E-01 ###   std  configs/fcc_001.dat
+####TIME#############LOG#####################################################
+9.685E-01 ###   std  configs/ec_4_003.out
+9.737E-01 ###   std  configs/ec_8_004.out
+9.798E-01 ###   std  configs/ec_8_003.out
+9.852E-01 ###   std  configs/ec_4_004.out
+2.706E+00 ###   BP Allocated Memory
+2.707E+00 ###   
+2.709E+00 ###   2GB
+2.709E+00 ###   
+2.710E+00 ###   255102 3061224 25510204
+2.710E+00 ###   
+1.076E+01 ###   Best rss: None (since last: 1)

@@ -1,0 +1,2 @@
+1. Fit spline to pair, embed and density sheng functions
+2. Hold embedding and 

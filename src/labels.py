@@ -17,7 +17,7 @@ class labels:
   @staticmethod
   def output(): 
     if(g.outputs):     
-      fh = open(g.dirs['output'] + '/' + 'labels.dat', 'w')   
+      fh = open(g.dirs['wd'] + '/data/' + 'labels.dat', 'w')   
       for k in g.labels.keys():
         fh.write(str(k) + '  ' + str(g.labels[k]) + '\n')
       fh.close()  

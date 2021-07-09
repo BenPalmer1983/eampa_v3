@@ -1,0 +1,6 @@
+#TYPE zero
+#P 0.0
+#TITLE Zero
+#X Distance/Angs
+#Y Energy/eV
+#PLOT zero.eps

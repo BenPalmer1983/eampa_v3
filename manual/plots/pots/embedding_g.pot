@@ -1,0 +1,7 @@
+#TYPE embedding_g
+#P -9.15 5.57
+#PF 0.01
+#TITLE Embedding g
+#X Density
+#Y Energy/eV
+#PLOT embedding_g.eps

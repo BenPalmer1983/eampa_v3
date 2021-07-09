@@ -1,0 +1,19 @@
+./ff.sh Pd_plot.den slater_4s pddens
+./ff.sh Pd_plot.den slater_4s pddens 100
+./ff.sh Pd_plot.embed embedding_g pdembe_embedding_g
+./ff.sh Pd_plot.pair cubic_spline_zbl pdpair_cubic_spline_zbl 30
+
+
+
+
+
+./ff.sh Al_plot.pair cubic_knot_spline_2 alpair 30
+./ff.sh Al_plot.den slater_4s aldens
+./ff.sh Al_plot.embed embedding_g alembe
+
+
+./ff.sh Al_plot.pair cubic_knot_spline_2 alpair2 30
+./ff.sh Al_plot.pair cubic_spline_zbl_2 alpair3 30
+
+
+

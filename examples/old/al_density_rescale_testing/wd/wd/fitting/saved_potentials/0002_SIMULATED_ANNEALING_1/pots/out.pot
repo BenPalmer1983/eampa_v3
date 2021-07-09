@@ -1,0 +1,80 @@
+POTNAME 
+
+
+! PAIR  AL1  AL1
+START
+F_ON true
+F_TYPE PAIR
+FILE al_pair.pot
+LABEL AL1  AL1
+F_GROUP 0
+R_CUT 6.5
+END
+
+
+! PAIR  AL2  AL2
+START
+F_ON true
+F_TYPE PAIR
+FILE al_pair.pot
+LABEL AL2  AL2
+F_GROUP 0
+R_CUT 6.5
+END
+
+
+! PAIR  AL1  AL2
+START
+F_ON true
+F_TYPE PAIR
+FILE al_pair.pot
+LABEL AL1  AL2
+F_GROUP 0
+R_CUT 6.5
+END
+
+
+! DENS  AL1  
+START
+F_ON true
+F_TYPE DENS
+FILE al_dens.pot
+LABEL AL1  
+F_GROUP 1
+R_CUT 6.5
+END
+
+
+! DENS  AL2  
+START
+F_ON true
+F_TYPE DENS
+FILE al_dens.pot
+LABEL AL2  
+F_GROUP 2
+R_CUT 6.5
+END
+
+
+! EMBE  AL1  
+START
+F_ON true
+F_TYPE EMBE
+FILE al_embe.pot
+LABEL AL1  
+F_GROUP 1
+R_CUT 6.5
+END
+
+
+! EMBE  AL2  
+START
+F_ON true
+F_TYPE EMBE
+FILE al_embe.pot
+LABEL AL2  
+F_GROUP 2
+R_CUT 6.5
+END
+
+

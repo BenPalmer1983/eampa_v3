@@ -1,0 +1,3 @@
+./knot_fit.sh Al_plot.den al_den 20
+./knot_fit.sh Al_plot.embed al_embed 20
+./knot_fit.sh Al_plot.pair al_pair 20

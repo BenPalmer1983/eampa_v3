@@ -1,0 +1,4 @@
+#TYPE embedding_f
+#P -4.28926346386 0.436912176109 
+#PF 0.0 
+#VR None

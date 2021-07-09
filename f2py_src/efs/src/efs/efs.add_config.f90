@@ -15,10 +15,7 @@ INTEGER(kind=StandardInteger) :: s_on
 INTEGER(kind=StandardInteger) :: ccz
 INTEGER(kind=StandardInteger) :: ka, kb, kc, kd
 REAL(kind=DoubleReal) :: to_cart(1:3, 1:3)
-
 INTEGER(KIND=StandardInteger) :: cn, an, cx, cy, cz, n, m, i
-
-
 REAL(kind=DoubleReal) :: shift(1:3)
 REAL(kind=DoubleReal) :: coords_crystal(1:3)
 REAL(kind=DoubleReal) :: coords_cartesian(1:3)
@@ -30,6 +27,7 @@ REAL(kind=DoubleReal) :: rd(1:3)
 REAL(kind=DoubleReal) :: r(1:3) 
 REAL(kind=DoubleReal) :: vol_cell(1:3,1:3)
 !###########################################################
+
 
 cc = cc + 1
 ccz = cc - 1
@@ -96,33 +94,26 @@ IF(SIZE(labels_in,1) .EQ. SIZE(coords_in,1))THEN
 
   DO cx = -1, 1
     DO cy = -1 ,1
-      DO cz = -1, 1
-        IF(cx .EQ. 0 .AND. cy .EQ. 0 .AND. cz .EQ. 0) THEN
-          DO n = ka, kb
-            ghostids(an) = ids(n)
-            ghostlabels(an) = labels(n)
-            ghostcoords(an, 1:3) = coords(n, 4:6)
-            ghosthalo(an) = .FALSE. 
-            an = an + 1
-          END DO
-        ELSE     
-          ! Shift
-          shift(1) = 1.0D0 * cx
-          shift(2) = 1.0D0 * cy
-          shift(3) = 1.0D0 * cz
+      DO cz = -1, 1    
+        ! Shift
+        shift(1) = 1.0D0 * cx
+        shift(2) = 1.0D0 * cy
+        shift(3) = 1.0D0 * cz
         
-          DO n = ka, kb 
-            ct(1:3) = matmul(alat(cc) * uv(3 * ccz + 1: 3 * ccz + 3, 1:3), coords(n, 1:3) + shift(1:3))
-            rd(1:3) = abs(ct(1:3) - c(1:3))          
-            IF(rd(1) .LE. td(1) .AND. rd(2) .LE. td(2) .AND. rd(3) .LE. td(3))THEN
-              ghostids(an) = ids(n)
-              ghostlabels(an) = labels(n)
-              ghostcoords(an, 1:3) = ct(1:3)
-              ghosthalo(an) = .TRUE.  
-              an = an + 1
-            END IF
-          END DO 
-        END IF   
+        DO n = ka, kb 
+
+          IF(cx .EQ. 0 .AND. cy .EQ. 0 .AND. cz .EQ. 0) THEN
+            ghosthalo(an) = .FALSE. 
+          ELSE 
+            ghosthalo(an) = .TRUE.  
+          END IF 
+
+          ghostids(an) = ids(n)
+          ghostlabels(an) = labels(n)
+          ghostcoords(an, 1:3) = alat(cc) * matmul( uv(3 * ccz + 1: 3 * ccz + 3, 1:3), coords(n, 1:3) + shift(1:3))
+          an = an + 1
+            
+        END DO         
       END DO
     END DO
   END DO

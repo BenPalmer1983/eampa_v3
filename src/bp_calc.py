@@ -33,48 +33,19 @@ class bp_calc:
     
     # Setup BP
     bp_calc.init()
-    
-    # Load potentials    
-    potential.bp_add_potentials()
-    
-    # Add required BP structures (add, make ghost configs, make NLs)
+    potential.load_to_bp()
     b_props.bp_add()
-        
-    # Calculate energies of configurations for all structures
     bp.energy() 
-   
-    #print(bp.cc)
-    #print(bp.calc_count)
-    #print(bp.cc_log[0,1)
-
-
-        
-    # Calculate BP
-    bp.calculate_bp()   
-    
-    #print(bp.rss)
-    
-    
-    # Output to Terminal
+    bp.calculate_bp()  
     b_props.bp_output_terminal()
-    
-    # Output to File
-    #b_props.bp_output()
-
-
     b_props.bp_eos_plot(g.dirs['wd'] + '/bp')
-    
-    
-    # Plots
-    #b_props.bp_eos_plot()
-    #potential.plot_fortran_potentials()
-    #potential.plot_python_potentials()
-    
     
     
 
   def output_dir():
     std.make_dir(g.dirs['wd'] + '/bp')
+
+
     
   def init():
     # Log
@@ -177,9 +148,19 @@ class bp_calc:
       bp_id = 0
       while(bp.bp_keys_i[bp_id,0] > -1):   
         g.bp_known['input'][bp_id] = g.bp_ids[bp_id+1]
-        g.bp_known['bp_calculations'][bp_id] = {'a0': None, 'e0': None, 'b0': None, 'ec': None, 'g': None, 'e': None, 'v': None,'b0_gpa': None,'ec_gpa': None,}
+        g.bp_known['bp_calculations'][bp_id] = {'a0': None, 'e0': None, 'b0': None, 
+                                                'ec': None, 'g': None, 'e': None, 'v': None, 
+                                                'b0_gpa': None,'ec_gpa': None,
+                                                'compliance': None, 'compliance_gpa': None,
+                                                'e_vec': None, 'g_vec': None, 'v_vec': None,
+                                                'GR': None, 'GV': None, 'G': None,
+                                                'BR': None, 'BV': None, 'B': None,
+                                                'vl': None, 'vt': None, 'vm': None,
+                                                'E': None, 'v': None, 
+                                                'debye': None, 'melting_point': None,
+                                               }
         
-        
+        ec_set = False
         if(bp.known_set[bp_id, 0] == 1):
           g.bp_known['bp_calculations'][bp_id]['a0'] = float(bp.known_alat[bp_id])
         if(bp.known_set[bp_id, 1] == 1):
@@ -188,6 +169,7 @@ class bp_calc:
           g.bp_known['bp_calculations'][bp_id]['b0'] = float(bp.known_b0[bp_id])
           g.bp_known['bp_calculations'][bp_id]['b0_gpa'] = 160.230732254 * float(bp.known_b0[bp_id])
         if(bp.known_set[bp_id, 3] == 1):
+          ec_set = True
           g.bp_known['bp_calculations'][bp_id]['ec'] = numpy.zeros((6,6,),)
           g.bp_known['bp_calculations'][bp_id]['ec_gpa'] = numpy.zeros((6,6,),)
           for i in range(6):
@@ -200,6 +182,17 @@ class bp_calc:
           g.bp_known['bp_calculations'][bp_id]['e'] = float(bp.known_e[bp_id])
         if(bp.known_set[bp_id, 6] == 1):
           g.bp_known['bp_calculations'][bp_id]['v'] = float(bp.known_v[bp_id])
+
+        # Calculated from ec
+        if(ec_set):
+          g.bp_known['bp_calculations'][bp_id]['compliance'] = numpy.linalg.inv(g.bp_known['bp_calculations'][bp_id]['ec'])
+          g.bp_known['bp_calculations'][bp_id]['compliance_gpa'] = numpy.linalg.inv(g.bp_known['bp_calculations'][bp_id]['ec_gpa'])
+
+
+
+          cavg = (g.bp_known['bp_calculations'][bp_id]['ec'][0,0] + g.bp_known['bp_calculations'][bp_id]['ec'][1,1] + g.bp_known['bp_calculations'][bp_id]['ec'][2,2]) / 3
+          g.bp_known['bp_calculations'][bp_id]['melting_point'] = 598 + 6.66 * cavg - 0.003 * cavg**2 
+  
         bp_id = bp_id + 1  
     except:
       g.bp_known['ok'] = False
@@ -257,8 +250,5 @@ class bp_calc:
 
     for i in range(bp.residuals_n):
       g.rss['residual'].append(f * float(bp.residuals[i]))
-      
-      
-      
       
 

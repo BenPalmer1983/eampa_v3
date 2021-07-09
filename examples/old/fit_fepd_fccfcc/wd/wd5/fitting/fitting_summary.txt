@@ -1,0 +1,4 @@
+RANDOM SEARCH 1                 2.2040e+04    -->    2.2040e+04      1164.593        
+RANDOM SEARCH 2                 2.2040e+04    -->    2.2040e+04      1160.199        
+SIMULATED ANNEALING 1           2.2040e+04    -->    1.9284e+04      1184.337        
+GENETIC ALGORITHM 1             1.9284e+04    -->    2.1650e+03      9529.808        

@@ -1,0 +1,6 @@
+#TYPE embedding_b
+#P 0.1
+#TITLE Embedding B - Mendelev
+#X Density
+#Y Energy/eV
+#PLOT embedding_b.eps
