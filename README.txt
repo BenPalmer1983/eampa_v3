@@ -38,6 +38,14 @@ Calculates some other properties:
 · young's modulus
 · estimated melting temperature
 
+Can be used to fit potentials to data:
+· random only fitting
+· simulated annealing
+· genetic algorithm
+· bin hopping (scipy)
+· nelder-mead (scipy)
+· conjugate-gradient (scipy)
+· bfgs (scipy)
 
 
 What configuration files can be used?
